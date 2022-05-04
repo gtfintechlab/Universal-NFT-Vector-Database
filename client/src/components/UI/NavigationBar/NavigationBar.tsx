@@ -1,19 +1,34 @@
 import React from "react";
-import { Stack, HStack, VStack } from '@chakra-ui/react'
+import { Stack, HStack, VStack, Box } from '@chakra-ui/react'
 import { Button } from '@chakra-ui/react'
 
 function NavigationBar (){
     return(
-        <VStack>
-            <Button colorScheme='blue' variant='outline'>
+        <VStack spacing='20px'>
+            <Box boxShadow='2xl'
+                width='80%'
+                rounded='lg'>
+            <Button width="100%" color="white" colorScheme="twitter">
                 Search
             </Button> 
-            <Button colorScheme='blue' variant='outline'>
+            </Box>
+
+            <Box boxShadow='xl'
+                width='80%'
+                rounded='lg'>
+            <Button width="100%" color="white" colorScheme="twitter">
                 Add NFTs
-            </Button>        
-            <Button colorScheme='blue' variant='outline'>
+            </Button> 
+            </Box>
+
+            <Box boxShadow='xl'
+                width='80%'
+                rounded='lg'>
+            <Button width="100%" color="white" colorScheme="twitter">
                 Dashboard
-            </Button>               
+            </Button> 
+            </Box>
+               
         </VStack>
     );
 }

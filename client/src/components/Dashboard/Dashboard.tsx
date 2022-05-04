@@ -1,7 +1,7 @@
-import { Stack, HStack, VStack } from '@chakra-ui/react'
+import { Stack, HStack, VStack, Grid, GridItem } from '@chakra-ui/react'
 import React, { useEffect } from "react";
 import { Contract, NFT } from '../../utils/Types';
-import { getContractsInQueue, getNFTsInQueue } from '../../actions/firebase';
+import { getContractsInQueue, getNFTsInQueue } from '../../actions/Firebase';
 import NavigationBar from '../UI/NavigationBar/NavigationBar';
 
 function Dashboard(){
@@ -21,8 +21,18 @@ function Dashboard(){
     })
 
     return (
-            <NavigationBar/>   
-    )
+        <Grid   
+        h='200px'
+        templateRows='repeat(10, 1fr)'
+        templateColumns='repeat(5, 1fr)'
+        gap={4}>
+            <GridItem rowSpan={2}  colSpan={1} rowStart={4}>
+                <NavigationBar></NavigationBar>
+
+            </GridItem>
+
+        </Grid>
+        )
 }
 
 export default Dashboard;
