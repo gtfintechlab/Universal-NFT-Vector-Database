@@ -15,8 +15,7 @@ def initializeMilvus(collection_name="ethereum_erc721"):
     if not utility.has_collection(collection_name):
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
-            FieldSchema(name="nft", dtype=DataType.FLOAT_VECTOR, dim=2048),
-            FieldSchema(name="nftId", dtype=DataType.INT64),
+            FieldSchema(name="nft", dtype=DataType.FLOAT_VECTOR, dim=256),
         ]
 
         schema = CollectionSchema(fields)
@@ -27,10 +26,9 @@ def initializeMilvus(collection_name="ethereum_erc721"):
 
 def insertDataMilvus(nftVector, nftId, collection_name="ethereum_erc721", vectorId=0):
     decimalId = int(nftId, 16)
+    print(nftVector)
     inputVector = [
-        [vectorId],
-        nftVector,
-        [decimalId]
+        [nftVector],
     ]
     collection = Collection(collection_name)
     collection.load()
@@ -49,14 +47,17 @@ def searchDataMilvus(inputVector, collection_name="ethereum_erc721", field_name=
         "params": {"nprobe": 10},
     }
 
-    result = collection.search(inputVector, field_name, search_params, limit=amount, output_fields=["nftId"])
+    result = collection.search(inputVector, field_name, search_params, limit=amount)
 
     collection.release()
 
     return result
 
 if __name__ == '__main__':
-    # initializeMilvus()
+    initializeMilvus()
     image = getImageFromURL("https://ipfs.io/ipfs/QmVdxTPraJKZskdfFk1kwCWXo6JUwhLRY95M7b1ZUDWxB6")
     imgVector = convertToVector(image['image'])
-    # insertDataMilvus(imgVector['vector'], "0x0080313cfc8a816348092290f2ce8d348c265d5a9dd9878ee019232245422fc9")
+    # insertDataMilvus(nftVector=imgVector['rawVector'], nftId="0x0080313cfc8a816348092290f2ce8d348c265d5a9dd9878ee019232245422fc9")
+    vec = [imgVector['rawVector']]
+    result = searchDataMilvus(inputVector=vec)
+    print(result)
