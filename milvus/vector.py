@@ -25,6 +25,10 @@ def getImageFromURL(imageURL):
         return {"success": False, "image": None}
 
 if __name__ == '__main__':
-    image = getImageFromURL("https://ipfs.io/ipfs/QmVdxTPraJKZskdfFk1kwCWXo6JUwhLRY95M7b1ZUDWxB6")
-    vector = convertToVector(image['image'])
-    print(vector)
+    # image = getImageFromURL("https://ipfs.io/ipfs/QmVdxTPraJKZskdfFk1kwCWXo6JUwhLRY95M7b1ZUDWxB6")
+    # vector = convertToVector(image['image'])
+    image_og = Image.open("images/gt-original.png")
+    image_altered = Image.open("images/gt-altered.png")
+    vectorOne = convertToVector(image_og['image'])
+    vectorTwo = convertToVector(image_altered['image'])
+    

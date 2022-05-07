@@ -24,8 +24,8 @@ def initializeMilvus(collection_name="ethereum_erc721"):
 
     return Collection(collection_name)      
 
-def insertDataMilvus(nftVector, nftId, collection_name="ethereum_erc721", vectorId=0):
-    decimalId = int(nftId, 16)
+def insertDataMilvus(nftVector, nftId="", collection_name="ethereum_erc721", vectorId=0):
+    # decimalId = int(nftId, 16)
     print(nftVector)
     inputVector = [
         [nftVector],
@@ -55,9 +55,15 @@ def searchDataMilvus(inputVector, collection_name="ethereum_erc721", field_name=
 
 if __name__ == '__main__':
     initializeMilvus()
-    image = getImageFromURL("https://ipfs.io/ipfs/QmVdxTPraJKZskdfFk1kwCWXo6JUwhLRY95M7b1ZUDWxB6")
-    imgVector = convertToVector(image['image'])
-    # insertDataMilvus(nftVector=imgVector['rawVector'], nftId="0x0080313cfc8a816348092290f2ce8d348c265d5a9dd9878ee019232245422fc9")
-    vec = [imgVector['rawVector']]
-    result = searchDataMilvus(inputVector=vec)
-    print(result)
+    image_og = Image.open("images/gt-original.png")
+    image_altered = Image.open("images/gt-altered.png")
+    vectorOne = convertToVector(image_og)
+    vectorTwo = convertToVector(image_altered)
+
+    vec = vectorOne['rawVector']
+    vec2 = vectorTwo['rawVector']
+    insertDataMilvus(nftVector=vec)
+    insertDataMilvus(nftVector=vec2)
+
+    result = searchDataMilvus(inputVector=[vec])
+    print("\n",result)
