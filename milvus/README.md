@@ -13,11 +13,11 @@ pip3 install -r requirements.txt
 ## Start Milvus
 
 ```
-sudo ./start_milvus.sh "start"
+sudo ./milvus.sh "start"
 ```
 
 ## End Milvus
 
 ```
-sudo ./start_milvus.sh "end"
+sudo ./milvus.sh "end"
 ```

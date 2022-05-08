@@ -15,7 +15,13 @@ interface NFT{
     tokenId: number,
     owner: string, 
     tokenURI: string,
-    queueImport: Date               //  time at which nft was added into queue
+}
+
+interface TaskQueueItem{
+    id: string,
+    type: string,
+    import: Date,
+    data: Object
 }
 
 export type {Contract, NFT};
