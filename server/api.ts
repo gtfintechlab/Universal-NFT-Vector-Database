@@ -2,6 +2,7 @@ import express from 'express';
 import { getFirestore } from 'firebase-admin/firestore';
 import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
+import { TaskQueueItem } from './Types';
 
 
 const api = express();
