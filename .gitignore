@@ -238,3 +238,4 @@ dmypy.json
 .pyre/
 
 volumes/
+firebase_credentials.json
