@@ -12,7 +12,8 @@ interface NFT{
     contractAddress: string,
     mintTime: Date,
     tokenId: number,
-    owner: string, 
+    owner: string,
+    media: string, 
     tokenURI: string,
 }
 
