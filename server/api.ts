@@ -2,7 +2,7 @@ import express from 'express';
 import { getFirestore } from 'firebase-admin/firestore';
 import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
-import { TaskQueueItem } from './Types';
+import { TaskQueueItem, TaskQueueType } from './Types';
 
 const api = express();
 
@@ -41,8 +41,8 @@ api.get("/api/analytics/get" , async (req, res) => {
 
 api.get("/api/taskQueue/get", async (req, res) => {
     try{
-        const taskQueueNfts = await database.collection("task_queue").where("type", "==", "NFT").get();
-        const taskQueueContracts = await database.collection("task_queue").where("type", "==", "contract").get();
+        const taskQueueNfts = await database.collection("task_queue").where("type", "==", TaskQueueType.ITEM_NFT).get();
+        const taskQueueContracts = await database.collection("task_queue").where("type", "==", TaskQueueType.ITEM_CONTRACT).get();
         
         const nfts: TaskQueueItem[] = [];
         const contracts: TaskQueueItem[] = [];

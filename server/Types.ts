@@ -18,9 +18,14 @@ interface NFT{
 
 interface TaskQueueItem{
     id: string,
-    type: string,
+    type: TaskQueueType,
     import: Date,
     data: Object
+}
+
+export enum TaskQueueType{
+    ITEM_CONTRACT = "contract",
+    ITEM_NFT = "NFT"
 }
 
 export type {Contract, NFT, TaskQueueItem};
