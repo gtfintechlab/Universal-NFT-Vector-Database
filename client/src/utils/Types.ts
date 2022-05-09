@@ -4,7 +4,6 @@ interface Contract{
     id: string,                     // id and address are the same
     address: string,
     name: string,
-    queueImport: Date               // time at which contract was added into queue
 }
 
 interface NFT{
