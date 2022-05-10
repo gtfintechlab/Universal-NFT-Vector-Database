@@ -24,11 +24,10 @@ function Dashboard(){
         <Grid   
         h='200px'
         templateRows='repeat(10, 1fr)'
-        templateColumns='repeat(5, 1fr)'
+        templateColumns='repeat(15, 1fr)'
         gap={4}>
-            <GridItem rowSpan={2}  colSpan={1} rowStart={4}>
+            <GridItem colStart={[1, 1, 1, 1]} colSpan={[15, 15, 1, 1]} rowStart={[3, 3, 0, 0]} rowSpan={[2,2,4,4]} ml={[0,0,0,0]}>
                 <NavigationBar></NavigationBar>
-
             </GridItem>
 
         </Grid>
