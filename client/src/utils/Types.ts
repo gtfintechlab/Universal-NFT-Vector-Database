@@ -1,5 +1,3 @@
-
-
 interface Contract{
     id: string,                     // id and address are the same
     address: string,
@@ -24,4 +22,12 @@ interface TaskQueueItem{
     data: Object
 }
 
-export type {Contract, NFT};
+interface Analytics{
+    totalContracts: number,
+    totalERC1155: number,
+    totalERC721: number,
+    totalEthereumNFTs: number,
+    totalNFTs: number
+}
+
+export type {Contract, NFT, Analytics};
