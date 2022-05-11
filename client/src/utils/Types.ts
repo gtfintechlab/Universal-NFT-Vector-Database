@@ -1,5 +1,3 @@
-
-
 interface Contract{
     id: string,                     // id and address are the same
     address: string,
@@ -12,15 +10,34 @@ interface NFT{
     contractAddress: string,
     mintTime: Date,
     tokenId: number,
-    owner: string, 
+    owner: string,
+    media: string, 
     tokenURI: string,
 }
 
 interface TaskQueueItem{
     id: string,
-    type: string,
+    type: TaskQueueType,
     import: Date,
-    data: Object
+    data: NFT | Contract
 }
 
-export type {Contract, NFT};
+interface AnalyticsProps{
+    totalContracts: number,
+    totalERC1155: number,
+    totalERC721: number,
+    totalEthereumNFTs: number,
+    totalNFTs: number
+}
+
+interface TaskQueueProps{
+    tableName: string,
+    data: TaskQueueItem[]
+}
+
+export enum TaskQueueType{
+    ITEM_CONTRACT = "contract",
+    ITEM_NFT = "NFT"
+}
+
+export type {Contract, NFT, AnalyticsProps,TaskQueueItem, TaskQueueProps};
