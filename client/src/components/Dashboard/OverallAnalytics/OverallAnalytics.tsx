@@ -1,8 +1,7 @@
-import React from "react";
-import { Stack, HStack, VStack, Box, Text} from '@chakra-ui/react'
-import { Analytics } from "../../../utils/Types";
+import { Stack, VStack, Box, Text} from '@chakra-ui/react'
+import { AnalyticsProps } from "../../../utils/Types";
 
-function OverallAnalytics (props: Analytics){
+function OverallAnalytics (props: AnalyticsProps){
     return (
         <Box w='100%' border="0px" borderColor="red" display="flex" justifyContent={['center', 'center', 'start', 'start']}>
             <Stack direction={['column', 'row']} display="flex">

@@ -1,11 +1,9 @@
-import React from "react";
-import { Stack, HStack, VStack, Box } from '@chakra-ui/react'
-import { Button } from '@chakra-ui/react'
+import { Stack, Box } from '@chakra-ui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 function NavigationBar (){
     return(
-        <Box w={["100vw", "100vw", "80px", "80px"]} h={["100%", "100%", "100vh", "100vh"]} boxShadow='xl' bg="white">
+        <Box w={["100vw", "100vw", "80px", "80px"]} h={["100%", "100%", "150vh", "150vh"]} boxShadow='xl' bg="white" id="scroll">
             <Stack direction={['row', 'row', 'column', 'column']} spacing={["0px", "0px", "60px","60px"]}>
                 <Box></Box>
                 <Box></Box>

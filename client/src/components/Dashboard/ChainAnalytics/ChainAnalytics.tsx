@@ -1,10 +1,9 @@
-import React from "react";
-import { Stack, HStack, VStack, Box, Text} from '@chakra-ui/react'
-import { Analytics } from "../../../utils/Types";
+import { Stack, VStack, Box, Text} from '@chakra-ui/react'
+import { AnalyticsProps } from "../../../utils/Types";
 
-function ChainAnalytics (props: Analytics){
+function ChainAnalytics (props: AnalyticsProps){
     return (
-        <Box w='100%' display="flex" justifyContent={['center', 'center', 'start', 'start']} >
+        <Box w='100%' display="flex" justifyContent={['center', 'center', 'start', 'start']}>
             <Stack direction={['column', 'row']} display="flex">
                 <VStack display='flex'>
                     <Text fontSize='4xl' fontWeight="bold" display="flex" w='100%'>Chain Analytics</Text>
