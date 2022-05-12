@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import { getFirestore } from 'firebase-admin/firestore';
 import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
-import { TaskQueueItem, TaskQueueType, NFT, BlockchainType, NFTType} from './Types';
+import { TaskQueueItem, TaskQueueType, NFT, Contract, BlockchainType, NFTType} from './Types';
 
 const api = express();
 
@@ -24,7 +24,7 @@ function checkField(str: string): boolean {
     return true
 }
 
-function isValid(nft: NFT): boolean{
+function isValidNFT(nft: NFT): boolean{
     if (
         checkField(nft.id) &&
         checkField(nft.contractAddress) &&
@@ -34,6 +34,17 @@ function isValid(nft: NFT): boolean{
         (Object.values(NFTType).includes(nft.type)) &&
         (Object.values(BlockchainType).includes(nft.chain))
     ){
+        return true
+    }
+    return false
+}
+
+function isValidContract(contract: Contract): boolean{
+    if(
+        checkField(contract.id) &&
+        checkField(contract.address) &&
+        checkField(contract.name)
+    ) {
         return true
     }
     return false
@@ -110,7 +121,7 @@ api.listen(APP_PORT, () => {
 api.post("/api/nfts/addAll", async (req, res) => {
     try {
         const nft: NFT = req.body;
-        const valid = isValid(nft);
+        const valid = isValidNFT(nft);
 
         if (!valid) {
             throw new Error("Invalid NFT Data")
@@ -136,11 +147,31 @@ api.post("/api/nfts/addAll", async (req, res) => {
 
 });
 
-api.post("/api/contracts/addAll", (req, res) => {
+api.post("/api/contracts/addAll", async (req, res) => {
     try {
+        const contract: Contract = req.body;
+        const valid = isValidContract(contract);
 
-    } catch {
-        
+        if (!valid) {
+            throw new Error("Invalid Contract Data")
+        }
+
+        await database.collection("all_contracts").doc(contract.id).set(contract);
+
+        res.status(200).json({
+            "success": true,
+            "data": contract
+        })
+    } catch (error) {
+        let message
+
+        if (error instanceof Error) message = error.message
+        else message = String(error)
+
+        res.status(400).json({
+            "success": false,
+            "error": message
+        })
     }
 });
 
