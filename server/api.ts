@@ -2,7 +2,7 @@ import express from 'express';
 import { getFirestore } from 'firebase-admin/firestore';
 import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
-import { TaskQueueItem, TaskQueueType } from './Types';
+import { TaskQueueItem, TaskQueueType, NFT } from './Types';
 
 const api = express();
 
@@ -77,3 +77,18 @@ api.get("/", (req, res) => {
 api.listen(APP_PORT, () => {
     console.log(`api listening at http://localhost:${APP_PORT}`);
 });
+
+
+
+api.post("/api/nfts/addAll", (req, res) => {
+    res.status(200).json({
+        "Hello": "World"
+    });
+});
+
+api.post("/api/contracts/addAll", (req, res) => {
+    res.status(200).json({
+        "Hello": "World"
+    });
+});
+
