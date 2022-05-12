@@ -19,6 +19,7 @@ interface TaskQueueItem{
     id: string,
     type: TaskQueueType,
     import: Date,
+    status: TaskQueueStatus,
     data: NFT | Contract
 }
 
@@ -39,5 +40,11 @@ export enum TaskQueueType{
     ITEM_CONTRACT = "contract",
     ITEM_NFT = "NFT"
 }
+
+export enum TaskQueueStatus{
+    IN_PROGRESS = "in progress",
+    SUCCESS = "success",
+    FAILURE = "failure"
+};
 
 export type {Contract, NFT, AnalyticsProps,TaskQueueItem, TaskQueueProps};

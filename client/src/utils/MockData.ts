@@ -1,4 +1,4 @@
-import { Contract, NFT, TaskQueueItem, TaskQueueType } from "./Types";
+import { Contract, NFT, TaskQueueItem, TaskQueueStatus, TaskQueueType } from "./Types";
 
 const mockContract: Contract = {
         id: "2e6e7919-d905-4c78-8fca-d13bb9de28be",
@@ -10,6 +10,7 @@ const mockTaskQueueItem: TaskQueueItem = {
             id: "2e6e7919-d905-4c78-8fca-d13bb9de28be",
             type: TaskQueueType.ITEM_CONTRACT,
             import: new Date(),
+            status: TaskQueueStatus.IN_PROGRESS,
             data: mockContract
         } as TaskQueueItem;
 
