@@ -1,16 +1,42 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import { getFirestore } from 'firebase-admin/firestore';
 import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
-import { TaskQueueItem, TaskQueueType, NFT } from './Types';
+import { TaskQueueItem, TaskQueueType, NFT} from './Types';
+import { BlockchainType } from './Types';
 
 const api = express();
+
+// Middleware for Express 
+api.use(bodyParser.urlencoded({ extended: false }));
+api.use(bodyParser.json());
 
 const serviceAccount = require(cwd() + '/firebase_credentials.json');
 initializeApp({
   credential: cert(serviceAccount),
 });
 const database = getFirestore();
+
+function checkField(str: string): boolean {
+    if (str == null || str.length == 0){
+        return false
+    }
+    return true
+}
+
+function isValid(nft: NFT): boolean{
+    if (
+        checkField(nft.id) && 
+        checkField(nft.contractAddress) &&
+        !isNaN(nft.tokenId) &&
+        checkField(nft.media) &&
+        checkField(nft.tokenURI)
+        ){
+        return true
+    }
+    return false
+}
 
 
 const APP_PORT = 3000;
@@ -80,15 +106,62 @@ api.listen(APP_PORT, () => {
 
 
 
-api.post("/api/nfts/addAll", (req, res) => {
-    res.status(200).json({
-        "Hello": "World"
-    });
+api.post("/api/nfts/addAll", async (req, res) => {
+    // try {
+    //     const nftCollection = database.collection("all_nfts");
+    //     res.status(200).json({
+    //         "success": true,
+    //         "data": null
+    //     })
+
+    // } catch {
+    //     res.status(400).json({
+    //         "success": false,
+    //         "error": ""
+    //     })
+    // }
+
+    // const nft = {
+    //     id: "ID",                    
+    //     transactionId: "tID",
+    //     contractAddress: "0xFCf455b6a9cBEE05c9393aecb190301EF8CC47f8",
+    //     mintTime: null,
+    //     tokenId: 1,
+    //     owner: "Owner",
+    //     media: "Media", 
+    //     tokenURI: "TokenURI"
+    // }
+
+    //    "contractAddress": "0xFCf455b6a9cBEE05c9393aecb190301EF8CC47f8",
+
+    try {
+        const nft: NFT = req.body;
+        const valid = isValid(nft);
+
+        if (!valid) {
+            throw new Error("Error!!!!")
+        }
+
+        await database.collection("all_nfts").doc(nft.id).set(nft);
+
+        res.status(200).json({
+            "success": true,
+            "data": nft
+        })
+    } catch {
+        res.status(400).json({
+            "success": false,
+            "error": ""
+        })
+    }
+
 });
 
 api.post("/api/contracts/addAll", (req, res) => {
-    res.status(200).json({
-        "Hello": "World"
-    });
+    try {
+
+    } catch {
+        
+    }
 });
 
