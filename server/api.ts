@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import { getFirestore } from 'firebase-admin/firestore';
 import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
-import { TaskQueueItem, TaskQueueType, NFT, BlockchainType} from './Types';
+import { TaskQueueItem, TaskQueueType, NFT, BlockchainType, NFTType} from './Types';
 
 const api = express();
 
@@ -26,12 +26,14 @@ function checkField(str: string): boolean {
 
 function isValid(nft: NFT): boolean{
     if (
-        checkField(nft.id) && 
+        checkField(nft.id) &&
         checkField(nft.contractAddress) &&
         !isNaN(nft.tokenId) &&
         checkField(nft.media) &&
-        checkField(nft.tokenURI)
-        ){
+        checkField(nft.tokenURI) &&
+        (Object.values(NFTType).includes(nft.type)) &&
+        (Object.values(BlockchainType).includes(nft.chain))
+    ){
         return true
     }
     return false
@@ -106,39 +108,12 @@ api.listen(APP_PORT, () => {
 
 
 api.post("/api/nfts/addAll", async (req, res) => {
-    // try {
-    //     const nftCollection = database.collection("all_nfts");
-    //     res.status(200).json({
-    //         "success": true,
-    //         "data": null
-    //     })
-
-    // } catch {
-    //     res.status(400).json({
-    //         "success": false,
-    //         "error": ""
-    //     })
-    // }
-
-    // const nft = {
-    //     id: "ID",                    
-    //     transactionId: "tID",
-    //     contractAddress: "0xFCf455b6a9cBEE05c9393aecb190301EF8CC47f8",
-    //     mintTime: null,
-    //     tokenId: 1,
-    //     owner: "Owner",
-    //     media: "Media", 
-    //     tokenURI: "TokenURI"
-    // }
-
-    //    "contractAddress": "0xFCf455b6a9cBEE05c9393aecb190301EF8CC47f8",
-
     try {
         const nft: NFT = req.body;
         const valid = isValid(nft);
 
         if (!valid) {
-            throw new Error("Error!!!!")
+            throw new Error("Invalid NFT Data")
         }
 
         await database.collection("all_nfts").doc(nft.id).set(nft);
@@ -147,16 +122,29 @@ api.post("/api/nfts/addAll", async (req, res) => {
             "success": true,
             "data": nft
         })
-    } catch {
+    } catch (error) {
+        let message
+
+        if (error instanceof Error) message = error.message
+        else message = String(error)
+
         res.status(400).json({
             "success": false,
-            "error": ""
+            "error": message
         })
     }
 
 });
 
 api.post("/api/contracts/addAll", (req, res) => {
+    try {
+
+    } catch {
+        
+    }
+});
+
+api.post("/api/taskQueue/add", (req, res) => {
     try {
 
     } catch {
