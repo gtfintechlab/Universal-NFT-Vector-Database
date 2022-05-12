@@ -3,8 +3,7 @@ import bodyParser from 'body-parser';
 import { getFirestore } from 'firebase-admin/firestore';
 import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
-import { TaskQueueItem, TaskQueueType, NFT} from './Types';
-import { BlockchainType } from './Types';
+import { TaskQueueItem, TaskQueueType, NFT, BlockchainType} from './Types';
 
 const api = express();
 
