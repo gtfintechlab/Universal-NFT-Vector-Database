@@ -36,16 +36,16 @@ def main():
             # Add contract to the appropriate contracts collection
             add_contract_to_database(item)
             # Move the id from the queue to the success
-            add_processed(item_id, "success")
+            update_processed(item_id, "success")
         
         # If the item is an NFT, process as per NFT guidelines
-        elif item.type == "NFT":
+        elif item.type == "nft":
             # Process the NFT as necessary
             process_nft(item)
             # Add NFT to the appropriate NFT collections
             add_nft_to_database(item)
             # Move the id from the queue to the success
-            add_processed(item_id, "success")
+            update_processed(item_id, "success")
 
 def peek_queue():
     # Get the queue from the task queue checkpoints
@@ -68,7 +68,7 @@ def peek_queue():
     
     # Process the message from SQS
     message = response['Messages'][0]
-    taskId = message["MessageAttributes"].get("TaskId").get("StringValue")
+    task_Id = message["MessageAttributes"].get("TaskId").get("StringValue")
     receipt_handle = message['ReceiptHandle']
 
     # Delete received message from queue
@@ -77,19 +77,26 @@ def peek_queue():
         ReceiptHandle=receipt_handle
     )
 
-    item = database.collection("task_queue").document(taskId).get().to_dict()
+    item = database.collection("task_queue").document(task_Id).get().to_dict()
     # Return the first element in the queue
     return item
 
 def get_item_from_task_queue(item_id):
+    # Get the item based on item id
     task_queue_item = database.collection("task_queue").document(item_id).get()
+    # Return the item
     if task_queue_item:
         return task_queue_item.to_dict()
     else:
         return None
 
-def add_processed(item_id, status="success"):
-    pass
+def update_processed(item, status="success"):
+    # Update the status of the item
+    item['status'] = status
+    # Update the database with new status
+    database.collection('task_queue').document(item.id).update(item)
+    return True
+
 
 def process_contract(item):
     pass
@@ -98,10 +105,32 @@ def process_nft(item):
     pass
 
 def add_nft_to_database(item):
-    pass
+    try:
+        # Get NFT Collection
+        nft_collection = database.collection("all_nfts")
+        # Get the nft itself that we will add
+        nft_to_add = item.data
+        # Create a new document in the NFT database to add this
+        nft_collection.document(nft_to_add.id).create(nft_to_add)
+        return True
+    except:
+        return False
 
 def add_contract_to_database(item):
+    try:
+        # Get the Contract Collection
+        contract_collection = database.collection("all_contracts")
+        # Get the contract itself that we will add
+        contract_to_add = item.data
+        # Create a new document in the contract's collection to add this
+        contract_collection.document(contract_to_add.id).create(contract_to_add)
+        return True
+    except:
+        return False
+
+def updateAnalytics():
     pass
+
 
 if __name__ == '__main__':
     print(peek_queue())
