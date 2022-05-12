@@ -3,51 +3,62 @@ import time
 from google.cloud import firestore
 import boto3
 from dotenv import load_dotenv
+from milvus import insert_data_milvus
+from milvus import initialize_milvus
+from vector import convertToVector, getImageFromURL
+import requests
+
 load_dotenv()  
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + os.sep + "firebase_credentials.json"
 database = firestore.Client()
 sqs = boto3.client('sqs', region_name='us-east-1', aws_access_key_id=os.getenv("CLIENT_KEY"),
                    aws_secret_access_key=os.getenv("CLIENT_SECRET"))
-queue_url = os.getenv("AWS_SQS_URL")
+queue_url = os.getenv("JOB_SQS_URL")
 
 def main():
+    initialize_milvus()
     # While True for Task Queue Script
     while True:
         # Get Item id from Top of Queue
-        item_id = peek_queue()
+        item_id = pop_queue()
         # If Queue is empty, take a 60 second break
         if not item_id:
             time.sleep(60)
             continue
-        
         # Get item assoicated with item id
-        item = get_item_from_task_queue(item_id)
+        item = get_item_from_task_queue(item_id['id'])
 
-        # If there is not an item, add the item id to the failed
+        # If there is not an item, skip
         if not item:
-            add_processed(item_id, "failure")
             continue
         
         # If the item type is a contract, process as per contract guidlines
-        if item.type == "contract":
+        if item["type"] == "contract":
             # Process the contract as necessary
-            process_contract(item)
+            result = process_contract(item)
+            if not result:
+                update_processed(item, "failure")
+                continue
             # Add contract to the appropriate contracts collection
             add_contract_to_database(item)
             # Move the id from the queue to the success
             update_processed(item_id, "success")
         
         # If the item is an NFT, process as per NFT guidelines
-        elif item.type == "nft":
+        elif item["type"] == "nft":
             # Process the NFT as necessary
-            process_nft(item)
+            result = process_nft(item)
+            if not result:
+                print(result)
+                update_processed(item, "failure")
+                continue
             # Add NFT to the appropriate NFT collections
             add_nft_to_database(item)
             # Move the id from the queue to the success
-            update_processed(item_id, "success")
+            update_processed(item, "success")
 
-def peek_queue():
+def pop_queue():
     # Get the queue from the task queue checkpoints
     response = sqs.receive_message(
                 QueueUrl=queue_url,
@@ -94,24 +105,56 @@ def update_processed(item, status="success"):
     # Update the status of the item
     item['status'] = status
     # Update the database with new status
-    database.collection('task_queue').document(item.id).update(item)
+    database.collection('task_queue').document(item['id']).update(item)
     return True
 
 
 def process_contract(item):
-    pass
+    token_list = get_collection_tokens(item["data"]["address"])
+    for token in token_list:
+        # Add token job to task queue in firebase
+        temp_doc = database.collection('task_queue').document()
+        task = {
+            'id': temp_doc.id,
+            "type": "nft",
+            "status": "in progress",
+            "data": token
+        } 
+        
+        # Write to firebase
+        database.collection("task_queue").document(task['id']).create(task)
+
+        # Add ID To Task Queue
+        push_to_aws_task_queue(task['id'])
+
+    # Add contract to database
+    add_contract_to_database(item)
 
 def process_nft(item):
-    pass
+    try:
+        pillow_image = getImageFromURL(item["data"]["media"])['image']
+        print(item["data"]["media"], pillow_image)
+        vector_image = convertToVector(pillow_image)['rawVector']
+        print(vector_image)
+        insert_data_milvus(nftVector=vector_image)
+        return True
+    except:
+        return False
 
 def add_nft_to_database(item):
     try:
         # Get NFT Collection
         nft_collection = database.collection("all_nfts")
         # Get the nft itself that we will add
-        nft_to_add = item.data
+        nft_to_add = item["data"]
         # Create a new document in the NFT database to add this
-        nft_collection.document(nft_to_add.id).create(nft_to_add)
+        nft_collection.document(nft_to_add['id']).create(nft_to_add)
+        # update analytics
+        update_analytics(totalERC1155=item["data"]["type"] == "ERC1155", 
+                            totalERC721=item["data"]["type"] == "ERC721",
+                            totalEthereumNFTs=item["data"]["chain"] == "ethereum",
+                            totalNFTs=True
+                         )  
         return True
     except:
         return False
@@ -121,16 +164,108 @@ def add_contract_to_database(item):
         # Get the Contract Collection
         contract_collection = database.collection("all_contracts")
         # Get the contract itself that we will add
-        contract_to_add = item.data
+        contract_to_add = item["data"]
         # Create a new document in the contract's collection to add this
-        contract_collection.document(contract_to_add.id).create(contract_to_add)
+        contract_collection.document(contract_to_add['id']).create(contract_to_add)
+        # update analytics
+        update_analytics(totalContracts=True)  
         return True
     except:
         return False
 
-def updateAnalytics():
-    pass
+def update_analytics(totalContracts=False, totalERC1155=False, totalERC721=False, totalEthereumNFTs=False, totalNFTs=False):
+    # Get Analytics Collection
+    analytics = database.collection("analytics").document("analytics").get().to_dict()
+    # Update Analytics as per paramters
+    analytics["totalContracts"] += int(totalContracts)
+    analytics["totalERC1155"] += int(totalERC1155)
+    analytics["totalERC721"] += int(totalERC721)
+    analytics["totalEthereumNFTs"] += int(totalEthereumNFTs)
+    analytics["totalNFTs"] += int(totalNFTs)
+    # Update Analytics
+    database.collection("analytics").document("analytics").update(analytics)
 
+def get_collection_tokens(contractAddress):
+    # Boolean value for pagnication of Alchemy API Response
+    has_next_page = True
+    # Start Token for pagination
+    start_token = ""
+    # List to keep track of all NFTs
+    token_list = []
+    # While there is a next page of tokens
+    while has_next_page:
+        # Call the API via our helper function
+        helper_response = get_collection_tokens_helper(contractAddress=contractAddress, startToken=start_token)
+        # Get the list of NFTs
+        nfts = helper_response['nfts']
+        # If the NFTs exist
+        if nfts and len(nfts) > 0:
+            # Iterate through the NFTs
+            for nft in nfts:
+                # Temporary document to get a firebase id
+                temp_doc = database.collection('all_nfts').document()
+                # Add NFT to token list as per NFT Model specifications
+                token_list.append({
+                    "id": temp_doc.id,
+                    "contractAddress": nft.get("contract").get("address"),
+                    "tokenId": nft.get("id").get("tokenId"),
+                    "media": nft.get("media")[0].get("gateway"),
+                    "tokenURI": nft.get("tokenUri").get("gateway"),
+                    "type": nft.get("id").get("tokenMetadata").get("tokenType")
+                })
+        
+        # IF there is not a next token, stop pagination
+        if not helper_response.get("nextToken"):
+            has_next_page = False
+        
+        # Set next token
+        start_token = helper_response.get("nextToken")
+    
+    # Return the NFT list
+    return token_list
+
+def get_collection_tokens_helper(contractAddress, startToken="", chain="ethereum"):
+    try:
+        # Check what chain we are on and the appropriate URL
+        if chain == "ethereum":
+            base_url = os.getenv("ETHERUEM_NODE") + "/getNFTsForCollection"
+        
+        # Get response with metadata
+        with_metadata = "true";
+        # Generate request URL
+        request_url = base_url + "/?contractAddress=" + contractAddress + "&startToken=" + startToken + "&withMetadata=" + with_metadata
+        # Get the response and return in JSON Format
+        response = requests.get(request_url)
+        return response.json()
+    except:
+        return None
+
+def push_to_aws_task_queue(taskId):
+    # Sends a message to the task queue on what task to handle next
+    response = sqs.send_message(
+        QueueUrl=queue_url,
+        DelaySeconds=0,
+        MessageAttributes={
+            'TaskId': {
+                'DataType': 'String',
+                'StringValue': taskId
+            },
+        },
+        MessageBody=(
+            taskId
+        )
+    )
 
 if __name__ == '__main__':
-    print(peek_queue())
+    # item = {
+    #     "id": "start",
+    #     "type": "contract",
+    #     "status": "in progress",
+    #     "data": {
+    #         "id": "testid2",
+    #         "address": "0x000000be320d58eabb01d14b6755b0403a93ab7d",
+    #         "name": "TESTING CONTRACT"
+    #     }
+    # }
+    # process_contract(item)
+    main()
