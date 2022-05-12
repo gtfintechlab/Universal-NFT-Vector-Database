@@ -6,21 +6,17 @@ interface Contract{
 
 interface NFT{
     id: string,                     // firebase id
-    transactionId: string,          // transaction id of token
     contractAddress: string,        // contract of token
-    mintTime: Date | number,        // date token was minted
     tokenId: number,                // id of token on the blockchain
-    owner: string,                  // owner wallet address
     media: string,                  // file link to token
     tokenURI: string,               // metadata of token
-    type: string,                   // erc-721 vs erc-1155
-    chain: string                   // ethereum / polygon / another chain
+    type: NFTType,                  // erc-721 vs erc-1155
+    chain: BlockchainType           // ethereum / polygon / another chain
 }
 
 interface TaskQueueItem{
     id: string,                     // firebase id
     type: TaskQueueType,            // type of task in task queue
-    import: Date,                   // date it was added to task queue
     status: TaskQueueStatus,        // status of item in task queue
     data: NFT | Contract            // data of task queue job
 }
@@ -44,8 +40,8 @@ export enum BlockchainType{
 }
 
 export enum NFTType{
-    ERC_721 = "erc-721",
-    ERC_1155 = "erc-1155"
+    ERC_721 = "ERC721",
+    ERC_1155 = "ERC1155"
 }
 
 export enum TaskQueueType{

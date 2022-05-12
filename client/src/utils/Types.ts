@@ -17,7 +17,6 @@ interface NFT{
 interface TaskQueueItem{
     id: string,                     // firebase id
     type: TaskQueueType,            // type of task in task queue
-    import: Date,                   // date it was added to task queue
     status: TaskQueueStatus,        // status of item in task queue
     data: NFT | Contract            // data of task queue job
 }
@@ -41,8 +40,8 @@ export enum BlockchainType{
 }
 
 export enum NFTType{
-    ERC_721 = "erc-721",
-    ERC_1155 = "erc-1155"
+    ERC_721 = "ERC721",
+    ERC_1155 = "ERC1155"
 }
 
 export enum TaskQueueType{
