@@ -21,19 +21,6 @@ interface TaskQueueItem{
     data: NFT | Contract            // data of task queue job
 }
 
-interface AnalyticsProps{
-    totalContracts: number,
-    totalERC1155: number,
-    totalERC721: number,
-    totalEthereumNFTs: number,
-    totalNFTs: number
-}
-
-interface TaskQueueProps{
-    tableName: string,
-    data: TaskQueueItem[]
-}
-
 export enum BlockchainType{
     ETHEREUM = "ethereum",
     POLYGON = "polygon"
@@ -55,4 +42,4 @@ export enum TaskQueueStatus{
     FAILURE = "failure"
 };
 
-export type {Contract, NFT, AnalyticsProps,TaskQueueItem, TaskQueueProps};
+export type {Contract, NFT,TaskQueueItem};
