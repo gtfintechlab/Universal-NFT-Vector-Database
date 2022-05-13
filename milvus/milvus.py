@@ -10,7 +10,7 @@ from pymilvus import (
 )
 from vector import *
 
-def initializeMilvus(collection_name="ethereum_erc721"):
+def initialize_milvus(collection_name="ethereum_erc721"):
     connections.connect("default", host="localhost", port="19530")
     if not utility.has_collection(collection_name):
         fields = [
@@ -24,9 +24,8 @@ def initializeMilvus(collection_name="ethereum_erc721"):
 
     return Collection(collection_name)      
 
-def insertDataMilvus(nftVector, nftId="", collection_name="ethereum_erc721", vectorId=0):
+def insert_data_milvus(nftVector, nftId="", collection_name="ethereum_erc721", vectorId=0):
     # decimalId = int(nftId, 16)
-    print(nftVector)
     inputVector = [
         [nftVector],
     ]
@@ -54,7 +53,7 @@ def searchDataMilvus(inputVector, collection_name="ethereum_erc721", field_name=
     return result
 
 if __name__ == '__main__':
-    initializeMilvus()
+    initialize_milvus()
     image_og = Image.open("images/gt-original.png")
     image_altered = Image.open("images/gt-altered.png")
     vectorOne = convertToVector(image_og)
@@ -62,8 +61,8 @@ if __name__ == '__main__':
 
     vec = vectorOne['rawVector']
     vec2 = vectorTwo['rawVector']
-    insertDataMilvus(nftVector=vec)
-    insertDataMilvus(nftVector=vec2)
+    insert_data_milvus(nftVector=vec)
+    insert_data_milvus(nftVector=vec2)
 
     result = searchDataMilvus(inputVector=[vec])
     print("\n",result)
