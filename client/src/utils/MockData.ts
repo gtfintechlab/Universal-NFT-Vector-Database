@@ -4,6 +4,8 @@ const mockContract: Contract = {
         id: "2e6e7919-d905-4c78-8fca-d13bb9de28be",
         address: "No Items are Currently In the Task Queue",
         name: "Cryptopunks",
+        type: NFTType.ERC_721,
+        chain: BlockchainType.ETHEREUM
     } as Contract;
 
 const mockTaskQueueItem: TaskQueueItem = {

@@ -48,7 +48,9 @@ function isValidContract(contract: Contract): boolean {
         if(
             checkField(contract.id) &&
             checkField(contract.address) &&
-            checkField(contract.name)
+            checkField(contract.name) &&
+            (Object.values(NFTType).includes(contract.type)) &&
+            (Object.values(BlockchainType).includes(contract.chain))
         ) {
             return true
         }
@@ -153,10 +155,13 @@ api.post("/api/nfts/addAll", async (req, res) => {
             "data": nft
         })
     } catch (error) {
-        let message
+        let message;
 
-        if (error instanceof Error) message = error.message
-        else message = String(error)
+        if (error instanceof Error){ 
+            message = error.message;
+        } else{
+            message = String(error);
+        }
 
         res.status(400).json({
             "success": false,

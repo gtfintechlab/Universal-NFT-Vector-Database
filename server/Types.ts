@@ -2,6 +2,8 @@ interface Contract{
     id: string,                     // firebase id
     address: string,                // address of contract
     name: string,                   // name of contract
+    type: NFTType,                  // ERC721 vs ERC 1155 Contract
+    chain: BlockchainType           // Chain this contract is on
 }
 
 interface NFT{

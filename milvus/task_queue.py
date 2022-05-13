@@ -239,15 +239,17 @@ def push_to_aws_task_queue(taskId):
     )
 
 if __name__ == '__main__':
-    # item = {
-    #     "id": "start",
-    #     "type": "contract",
-    #     "status": "in progress",
-    #     "data": {
-    #         "id": "testid2",
-    #         "address": "0x000000be320d58eabb01d14b6755b0403a93ab7d",
-    #         "name": "TESTING CONTRACT"
-    #     }
-    # }
-    # process_contract(item)
+    item = {
+        "id": "start",
+        "type": "contract",
+        "status": "in progress",
+        "chain": "ethereum",
+        "type": "ERC721",
+        "data": {
+            "id": "testid2",
+            "address": "0x000000be320d58eabb01d14b6755b0403a93ab7d",
+            "name": "TESTING CONTRACT"
+        }
+    }
+    process_contract(item)
     main()
