@@ -4,6 +4,10 @@ import { getFirestore } from 'firebase-admin/firestore';
 import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
 import { TaskQueueItem, TaskQueueType, NFT, Contract, BlockchainType, NFTType, TaskQueueStatus} from './Types';
+import { SQS, config } from 'aws-sdk';
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const api = express();
 
@@ -16,6 +20,13 @@ initializeApp({
   credential: cert(serviceAccount),
 });
 const database = getFirestore();
+
+// AWS Settings
+config.update({
+    region: "us-east-1",
+})
+
+const sqs = new SQS();
 
 function checkField(str: string): boolean {
     if (str == null || str.length == 0){
@@ -126,12 +137,6 @@ api.get("/", (req, res) => {
     });
 });
 
-api.listen(APP_PORT, () => {
-    console.log(`api listening at http://localhost:${APP_PORT}`);
-});
-
-
-
 api.post("/api/nfts/addAll", async (req, res) => {
     try {
         const nft: NFT = req.body;
@@ -202,7 +207,7 @@ api.post("/api/taskQueue/add", async (req, res) => {
         }
 
         await database.collection("task_queue").doc(tQItem.id).set(tQItem);
-
+        addTaskIdSQS(tQItem.id);
         res.status(200).json({
             "success": true,
             "data": tQItem
@@ -220,3 +225,22 @@ api.post("/api/taskQueue/add", async (req, res) => {
     }
 });
 
+function addTaskIdSQS(taskId: string) {
+    const params = {
+        QueueUrl: process.env.JOB_SQS_URL as string,
+        DelaySeconds: 0,
+        MessageAttributes: {
+            'TaskId': {
+                'DataType': 'String',
+                'StringValue': taskId
+            },
+        },
+        MessageBody: taskId
+    };
+
+    sqs.sendMessage(params);
+}
+
+api.listen(APP_PORT, () => {
+    console.log(`api listening at http://localhost:${APP_PORT}`);
+});
