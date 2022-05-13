@@ -100,24 +100,17 @@ api.get("/api/analytics/get" , async (req, res) => {
 
 api.get("/api/taskQueue/get", async (req, res) => {
     try{
-        const taskQueueNfts = await database.collection("task_queue").where("type", "==", TaskQueueType.ITEM_NFT).get();
-        const taskQueueContracts = await database.collection("task_queue").where("type", "==", TaskQueueType.ITEM_CONTRACT).get();
+        const taskQueueItems = await database.collection("task_queue").where("status", "==", TaskQueueStatus.IN_PROGRESS).get();
         
-        const nfts: TaskQueueItem[] = [];
-        const contracts: TaskQueueItem[] = [];
+        const finalItems: TaskQueueItem[] = [];
         
-        taskQueueContracts.forEach((contract) => {
-            contracts.push(contract.data() as TaskQueueItem);
-        })
-
-        taskQueueNfts.forEach((nft) => {
-            nfts.push(nft.data() as TaskQueueItem);
+        taskQueueItems.forEach((item) => {
+            finalItems.push(item.data() as TaskQueueItem);
         })
 
         res.status(200).json({
             success: true,
-            contracts: contracts,
-            nfts: nfts
+            items: finalItems,
         });
     } catch {
         res.status(400).json({
