@@ -21,16 +21,10 @@ def main():
     # While True for Task Queue Script
     while True:
         # Get Item id from Top of Queue
-        item_id = pop_queue()
+        item = pop_queue()
         # If Queue is empty, take a 60 second break
-        if not item_id:
-            time.sleep(60)
-            continue
-        # Get item assoicated with item id
-        item = get_item_from_task_queue(item_id['id'])
-
-        # If there is not an item, skip
         if not item:
+            time.sleep(60)
             continue
         
         # If the item type is a contract, process as per contract guidlines
@@ -43,14 +37,13 @@ def main():
             # Add contract to the appropriate contracts collection
             add_contract_to_database(item)
             # Move the id from the queue to the success
-            update_processed(item_id, "success")
+            update_processed(item, "success")
         
         # If the item is an NFT, process as per NFT guidelines
         elif item["type"] == "nft":
             # Process the NFT as necessary
             result = process_nft(item)
             if not result:
-                print(result)
                 update_processed(item, "failure")
                 continue
             # Add NFT to the appropriate NFT collections
@@ -92,15 +85,6 @@ def pop_queue():
     # Return the first element in the queue
     return item
 
-def get_item_from_task_queue(item_id):
-    # Get the item based on item id
-    task_queue_item = database.collection("task_queue").document(item_id).get()
-    # Return the item
-    if task_queue_item:
-        return task_queue_item.to_dict()
-    else:
-        return None
-
 def update_processed(item, status="success"):
     # Update the status of the item
     item['status'] = status
@@ -133,9 +117,7 @@ def process_contract(item):
 def process_nft(item):
     try:
         pillow_image = getImageFromURL(item["data"]["media"])['image']
-        print(item["data"]["media"], pillow_image)
         vector_image = convertToVector(pillow_image)['rawVector']
-        print(vector_image)
         insert_data_milvus(nftVector=vector_image)
         return True
     except:
