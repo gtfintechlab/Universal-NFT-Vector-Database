@@ -1,13 +1,5 @@
 import { AnalyticsProps, Contract, NFT, TaskQueueItem } from "../utils/Types";
 
-async function getContractsInQueue(){
-    return [] as Contract[];
-}
-
-async function getNFTsInQueue(){
-    return [] as NFT[];
-}
-
 async function getTaskQueueItems(){
     return [] as TaskQueueItem[];
 }
@@ -21,4 +13,9 @@ async function getAnalytics(){
         totalNFTs: 0
     } as AnalyticsProps; 
 }
-export {getContractsInQueue, getNFTsInQueue, getTaskQueueItems, getAnalytics};
+
+async function addToTaskQueue(item: TaskQueueItem){
+
+}
+
+export {getTaskQueueItems, getAnalytics, addToTaskQueue};
