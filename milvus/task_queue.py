@@ -12,8 +12,8 @@ load_dotenv()
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + os.sep + "firebase_credentials.json"
 database = firestore.Client()
-sqs = boto3.client('sqs', region_name='us-east-1', aws_access_key_id=os.getenv("CLIENT_KEY"),
-                   aws_secret_access_key=os.getenv("CLIENT_SECRET"))
+sqs = boto3.client('sqs', region_name='us-east-1', aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+                   aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"))
 queue_url = os.getenv("JOB_SQS_URL")
 
 def main():
