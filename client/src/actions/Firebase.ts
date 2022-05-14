@@ -18,4 +18,12 @@ async function addToTaskQueue(item: TaskQueueItem){
 
 }
 
-export {getTaskQueueItems, getAnalytics, addToTaskQueue};
+async function getLastContract(){
+    return "";
+}
+
+async function updateLastContract(newAddress: string){
+
+}
+
+export {getTaskQueueItems, getAnalytics, addToTaskQueue, getLastContract, updateLastContract};

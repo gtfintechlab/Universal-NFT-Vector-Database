@@ -2,6 +2,7 @@ import { Grid, GridItem } from '@chakra-ui/react'
 import React, { useEffect } from "react";
 import { AnalyticsProps, TaskQueueItem } from '../../utils/Types';
 import { getAnalytics, getTaskQueueItems } from '../../actions/Firebase';
+import {getNextContracts}  from '../../actions/TaskQueueControl';
 import NavigationBar from '../UI/NavigationBar/NavigationBar';
 import OverallAnalytics from './OverallAnalytics/OverallAnalytics';
 import ChainAnalytics from './ChainAnalytics/ChainAnalytics';
@@ -21,7 +22,8 @@ function Dashboard(){
     useEffect(() => {
         document.body.style.backgroundColor = '#f7f7f7'
         async function getDashbordInfo(){
-            console.log("Hello World");
+            // const next = await getNextContracts("", 10);
+            // console.log(next);
             const taskQueueItems: TaskQueueItem[] = await getTaskQueueItems();
             const analytics: AnalyticsProps = await getAnalytics();
             if (taskQueueItems.length === 0){

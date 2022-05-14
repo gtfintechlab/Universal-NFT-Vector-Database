@@ -226,6 +226,29 @@ api.post("/api/taskQueue/add", async (req, res) => {
     }
 });
 
+api.get("/api/contracts/last", async(req, res) => {
+    const contractCheckpoint = await database.collection("checkpoints").doc("contracts").get();
+    if (contractCheckpoint.exists){
+        const checkpointData = contractCheckpoint.data();
+        if (checkpointData){
+            res.status(200).json({
+                "success": true,
+                "lastContract": checkpointData.lastContract
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                error: "Could not retrieve checkpoint data"
+            });
+        }
+    } else {
+        res.status(400).json({
+            success: false,
+            error: "Could not retrieve checkpoint"
+        });
+    }
+});
+
 function addTaskIdSQS(taskId: string) {
     const params = {
         QueueUrl: process.env.JOB_SQS_URL as string,
