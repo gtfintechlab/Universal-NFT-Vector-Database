@@ -21,6 +21,7 @@ function Dashboard(){
     useEffect(() => {
         document.body.style.backgroundColor = '#f7f7f7'
         async function getDashbordInfo(){
+            console.log("Hello World");
             const taskQueueItems: TaskQueueItem[] = await getTaskQueueItems();
             const analytics: AnalyticsProps = await getAnalytics();
             if (taskQueueItems.length === 0){
@@ -31,7 +32,7 @@ function Dashboard(){
         }
 
         getDashbordInfo().then().catch();
-    })
+    }, []);
 
     return (
         <Grid  h="100vh"
