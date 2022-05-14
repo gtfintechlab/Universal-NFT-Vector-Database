@@ -4,6 +4,7 @@ from io import BytesIO
 import base64
 from milvus import search_data_milvus, initialize_milvus
 from vector import convert_to_vector
+from pymilvus import connections
 
 app = Flask(__name__)
 
@@ -27,6 +28,8 @@ def search():
         result_json[index] = {}
         result_json[index]['milvusId'] = milvus_id
         result_json[index]['distance'] = distances[index]
+    
+    connections.disconnect("default")
 
     return { "results": result_json}
 
