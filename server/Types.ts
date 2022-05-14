@@ -13,7 +13,8 @@ interface NFT{
     media: string,                  // file link to token
     tokenURI: string,               // metadata of token
     type: NFTType,                  // erc-721 vs erc-1155
-    chain: BlockchainType           // ethereum / polygon / another chain
+    chain: BlockchainType,          // ethereum / polygon / another chain
+    milvusId: number                // id of image in milvus
 }
 
 interface TaskQueueItem{

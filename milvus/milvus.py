@@ -31,8 +31,9 @@ def insert_data_milvus(nftVector, nftId="", collection_name="ethereum_erc721", v
     ]
     collection = Collection(collection_name)
     collection.load()
-    collection.insert(inputVector)
+    result = collection.insert(inputVector)
     collection.release()
+    return result
 
 def search_data_milvus(inputVector, collection_name="ethereum_erc721", field_name="nft", amount=3):
     index = {"index_type": "BIN_FLAT", "params": {}, "metric_type": "HAMMING"}
@@ -62,7 +63,8 @@ if __name__ == '__main__':
     vec = vectorOne['rawVector']
     vec2 = vectorTwo['rawVector']
     insert_data_milvus(nftVector=vec)
-    insert_data_milvus(nftVector=vec2)
+    res = insert_data_milvus(nftVector=vec2)
+    print(res.timestamp)
 
     result = search_data_milvus(inputVector=[vec])
-    print("\n",result)
+    print("\n",result[0].distances)

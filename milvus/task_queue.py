@@ -42,12 +42,12 @@ def main():
         # If the item is an NFT, process as per NFT guidelines
         elif item["type"] == "nft":
             # Process the NFT as necessary
-            result = process_nft(item)
+            result, milvus_id = process_nft(item)
             if not result:
                 update_processed(item, "failure")
                 continue
             # Add NFT to the appropriate NFT collections
-            add_nft_to_database(item)
+            add_nft_to_database(item, milvus_id)
             # Move the id from the queue to the success
             update_processed(item, "success")
 
@@ -116,25 +116,32 @@ def process_contract(item):
 
 def process_nft(item):
     try:
+        # Turn image into Pillow Image
         pillow_image = getImageFromURL(item["data"]["media"])['image']
+        # Get Raw Vector from Pillow Image
         vector_image = convertToVector(pillow_image)['rawVector']
-        insert_data_milvus(nftVector=vector_image)
-        return True
+        # Inser the data and get the id of the inserted image
+        milvus_insert = insert_data_milvus(nftVector=vector_image)
+        print(milvus_insert)
+        milvus_id = milvus_insert.timestamp
+        # Return the status and id
+        return True, milvus_id
     except:
-        return False
+        return False, -1
 
-def add_nft_to_database(item):
+def add_nft_to_database(item, milvus_id):
     try:
         # Get NFT Collection
         nft_collection = database.collection("all_nfts")
         # Get the nft itself that we will add
         nft_to_add = item["data"]
         # Create a new document in the NFT database to add this
+        nft_to_add['milvusId'] = milvus_id
         nft_collection.document(nft_to_add['id']).create(nft_to_add)
         # update analytics
-        update_analytics(totalERC1155=item["data"]["type"] == "ERC1155", 
-                            totalERC721=item["data"]["type"] == "ERC721",
-                            totalEthereumNFTs=item["data"]["chain"] == "ethereum",
+        update_analytics(totalERC1155=nft_to_add["type"] == "ERC1155", 
+                            totalERC721=nft_to_add["type"] == "ERC721",
+                            totalEthereumNFTs=nft_to_add["chain"] == "ethereum",
                             totalNFTs=True
                          )  
         return True
@@ -167,7 +174,7 @@ def update_analytics(totalContracts=False, totalERC1155=False, totalERC721=False
     # Update Analytics
     database.collection("analytics").document("analytics").update(analytics)
 
-def get_collection_tokens(contractAddress):
+def get_collection_tokens(contractAddress, chain="ethereum"):
     # Boolean value for pagnication of Alchemy API Response
     has_next_page = True
     # Start Token for pagination
@@ -177,7 +184,7 @@ def get_collection_tokens(contractAddress):
     # While there is a next page of tokens
     while has_next_page:
         # Call the API via our helper function
-        helper_response = get_collection_tokens_helper(contractAddress=contractAddress, startToken=start_token)
+        helper_response = get_collection_tokens_helper(contractAddress=contractAddress, startToken=start_token, chain=chain)
         # Get the list of NFTs
         nfts = helper_response['nfts']
         # If the NFTs exist
@@ -193,7 +200,8 @@ def get_collection_tokens(contractAddress):
                     "tokenId": nft.get("id").get("tokenId"),
                     "media": nft.get("media")[0].get("gateway"),
                     "tokenURI": nft.get("tokenUri").get("gateway"),
-                    "type": nft.get("id").get("tokenMetadata").get("tokenType")
+                    "type": nft.get("id").get("tokenMetadata").get("tokenType"),
+                    "chain": chain
                 })
         
         # IF there is not a next token, stop pagination
@@ -216,6 +224,7 @@ def get_collection_tokens_helper(contractAddress, startToken="", chain="ethereum
         with_metadata = "true";
         # Generate request URL
         request_url = base_url + "/?contractAddress=" + contractAddress + "&startToken=" + startToken + "&withMetadata=" + with_metadata
+        print(request_url)
         # Get the response and return in JSON Format
         response = requests.get(request_url)
         return response.json()
