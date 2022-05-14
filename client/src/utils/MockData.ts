@@ -10,7 +10,7 @@ const mockContract: Contract = {
 
 const mockTaskQueueItem: TaskQueueItem = {
             id: "2e6e7919-d905-4c78-8fca-d13bb9de28be",
-            type: TaskQueueType.ITEM_CONTRACT,
+            type: TaskQueueType.ITEM_NOT_APPLICABLE,
             import: new Date(),
             status: TaskQueueStatus.IN_PROGRESS,
             data: mockContract

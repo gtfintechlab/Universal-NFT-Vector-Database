@@ -33,7 +33,7 @@ function TaskQueue(props: TaskQueueProps){
                                 <Td fontSize={['xs','sm','lg']}>
                                     {(value.data as NFT).media}
                                 </Td>}
-                                {value.type === TaskQueueType.ITEM_CONTRACT && 
+                                {value.type === TaskQueueType.ITEM_CONTRACT || value.type == TaskQueueType.ITEM_NOT_APPLICABLE && 
                                 <Td fontSize={['xs','sm','lg']}>
                                     {(value.data as Contract).address}
                                 </Td>}

@@ -44,7 +44,7 @@ async function processNextContracts(amount=10, nftType=NFTType.ERC_721, chain=Bl
                 } as Contract
             } as TaskQueueItem;
 
-            addToTaskQueue(contractToAdd);
+            await addToTaskQueue(contractToAdd);
 
             if (index === nextContracts.length - 1){
                 newLastContract = contract.id
@@ -53,6 +53,6 @@ async function processNextContracts(amount=10, nftType=NFTType.ERC_721, chain=Bl
             index += 1;
         };
 
-        updateLastContract(newLastContract);
+        await updateLastContract(newLastContract);
     }
 }

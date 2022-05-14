@@ -49,7 +49,8 @@ export enum NFTType{
 
 export enum TaskQueueType{
     ITEM_CONTRACT = "contract",
-    ITEM_NFT = "nft"
+    ITEM_NFT = "nft",
+    ITEM_NOT_APPLICABLE = "N/A"
 }
 
 export enum TaskQueueStatus{

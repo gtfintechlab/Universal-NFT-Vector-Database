@@ -1,4 +1,7 @@
+import axios from "axios";
 import { AnalyticsProps, Contract, NFT, TaskQueueItem } from "../utils/Types";
+
+const host = "http://localhost:4000";
 
 async function getTaskQueueItems(){
     return [] as TaskQueueItem[];
@@ -19,10 +22,22 @@ async function addToTaskQueue(item: TaskQueueItem){
 }
 
 async function getLastContract(){
+    const response = await axios.get(host + "/api/contracts/last/get");
+    if (response.status === 200){
+        return response.data.lastContract;
+    }
     return "";
+
 }
 
 async function updateLastContract(newAddress: string){
+    const response = await axios.post(host + "/api/contracts/last/update", {
+        newContract: newAddress
+    });
+    if (response.status === 200){
+        return "";
+    }
+    return response.data.error;
 
 }
 
