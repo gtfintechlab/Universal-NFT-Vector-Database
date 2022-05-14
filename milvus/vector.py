@@ -1,4 +1,3 @@
-from pip import main
 import numpy as np
 import pdqhash
 from PIL import Image

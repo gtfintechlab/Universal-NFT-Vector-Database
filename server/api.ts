@@ -40,9 +40,10 @@ function isValidNFT(nft: NFT): boolean {
         if (
             checkField(nft.id) &&
             checkField(nft.contractAddress) &&
-            !isNaN(nft.tokenId) &&
+            checkField(nft.tokenId) &&
             checkField(nft.media) &&
             checkField(nft.tokenURI) &&
+            !isNaN(nft.milvusId) &&
             (Object.values(NFTType).includes(nft.type)) &&
             (Object.values(BlockchainType).includes(nft.chain))
         ){

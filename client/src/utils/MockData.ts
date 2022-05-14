@@ -19,11 +19,12 @@ const mockTaskQueueItem: TaskQueueItem = {
 const mockNFT: NFT = {
     id: "0x0080313cfc8a816348092290f2ce8d348c265d5a9dd9878ee019232245422fc9",
     contractAddress: "0x0000000000001b84b1cb32787b0d64758d019317",
-    tokenId: 10,
+    tokenId: "0x10",
     media: "https://ipfs.io/ipfs/QmVdxTPraJKZskdfFk1kwCWXo6JUwhLRY95M7b1ZUDWxB6", 
     tokenURI: "https://ipfs.io/ipfs/QmYzZZEp7hCS5GnQG4Rw4Loa33EoMYXUx2fgzPT14d2s5V",
     chain: BlockchainType.ETHEREUM,
-    type: NFTType.ERC_721
+    type: NFTType.ERC_721,
+    milvusId: 4685408067
 } as NFT;
 
 export {mockContract, mockTaskQueueItem, mockNFT};
