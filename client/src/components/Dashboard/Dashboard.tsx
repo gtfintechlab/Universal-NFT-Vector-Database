@@ -8,6 +8,7 @@ import OverallAnalytics from './OverallAnalytics/OverallAnalytics';
 import ChainAnalytics from './ChainAnalytics/ChainAnalytics';
 import TaskQueue from './TaskQueue/TaskQueue';
 import { mockTaskQueueItem } from './../../utils/MockData';
+import TaskQueueControl from './TaskQueueControl/TaskQueueControl';
 
 function Dashboard(){
     const [taskQueueItems, setTaskQueueItems] = React.useState<TaskQueueItem[]>([]);
@@ -62,6 +63,12 @@ function Dashboard(){
             <GridItem colStart={[1,1,2,2]} colEnd={[16,16,16,16]} rowStart={[12,12,6,6]} display="flex" justifyContent="center">
                 <TaskQueue tableName='' data={taskQueueItems}></TaskQueue>
             </GridItem>
+
+            <GridItem colStart={[1,1,2,2]} colEnd={[16,16,16,16]} rowStart={[14,14,8,8]} display="flex" 
+                      justifyContent={["center","center","start", "start"]}>
+                <TaskQueueControl/>
+            </GridItem>
+
 
 
 

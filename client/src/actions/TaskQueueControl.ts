@@ -22,9 +22,9 @@ export async function getNextContracts(lastContract: string, amount: number){
     return queryResult.data.tokenContracts;
 }
 
-async function processNextContracts(amount=10, nftType=NFTType.ERC_721, chain=BlockchainType.ETHEREUM){
+export async function processNextContracts(amount=10, nftType=NFTType.ERC_721, chain=BlockchainType.ETHEREUM){
     const lastContract = await getLastContract();
-    if (lastContract){
+    if (lastContract != null){
         const nextContracts = await getNextContracts(lastContract, amount);
 
         let index = 0;
@@ -52,7 +52,6 @@ async function processNextContracts(amount=10, nftType=NFTType.ERC_721, chain=Bl
 
             index += 1;
         };
-
         await updateLastContract(newLastContract);
     }
 }

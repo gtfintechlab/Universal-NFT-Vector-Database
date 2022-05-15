@@ -26,7 +26,7 @@ async function getLastContract(){
     if (response.status === 200){
         return response.data.lastContract;
     }
-    return "";
+    return null;
 
 }
 

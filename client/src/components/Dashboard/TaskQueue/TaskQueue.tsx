@@ -14,7 +14,7 @@ import { Contract, NFT, TaskQueueProps, TaskQueueType } from "../../../utils/Typ
 
 function TaskQueue(props: TaskQueueProps){
     return (
-            <VStack w={['90%','90%','100%','100%']} mr={["0","0","1.5%","1.5%"]} mb={["30px", "30px", "0px", "0px"]}>
+            <VStack w={['90%','90%','100%','100%']} mr={["0","0","1.5%","1.5%"]}>
                 <Text fontSize='4xl' fontWeight="bold" display="flex" w='100%' >Task Queue Information</Text>
                 <TableContainer w='100%'>
                     <Table variant='striped' colorScheme="blackAlpha">
@@ -27,7 +27,7 @@ function TaskQueue(props: TaskQueueProps){
                         </Thead>
                         <Tbody>
                         {props.data.map((value, index) => {
-                            return <Tr>
+                            return <Tr key={index}>
                                 <Td fontSize={['lg']} fontWeight="bold">{index}</Td>
                                 {value.type === TaskQueueType.ITEM_NFT && 
                                 <Td fontSize={['xs','sm','lg']}>
