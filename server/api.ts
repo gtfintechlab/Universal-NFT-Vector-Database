@@ -202,7 +202,7 @@ api.post("/api/contracts/addAll", async (req, res) => {
 
 api.post("/api/taskQueue/add", async (req, res) => {
     try {
-        const tQItem: TaskQueueItem = req.body;
+        const tQItem: TaskQueueItem = req.body.itemToAdd;
         const valid = isValidTaskQueueItem(tQItem);
 
         if (!valid) {
@@ -287,7 +287,7 @@ function addTaskIdSQS(taskId: string) {
         MessageBody: taskId
     };
 
-    sqs.sendMessage(params);
+    sqs.sendMessage(params).send();
 }
 
 api.listen(APP_PORT, () => {

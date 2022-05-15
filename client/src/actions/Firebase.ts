@@ -18,7 +18,13 @@ async function getAnalytics(){
 }
 
 async function addToTaskQueue(item: TaskQueueItem){
-
+    const response = await axios.post(host + "/api/taskQueue/add", {
+        itemToAdd: item
+    });
+    if (response.status === 200){
+        return "";
+    }
+    return response.data.error;
 }
 
 async function getLastContract(){

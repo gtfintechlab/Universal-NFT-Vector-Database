@@ -1,6 +1,7 @@
 import { BlockchainType, Contract, NFTType, TaskQueueItem, TaskQueueStatus, TaskQueueType } from "../utils/Types";
 import { Client, createClient, gql } from "urql";
 import { addToTaskQueue, getLastContract, updateLastContract } from "./Firebase";
+import { firebaseId } from "../utils/FirebaseId";
 
 const EIP_721_SUBGRAPH = "https://api.thegraph.com/subgraphs/name/wighawag/eip721-subgraph";
 const client: Client = createClient({
@@ -32,11 +33,11 @@ export async function processNextContracts(amount=10, nftType=NFTType.ERC_721, c
 
         for (const contract of nextContracts){
             const contractToAdd = {
-                id: "",
+                id: firebaseId.generate(),
                 type: TaskQueueType.ITEM_CONTRACT,
                 status: TaskQueueStatus.IN_PROGRESS,
                 data: {
-                    id: "",
+                    id: firebaseId.generate(),
                     address: contract.id,
                     name: contract.name,
                     type: nftType,
