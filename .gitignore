@@ -239,3 +239,5 @@ dmypy.json
 
 volumes/
 firebase_credentials.json
+
+nohup.out

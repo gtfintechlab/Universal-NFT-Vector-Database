@@ -122,7 +122,6 @@ def process_nft(item):
         vector_image = convertToVector(pillow_image)['rawVector']
         # Inser the data and get the id of the inserted image
         milvus_insert = insert_data_milvus(nftVector=vector_image)
-        print(milvus_insert)
         milvus_id = milvus_insert.timestamp
         # Return the status and id
         return True, milvus_id
@@ -224,7 +223,6 @@ def get_collection_tokens_helper(contractAddress, startToken="", chain="ethereum
         with_metadata = "true";
         # Generate request URL
         request_url = base_url + "/?contractAddress=" + contractAddress + "&startToken=" + startToken + "&withMetadata=" + with_metadata
-        print(request_url)
         # Get the response and return in JSON Format
         response = requests.get(request_url)
         return response.json()

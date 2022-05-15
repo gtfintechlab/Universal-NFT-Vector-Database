@@ -24,6 +24,8 @@ function Dashboard(){
         async function getDashbordInfo(){
             const taskQueueItems: TaskQueueItem[] = await getTaskQueueItems();
             const analytics: AnalyticsProps = await getAnalytics();
+            console.log(taskQueueItems);
+            taskQueueItems.splice(0,10);
             if (taskQueueItems.length === 0){
                 taskQueueItems.push(mockTaskQueueItem);
             }

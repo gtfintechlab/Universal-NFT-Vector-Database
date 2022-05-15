@@ -4,7 +4,12 @@ import { AnalyticsProps, Contract, NFT, TaskQueueItem } from "../utils/Types";
 const host = "http://localhost:4000";
 
 async function getTaskQueueItems(){
-    return [] as TaskQueueItem[];
+    const response = await axios.get(host + "/api/taskQueue/get");
+    if (response.status === 200){
+        return response.data.items;
+    }
+    return [];
+
 }
 
 async function getAnalytics(){
