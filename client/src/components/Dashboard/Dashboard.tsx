@@ -1,12 +1,13 @@
 import { Grid, GridItem } from '@chakra-ui/react'
 import React, { useEffect } from "react";
 import { AnalyticsProps, TaskQueueItem } from '../../utils/Types';
-import { getAnalytics, getTaskQueueItems } from '../../actions/Firebase';
+import { getAnalytics, getLastContract, getTaskQueueItems, updateLastContract } from '../../actions/Firebase';
 import NavigationBar from '../UI/NavigationBar/NavigationBar';
 import OverallAnalytics from './OverallAnalytics/OverallAnalytics';
 import ChainAnalytics from './ChainAnalytics/ChainAnalytics';
 import TaskQueue from './TaskQueue/TaskQueue';
 import { mockTaskQueueItem } from './../../utils/MockData';
+import TaskQueueControl from './TaskQueueControl/TaskQueueControl';
 
 function Dashboard(){
     const [taskQueueItems, setTaskQueueItems] = React.useState<TaskQueueItem[]>([]);
@@ -19,9 +20,8 @@ function Dashboard(){
     } as AnalyticsProps);
 
     useEffect(() => {
-        document.body.style.backgroundColor = '#f7f7f7'
+        document.body.style.backgroundColor = '#f7f7f7';
         async function getDashbordInfo(){
-            console.log("Hello World");
             const taskQueueItems: TaskQueueItem[] = await getTaskQueueItems();
             const analytics: AnalyticsProps = await getAnalytics();
             if (taskQueueItems.length === 0){
@@ -62,6 +62,12 @@ function Dashboard(){
             <GridItem colStart={[1,1,2,2]} colEnd={[16,16,16,16]} rowStart={[12,12,6,6]} display="flex" justifyContent="center">
                 <TaskQueue tableName='' data={taskQueueItems}></TaskQueue>
             </GridItem>
+
+            <GridItem colStart={[1,1,2,2]} colEnd={[16,16,16,16]} rowStart={[14,14,8,8]} display="flex" 
+                      justifyContent={["center","center","start", "start"]}>
+                <TaskQueueControl/>
+            </GridItem>
+
 
 
 

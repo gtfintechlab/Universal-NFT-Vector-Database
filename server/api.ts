@@ -6,10 +6,12 @@ import { cwd } from 'process';
 import { TaskQueueItem, TaskQueueType, NFT, Contract, BlockchainType, NFTType, TaskQueueStatus} from './Types';
 import { SQS, config } from 'aws-sdk';
 import dotenv from 'dotenv'
+import cors from 'cors';
 
 dotenv.config()
 
 const api = express();
+api.use(cors({ origin: true }));
 
 // Middleware for Express 
 api.use(bodyParser.urlencoded({ extended: false }));
@@ -84,7 +86,7 @@ function isValidTaskQueueItem(taskQueueItem: TaskQueueItem): boolean {
     return false
 }
 
-const APP_PORT = 3000;
+const APP_PORT = 4000;
 
 api.get("/api/analytics/get" , async (req, res) => {
     try{
@@ -200,7 +202,7 @@ api.post("/api/contracts/addAll", async (req, res) => {
 
 api.post("/api/taskQueue/add", async (req, res) => {
     try {
-        const tQItem: TaskQueueItem = req.body;
+        const tQItem: TaskQueueItem = req.body.itemToAdd;
         const valid = isValidTaskQueueItem(tQItem);
 
         if (!valid) {
@@ -226,6 +228,52 @@ api.post("/api/taskQueue/add", async (req, res) => {
     }
 });
 
+api.get("/api/contracts/last/get", async(req, res) => {
+    const contractCheckpoint = await database.collection("checkpoints").doc("contracts").get();
+    if (contractCheckpoint.exists){
+        const checkpointData = contractCheckpoint.data();
+        if (checkpointData){
+            res.status(200).json({
+                "success": true,
+                "lastContract": checkpointData.lastContract
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                error: "Could not retrieve checkpoint data"
+            });
+        }
+    } else {
+        res.status(400).json({
+            success: false,
+            error: "Could not retrieve checkpoint"
+        });
+    }
+});
+
+api.post("/api/contracts/last/update", async(req, res) => {
+    const newContract = req.body.newContract;
+    const checkpoint = database.collection("checkpoints").doc("contracts");
+    const checkpointGet = await checkpoint.get();
+    if (checkpointGet.exists){
+        const checkpointData = checkpointGet.data();
+        if (checkpointData){
+            checkpointData.lastContract = newContract;
+            checkpoint.update(checkpointData);
+        }
+
+        res.status(200).json({
+            success: true,
+            checkpointData: checkpointData,
+        });
+    } else {
+        res.status(400).json({
+            success: true,
+            error: "Failed to retrieve current checkpoint data",
+        });
+    }
+});
+
 function addTaskIdSQS(taskId: string) {
     const params = {
         QueueUrl: process.env.JOB_SQS_URL as string,
@@ -239,7 +287,7 @@ function addTaskIdSQS(taskId: string) {
         MessageBody: taskId
     };
 
-    sqs.sendMessage(params);
+    sqs.sendMessage(params).send();
 }
 
 api.listen(APP_PORT, () => {
