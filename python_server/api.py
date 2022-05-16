@@ -12,12 +12,10 @@ app = Flask(__name__)
 def search():
     base_64_image = request.json['image']
     amount = request.json['amount']
-    
-    pillow_image = Image.open(BytesIO(base64.b64decode(base_64_image)))
-    input_vector = convert_to_vector(pillow_image)
+    input_vector = convert_to_vector(base_64_image)
     
     initialize_milvus()
-    results = search_data_milvus([input_vector['rawVector']], amount=amount)
+    results = search_data_milvus([input_vector['vector']], amount=amount)
     ids = list(results[0].ids)
     distances = list(results[0].distances)
     result_json = {

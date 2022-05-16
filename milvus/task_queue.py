@@ -5,7 +5,7 @@ import boto3
 from dotenv import load_dotenv
 from milvus import insert_data_milvus
 from milvus import initialize_milvus
-from vector import convertToVector, getImageFromURL
+from vector import convert_to_vector
 import requests
 
 load_dotenv()  
@@ -116,10 +116,8 @@ def process_contract(item):
 
 def process_nft(item):
     try:
-        # Turn image into Pillow Image
-        pillow_image = getImageFromURL(item["data"]["media"])['image']
         # Get Raw Vector from Pillow Image
-        vector_image = convertToVector(pillow_image)['rawVector']
+        vector_image = convert_to_vector(item["data"]["media"])['vector']
         # Inser the data and get the id of the inserted image
         milvus_insert = insert_data_milvus(nftVector=vector_image)
         milvus_id = milvus_insert.timestamp
@@ -246,17 +244,17 @@ def push_to_aws_task_queue(taskId):
     )
 
 if __name__ == '__main__':
-    item = {
-        "id": "start",
-        "type": "contract",
-        "status": "in progress",
-        "chain": "ethereum",
-        "type": "ERC721",
-        "data": {
-            "id": "testid2",
-            "address": "0x000000be320d58eabb01d14b6755b0403a93ab7d",
-            "name": "TESTING CONTRACT"
-        }
-    }
-    process_contract(item)
+    # item = {
+    #     "id": "start",
+    #     "type": "contract",
+    #     "status": "in progress",
+    #     "chain": "ethereum",
+    #     "type": "ERC721",
+    #     "data": {
+    #         "id": "testid2",
+    #         "address": "0x000000be320d58eabb01d14b6755b0403a93ab7d",
+    #         "name": "TESTING CONTRACT"
+    #     }
+    # }
+    # process_contract(item)
     main()

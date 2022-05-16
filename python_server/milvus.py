@@ -10,7 +10,7 @@ def initialize_milvus(collection_name="ethereum_erc721"):
     if not utility.has_collection(collection_name):
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
-            FieldSchema(name="nft", dtype=DataType.FLOAT_VECTOR, dim=256),
+            FieldSchema(name="nft", dtype=DataType.FLOAT_VECTOR, dim=2048),
         ]
 
         schema = CollectionSchema(fields)
@@ -20,7 +20,11 @@ def initialize_milvus(collection_name="ethereum_erc721"):
     return Collection(collection_name)      
 
 def search_data_milvus(inputVector, collection_name="ethereum_erc721", field_name="nft", amount=3):
-    index = {"index_type": "BIN_FLAT", "params": {}, "metric_type": "HAMMING"}
+    index = {
+        "metric_type":"L2",
+        "index_type":"IVF_FLAT",
+        "params":{"nlist":1024}
+    }
 
     collection = Collection(collection_name)
     collection.create_index(field_name, index)

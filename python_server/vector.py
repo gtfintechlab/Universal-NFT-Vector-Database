@@ -1,12 +1,21 @@
+import base64
+import io
+from PIL import Image
+from uuid import uuid4
 import numpy as np
-import pdqhash
+from towhee import pipeline
+import os
 
-def convert_to_vector(pillowImage):
+def convert_to_vector(base64String):
     try:
-        pillowImage = np.array(pillowImage)
-        rawVector, quality = pdqhash.compute(pillowImage)
-        binaryVector = bytes(np.packbits(rawVector, axis=-1).tolist())
+        embedding_pipeline = pipeline('image-embedding')
 
-        return {"success": True, "rawVector": rawVector, "vector": binaryVector}
-    except:
-        return {"success": False, "rawVector": None, "vector": None}
+        file_content = base64.b64decode(base64String)
+        image = Image.open(io.BytesIO(file_content))
+        path = 'tmp/' + str(uuid4()) + '.png'
+        image.save(path, "PNG")
+        vector = embedding_pipeline(path)
+        os.remove(path)
+        return {"success": True, "vector": vector}
+    except Exception as e:
+        return {"success": False, "vector": None}

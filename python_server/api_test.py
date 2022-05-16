@@ -7,7 +7,7 @@ with open("gt-original.png", "rb") as image_file:
 
 data = {
     'image': encoded_string,
-    'amount': 10
+    'amount': 100
 }
 
 url = 'http://127.0.0.1:5000/api/milvus/search'

@@ -8,14 +8,14 @@ from pymilvus import (
     FieldSchema, CollectionSchema, DataType,
     Collection,
 )
-from vector import *
+from vector import convert_to_vector
 
 def initialize_milvus(collection_name="ethereum_erc721"):
     connections.connect("default", host="localhost", port="19530")
     if not utility.has_collection(collection_name):
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
-            FieldSchema(name="nft", dtype=DataType.FLOAT_VECTOR, dim=256),
+            FieldSchema(name="nft", dtype=DataType.FLOAT_VECTOR, dim=2048),
         ]
 
         schema = CollectionSchema(fields)
@@ -36,14 +36,18 @@ def insert_data_milvus(nftVector, nftId="", collection_name="ethereum_erc721", v
     return result
 
 def search_data_milvus(inputVector, collection_name="ethereum_erc721", field_name="nft", amount=3):
-    index = {"index_type": "BIN_FLAT", "params": {}, "metric_type": "HAMMING"}
+    index = {
+        "metric_type":"L2",
+        "index_type":"IVF_FLAT",
+        "params":{"nlist":1024}
+    }
 
     collection = Collection(collection_name)
     collection.create_index(field_name, index)
     collection.load()
 
     search_params = {
-        "metric_type": "l2",
+        "metric_type": "L2",
         "params": {"nprobe": 10},
     }
 
@@ -55,16 +59,21 @@ def search_data_milvus(inputVector, collection_name="ethereum_erc721", field_nam
 
 if __name__ == '__main__':
     initialize_milvus()
-    image_og = Image.open("images/gt-original.png")
-    image_altered = Image.open("images/gt-altered.png")
-    vectorOne = convertToVector(image_og)
-    vectorTwo = convertToVector(image_altered)
+    vectorOne = convert_to_vector("images/gt-original.png")
+    vectorTwo = convert_to_vector("images/gt-altered.png")
+    vectorThree = convert_to_vector("images/gt-3.png")
 
-    vec = vectorOne['rawVector']
-    vec2 = vectorTwo['rawVector']
-    insert_data_milvus(nftVector=vec)
+    vec = vectorOne['vector']
+    vec2 = vectorTwo['vector']
+    vec3 = vectorThree['vector']
+
+    print(vec)
+    print(vec2)
+    print(vec3)
+
+    res = insert_data_milvus(nftVector=vec)
     res = insert_data_milvus(nftVector=vec2)
-    print(res.timestamp)
+    res = insert_data_milvus(nftVector=vec3)
 
     result = search_data_milvus(inputVector=[vec])
     print("\n",result[0].distances)
