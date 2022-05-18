@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "rewrites": [ {
+      "source": "/",
+      "run": {
+        "serviceId": "search-api",
+        "region": "us-central1"
+      }
+    } ]
+  }
+  
+}

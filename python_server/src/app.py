@@ -1,12 +1,16 @@
 from flask import Flask, request
 from PIL import Image
 from io import BytesIO
-import base64
+import os
 from milvus import search_data_milvus, initialize_milvus
 from vector import convert_to_vector
 from pymilvus import connections
 
 app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return {"Hello": "World"}
 
 @app.route("/api/milvus/search", methods=['POST'])
 def search():
@@ -32,4 +36,4 @@ def search():
     return { "results": result_json}
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host="0.0.0.0", port=os.environ.get("PORT", 5000))
