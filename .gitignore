@@ -241,3 +241,4 @@ volumes/
 firebase_credentials.json
 
 nohup.out
+secrets.yml

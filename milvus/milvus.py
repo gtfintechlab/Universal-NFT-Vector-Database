@@ -59,9 +59,9 @@ def search_data_milvus(inputVector, collection_name="ethereum_erc721", field_nam
 
 if __name__ == '__main__':
     initialize_milvus()
-    vectorOne = convert_to_vector("images/gt-original.png")
-    vectorTwo = convert_to_vector("images/gt-altered.png")
-    vectorThree = convert_to_vector("images/gt-3.png")
+    vectorOne = convert_to_vector("./images/gt-original.png")
+    vectorTwo = convert_to_vector("./images/gt-altered.png")
+    vectorThree = convert_to_vector("./images/gt-3.png")
 
     vec = vectorOne['vector']
     vec2 = vectorTwo['vector']
@@ -75,5 +75,5 @@ if __name__ == '__main__':
     res = insert_data_milvus(nftVector=vec2)
     res = insert_data_milvus(nftVector=vec3)
 
-    result = search_data_milvus(inputVector=[vec])
+    result = search_data_milvus(inputVector=[vec],amount=100)
     print("\n",result[0].distances)

@@ -26,15 +26,18 @@ etcd:
   use:
     embed: false # Whether to enable embedded Etcd (an in-process EtcdServer).
 
+custom:
+  secrets: ${file(secrets.yml):${self:provider.stage}}
+
 # Related configuration of minio, which is responsible for data persistence for Milvus.
 minio:
-  address: localhost # Address of MinIO/S3
-  port: 9000 # Port of MinIO/S3
-  accessKeyID: minioadmin # accessKeyID of MinIO/S3
-  secretAccessKey: minioadmin # MinIO/S3 encryption string
+  address: ${self:custom.secrets.S3_BUCKET_ADDRESS} # Address of MinIO/S3
+  port: 80 # Port of MinIO/S3
+  accessKeyID: ${self:custom.secrets.AWS_ACCESS_KEY_ID} # accessKeyID of MinIO/S3
+  secretAccessKey: ${self:custom.secrets.AWS_SECRET_ACCESS_KEY} # MinIO/S3 encryption string
   useSSL: false # Access to MinIO/S3 with SSL
-  bucketName: "a-bucket" # Bucket name in MinIO/S3
-  rootPath: files # The root path where the message is stored in MinIO/S3
+  bucketName: ${self:custom.secrets.BUCKET_NAME} # Bucket name in MinIO/S3
+  rootPath: / # The root path where the message is stored in MinIO/S3
 
 # Related configuration of pulsar, used to manage Milvus logs of recent mutation operations, output streaming log, and provide log publish-subscribe services.
 pulsar:
