@@ -15,8 +15,6 @@ async function getTaskQueueItems(){
 async function getAnalytics(){
     try {
         const response = await axios.get(host + "/api/analytics/get");
-        console.log(response) 
-        console.log(response.data)
         if (response.status === 200) {
             return {
                 totalContracts: response.data.totalContracts,
