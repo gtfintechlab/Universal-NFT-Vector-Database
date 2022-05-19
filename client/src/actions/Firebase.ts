@@ -13,13 +13,35 @@ async function getTaskQueueItems(){
 }
 
 async function getAnalytics(){
+    try {
+        const response = await axios.get(host + "/api/analytics/get");
+        console.log(response) 
+        console.log(response.data)
+        if (response.status === 200) {
+            return {
+                totalContracts: response.data.totalContracts,
+                totalERC1155: response.data.totalERC1155,
+                totalERC721: response.data.totalERC721,
+                totalEthereumNFTs: response.data.totalEthereumNFTs,
+                totalNFTs: response.data.totalNFTs
+            };
+        }
+    } catch (error) {
+        return {
+            totalContracts: 0,
+            totalERC1155: 0,
+            totalERC721: 0,
+            totalEthereumNFTs: 0,
+            totalNFTs: 0
+        } as AnalyticsProps;
+    }
     return {
         totalContracts: 0,
         totalERC1155: 0,
         totalERC721: 0,
         totalEthereumNFTs: 0,
         totalNFTs: 0
-    } as AnalyticsProps; 
+    } as AnalyticsProps;
 }
 
 async function addToTaskQueue(item: TaskQueueItem){
