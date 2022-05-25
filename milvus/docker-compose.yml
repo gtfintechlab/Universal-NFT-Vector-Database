@@ -34,9 +34,6 @@ services:
   minio:
     container_name: milvus-minio
     image: minio/minio:RELEASE.2020-12-03T00-03-10Z
-    environment:
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
     command: minio server /minio_data
@@ -54,7 +51,6 @@ services:
       - ./milvus.yaml:/milvus/configs/milvus.yaml
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
       PULSAR_ADDRESS: pulsar://pulsar:6650
       ROOT_COORD_ADDRESS: rootcoord:53100
     depends_on:
@@ -70,7 +66,6 @@ services:
       - ./milvus.yaml:/milvus/configs/milvus.yaml
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
       PULSAR_ADDRESS: pulsar://pulsar:6650
     ports:
       - "19530:19530"
@@ -83,7 +78,6 @@ services:
       - ./milvus.yaml:/milvus/configs/milvus.yaml
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
       PULSAR_ADDRESS: pulsar://pulsar:6650
       QUERY_COORD_ADDRESS: querycoord:19531
     depends_on:
@@ -99,7 +93,6 @@ services:
       - ./milvus.yaml:/milvus/configs/milvus.yaml
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
       PULSAR_ADDRESS: pulsar://pulsar:6650
     depends_on:
       - "querycoord"
@@ -112,7 +105,6 @@ services:
       - ./milvus.yaml:/milvus/configs/milvus.yaml
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
       PULSAR_ADDRESS: pulsar://pulsar:6650
       INDEX_COORD_ADDRESS: indexcoord:31000
     depends_on:
@@ -128,7 +120,6 @@ services:
       - ./milvus.yaml:/milvus/configs/milvus.yaml
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
       PULSAR_ADDRESS: pulsar://pulsar:6650
       INDEX_COORD_ADDRESS: indexcoord:31000
     depends_on:
@@ -142,7 +133,6 @@ services:
       - ./milvus.yaml:/milvus/configs/milvus.yaml
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
       PULSAR_ADDRESS: pulsar://pulsar:6650
       DATA_COORD_ADDRESS: datacoord:13333
     depends_on:
@@ -158,7 +148,6 @@ services:
       - ./milvus.yaml:/milvus/configs/milvus.yaml
     environment:
       ETCD_ENDPOINTS: etcd:2379
-      MINIO_ADDRESS: minio:9000
       PULSAR_ADDRESS: pulsar://pulsar:6650
     depends_on:
       - "datacoord"
