@@ -1,9 +1,13 @@
 name: Firebase Function Deploy
 on:
   push:
-    branches: [main, samrat/23-deploy-backend]
+    branches: [main]
     paths:
       - "server/**"
+defaults:
+  run:
+    working-directory: server
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,12 +29,8 @@ jobs:
       - name: Create Firebase Credentials File
         uses: "finnp/create-file-action@76e2826db048c29ab0955dd7728016657363fb3a"
         env:
-          FILE_NAME: "server/firebase_credentials.json"
+          FILE_NAME: "firebase_credentials.json"
           FILE_DATA: ${{ secrets.FIREBASE_CREDENTIALS }}
-
-      - name: Change Directories to server
-        run: |
-          cd server
 
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@1e278621b8467eff7eb0248e275bef80e85360df
