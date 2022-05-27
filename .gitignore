@@ -243,3 +243,5 @@ firebase_credentials.json
 nohup.out
 secrets.yml
 milvus.yaml
+
+my.secrets
