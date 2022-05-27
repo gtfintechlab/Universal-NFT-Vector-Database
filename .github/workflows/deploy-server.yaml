@@ -28,10 +28,13 @@ jobs:
           FILE_NAME: "server/firebase_credentials.json"
           FILE_DATA: ${{ secrets.FIREBASE_CREDENTIALS }}
 
+      - name: Change Directories to server
+        run: |
+          cd server
+
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@1e278621b8467eff7eb0248e275bef80e85360df
         with:
           args: deploy --only functions:app
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        working-directory: ./server
