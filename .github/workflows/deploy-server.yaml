@@ -1,11 +1,9 @@
 name: Firebase Function Deploy
 on:
   push:
-    branches:
-      - main
-      - samrat/23-deploy-backend
+    branches: [main, samrat/23-deploy-backend]
     paths:
-      - server
+      - "server/**"
 jobs:
   build:
     runs-on: ubuntu-latest
