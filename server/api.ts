@@ -7,6 +7,7 @@ import { TaskQueueItem, TaskQueueType, NFT, Contract, BlockchainType, NFTType, T
 import { SQS, config } from 'aws-sdk';
 import dotenv from 'dotenv'
 import cors from 'cors';
+import * as functions from "firebase-functions"
 
 dotenv.config()
 
@@ -293,3 +294,5 @@ function addTaskIdSQS(taskId: string) {
 api.listen(APP_PORT, () => {
     console.log(`api listening at http://localhost:${APP_PORT}`);
 });
+
+exports.api = functions.https.onRequest(api);
