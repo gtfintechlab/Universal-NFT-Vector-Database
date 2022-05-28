@@ -18,7 +18,6 @@ numpy==1.22.3
 opencv-python==4.5.5.64
 pandas==1.4.2
 Pillow==9.1.0
-pkg_resources==0.0.0
 proto-plus==1.20.3
 protobuf==3.20.1
 pyasn1==0.4.8
@@ -31,6 +30,7 @@ requests==2.27.1
 rsa==4.8
 ruamel.yaml==0.16.6
 s3transfer==0.5.2
+setuptools==62.3.2
 six==1.16.0
 tabulate==0.8.9
 timm==0.5.4
