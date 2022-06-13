@@ -1,16 +1,22 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { getFirestore } from 'firebase-admin/firestore';
-import {initializeApp, cert} from 'firebase-admin/app';
+// import { getFirestore } from 'firebase-admin/firestore';
+// import {initializeApp, cert} from 'firebase-admin/app';
 import { cwd } from 'process';
 import { TaskQueueItem, TaskQueueType, NFT, Contract, BlockchainType, NFTType, TaskQueueStatus} from './Types';
 import { SQS, config } from 'aws-sdk';
 import dotenv from 'dotenv'
 import cors from 'cors';
-import * as functions from "firebase-functions"
+import * as functions from "firebase-functions";
+import mongoose, { Types } from 'mongoose';
+import AnalyticsModel from './models/Analytics';
+import TaskQueueItemModel from './models/TaskQueueItem';
+import NFTModel from './models/NFT';
+import ContractModel from './models/Contract';
+import CheckpointModel from './models/Checkpoints';
 
+const APP_PORT = 4000;
 dotenv.config()
-
 const api = express();
 api.use(cors({ origin: true }));
 
@@ -18,11 +24,7 @@ api.use(cors({ origin: true }));
 api.use(bodyParser.urlencoded({ extended: false }));
 api.use(bodyParser.json());
 
-const serviceAccount = require(cwd() + '/firebase_credentials.json');
-initializeApp({
-  credential: cert(serviceAccount),
-});
-const database = getFirestore();
+const database = initMongo();
 
 // AWS Settings
 config.update({
@@ -31,11 +33,8 @@ config.update({
 
 const sqs = new SQS();
 
-function checkField(str: string): boolean {
-    if (str == null || str.length == 0){
-        return false
-    }
-    return true
+function checkField(field: string | Types.ObjectId): boolean {
+    return field != null;
 }
 
 function isValidNFT(nft: NFT): boolean {
@@ -87,16 +86,15 @@ function isValidTaskQueueItem(taskQueueItem: TaskQueueItem): boolean {
     return false
 }
 
-const APP_PORT = 4000;
 
 api.get("/api/analytics/get" , async (req, res) => {
     try{
-        const analyticsDocument = await database.collection("analytics").doc("analytics").get();
-        if (analyticsDocument.exists){
-            const analytics = analyticsDocument.data();
+        const analyticsDocument = await AnalyticsModel.find({}).exec();
+
+        if (analyticsDocument){
             res.status(200).json({
                 success: true,
-                ...analytics
+                ...analyticsDocument
             });
         } else {
             res.status(400).json({
@@ -115,17 +113,10 @@ api.get("/api/analytics/get" , async (req, res) => {
 
 api.get("/api/taskQueue/get", async (req, res) => {
     try{
-        const taskQueueItems = await database.collection("task_queue").where("status", "==", TaskQueueStatus.IN_PROGRESS).get();
-        
-        const finalItems: TaskQueueItem[] = [];
-        
-        taskQueueItems.forEach((item) => {
-            finalItems.push(item.data() as TaskQueueItem);
-        })
-
+        const taskQueueItems = await TaskQueueItemModel.find({status: TaskQueueStatus.IN_PROGRESS}).exec();
         res.status(200).json({
             success: true,
-            items: finalItems,
+            items: taskQueueItems,
         });
     } catch {
         res.status(400).json({
@@ -141,7 +132,7 @@ api.get("/", (req, res) => {
     });
 });
 
-api.post("/api/nfts/addAll", async (req, res) => {
+api.post("/api/nfts/add", async (req, res) => {
     try {
         const nft: NFT = req.body;
         const valid = isValidNFT(nft);
@@ -150,12 +141,13 @@ api.post("/api/nfts/addAll", async (req, res) => {
             throw new Error("Invalid NFT Data")
         }
 
-        await database.collection("all_nfts").doc(nft.id).set(nft);
+        const createdNFT = await NFTModel.create(nft);
 
         res.status(200).json({
             "success": true,
-            "data": nft
-        })
+            "data": createdNFT
+        });
+
     } catch (error) {
         let message;
 
@@ -173,7 +165,7 @@ api.post("/api/nfts/addAll", async (req, res) => {
 
 });
 
-api.post("/api/contracts/addAll", async (req, res) => {
+api.post("/api/contracts/add", async (req, res) => {
     try {
         const contract: Contract = req.body;
         const valid = isValidContract(contract);
@@ -182,11 +174,11 @@ api.post("/api/contracts/addAll", async (req, res) => {
             throw new Error("Invalid Contract Data")
         }
 
-        await database.collection("all_contracts").doc(contract.id).set(contract);
+        const createdContract = await ContractModel.create(contract);
 
         res.status(200).json({
             "success": true,
-            "data": contract
+            "data": createdContract
         })
     } catch (error) {
         let message
@@ -210,11 +202,11 @@ api.post("/api/taskQueue/add", async (req, res) => {
             throw new Error("Invalid TaskQueueItem Data")
         }
 
-        await database.collection("task_queue").doc(tQItem.id).set(tQItem);
-        addTaskIdSQS(tQItem.id);
+        const createdTaskQueueItem = await TaskQueueItemModel.create(tQItem);
+        addTaskIdSQS(createdTaskQueueItem.id);
         res.status(200).json({
             "success": true,
-            "data": tQItem
+            "data": createdTaskQueueItem
         })
     } catch (error) {
         let message
@@ -230,49 +222,27 @@ api.post("/api/taskQueue/add", async (req, res) => {
 });
 
 api.get("/api/contracts/last/get", async(req, res) => {
-    const contractCheckpoint = await database.collection("checkpoints").doc("contracts").get();
-    if (contractCheckpoint.exists){
-        const checkpointData = contractCheckpoint.data();
-        if (checkpointData){
-            res.status(200).json({
-                "success": true,
-                "lastContract": checkpointData.lastContract
-            });
-        } else {
-            res.status(400).json({
-                success: false,
-                error: "Could not retrieve checkpoint data"
-            });
-        }
+    const contractCheckpoint = await CheckpointModel.find({});
+    if (contractCheckpoint){
+        res.status(200).json({
+            "success": true,
+            "lastContract": contractCheckpoint[0].lastContract
+        });
     } else {
         res.status(400).json({
             success: false,
-            error: "Could not retrieve checkpoint"
+            error: "Could not retrieve checkpoint data"
         });
     }
 });
 
 api.post("/api/contracts/last/update", async(req, res) => {
     const newContract = req.body.newContract;
-    const checkpoint = database.collection("checkpoints").doc("contracts");
-    const checkpointGet = await checkpoint.get();
-    if (checkpointGet.exists){
-        const checkpointData = checkpointGet.data();
-        if (checkpointData){
-            checkpointData.lastContract = newContract;
-            checkpoint.update(checkpointData);
-        }
-
-        res.status(200).json({
-            success: true,
-            checkpointData: checkpointData,
-        });
-    } else {
-        res.status(400).json({
-            success: true,
-            error: "Failed to retrieve current checkpoint data",
-        });
-    }
+    const checkpoint = await CheckpointModel.findOneAndUpdate({}, {contract: newContract});
+    res.status(200).json({
+        success: true,
+        checkpointData: checkpoint,
+    });
 });
 
 function addTaskIdSQS(taskId: string) {
@@ -289,6 +259,11 @@ function addTaskIdSQS(taskId: string) {
     };
 
     sqs.sendMessage(params).send();
+}
+
+async function initMongo(){
+    const database = await mongoose.connect((process.env.MONGO_DB_URL + "/universal-nft-vector-database") as string);
+    return database;
 }
 
 api.listen(APP_PORT, () => {
