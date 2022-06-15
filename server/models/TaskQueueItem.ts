@@ -3,10 +3,6 @@ import {TaskQueueItem} from "../Types";
 
 const TaskQueueItemSchema = new Schema<TaskQueueItem>(
     {
-      id: {
-        type: Schema.Types.ObjectId,
-        required: true,
-      },
       type: {
         type: String,
         required: true,

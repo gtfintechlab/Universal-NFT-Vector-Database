@@ -2,10 +2,6 @@ import mongoose, { Schema } from "mongoose";
 
 const CheckpointSchema = new Schema(
     {
-      id: {
-        type: Schema.Types.ObjectId,
-        required: true,
-      },
       lastContract: {
         type: String,
         required: true

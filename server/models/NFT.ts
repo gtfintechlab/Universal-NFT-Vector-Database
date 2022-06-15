@@ -3,10 +3,6 @@ import {NFT} from "../Types";
 
 const NFTSchema = new Schema<NFT>(
     {
-      id: {
-        type: Schema.Types.ObjectId,
-        required: true,
-      },
       contractAddress: {
         type: String,
         required: true,

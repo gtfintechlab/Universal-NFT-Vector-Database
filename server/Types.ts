@@ -1,7 +1,6 @@
 import { Types } from "mongoose";
 
 interface Contract{
-    id: string | Types.ObjectId,    // firebase id
     address: string,                // address of contract
     name: string,                   // name of contract
     type: NFTType,                  // ERC721 vs ERC 1155 Contract
@@ -9,7 +8,6 @@ interface Contract{
 }
 
 interface NFT{
-    id: string | Types.ObjectId,                     // firebase id
     contractAddress: string,        // contract of token
     tokenId: string,                // id of token on the blockchain
     media: string,                  // file link to token
@@ -20,7 +18,6 @@ interface NFT{
 }
 
 interface TaskQueueItem{
-    id: string | Types.ObjectId,                     // firebase id
     type: TaskQueueType,            // type of task in task queue
     status: TaskQueueStatus,        // status of item in task queue
     data: NFT | Contract            // data of task queue job

@@ -3,10 +3,6 @@ import {Contract} from "../Types";
 
 const ContractSchema = new Schema<Contract>(
     {
-      id: {
-        type: Schema.Types.ObjectId,
-        required: true,
-      },
       address: {
         type: String,
         required: true,

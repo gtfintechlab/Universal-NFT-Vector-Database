@@ -2,10 +2,6 @@ import mongoose, { Schema } from "mongoose";
 
 const AnalyticsSchema = new Schema(
     {
-      id: {
-        type: Schema.Types.ObjectId,
-        required: true,
-      },
       totalContracts: {
         type: Number,
         required: true
