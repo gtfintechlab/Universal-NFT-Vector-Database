@@ -18,13 +18,12 @@ import CheckpointModel from './models/Checkpoints';
 const APP_PORT = 4000;
 dotenv.config()
 const api = express();
-api.use(cors({ origin: true }));
+api.use(cors());
+const database = initMongo();
 
 // Middleware for Express 
 api.use(bodyParser.urlencoded({ extended: false }));
 api.use(bodyParser.json());
-
-const database = initMongo();
 
 // AWS Settings
 config.update({
@@ -86,25 +85,21 @@ function isValidTaskQueueItem(taskQueueItem: TaskQueueItem): boolean {
 
 
 api.get("/api/analytics/get" , async (req, res) => {
-    const database = await initMongo();
     try{
         const analyticsDocument = await AnalyticsModel.find({}).exec();
 
         if (analyticsDocument){
-            database.disconnect();
             res.status(200).json({
                 success: true,
                 ...analyticsDocument
             });
         } else {
-            database.disconnect();
             res.status(400).json({
                 success: false,
                 error: "Failed to retrieve Analytics"
             });
         }
     } catch{
-        database.disconnect();
         res.status(400).json({
             success: false,
             error: "Something went wrong -- please try again!"
@@ -114,16 +109,13 @@ api.get("/api/analytics/get" , async (req, res) => {
 });
 
 api.get("/api/taskQueue/get", async (req, res) => {
-    const database = await initMongo();
     try{
         const taskQueueItems = await TaskQueueItemModel.find({status: TaskQueueStatus.IN_PROGRESS}).exec();
-        database.disconnect();
         res.status(200).json({
             success: true,
             items: taskQueueItems,
         });
     } catch {
-        database.disconnect();
         res.status(400).json({
             success: false,
             error: "Something went wrong -- please try again!"
@@ -148,7 +140,6 @@ api.post("/api/nfts/add", async (req, res) => {
         }
 
         const createdNFT = await NFTModel.create(nft);
-        database.disconnect()
         res.status(200).json({
             "success": true,
             "data": createdNFT
@@ -162,7 +153,6 @@ api.post("/api/nfts/add", async (req, res) => {
         } else{
             message = String(error);
         }
-        database.disconnect();
         res.status(400).json({
             "success": false,
             "error": message
@@ -182,7 +172,6 @@ api.post("/api/contracts/add", async (req, res) => {
         }
 
         const createdContract = await ContractModel.create(contract);
-        database.disconnect();
         res.status(200).json({
             "success": true,
             "data": createdContract
@@ -192,7 +181,6 @@ api.post("/api/contracts/add", async (req, res) => {
 
         if (error instanceof Error) message = error.message
         else message = String(error)
-        database.disconnect();
         res.status(400).json({
             "success": false,
             "error": message
@@ -201,7 +189,6 @@ api.post("/api/contracts/add", async (req, res) => {
 });
 
 api.post("/api/taskQueue/add", async (req, res) => {
-    const database = await initMongo();
     try {
         const tQItem: TaskQueueItem = req.body;
         const valid = isValidTaskQueueItem(tQItem);
@@ -212,7 +199,6 @@ api.post("/api/taskQueue/add", async (req, res) => {
 
         const createdTaskQueueItem = await TaskQueueItemModel.create(tQItem);
         addTaskIdSQS(createdTaskQueueItem._id.toString());
-        database.disconnect();
         res.status(200).json({
             "success": true,
             "data": createdTaskQueueItem
@@ -222,7 +208,6 @@ api.post("/api/taskQueue/add", async (req, res) => {
 
         if (error instanceof Error) message = error.message
         else message = String(error)
-        database.disconnect();
         res.status(400).json({
             "success": false,
             "error": message
@@ -234,13 +219,11 @@ api.get("/api/contracts/last/get", async(req, res) => {
     const database = await initMongo();
     const contractCheckpoint = await CheckpointModel.find({});
     if (contractCheckpoint){
-        database.disconnect();
         res.status(200).json({
             "success": true,
             "lastContract": contractCheckpoint[0].lastContract
         });
     } else {
-        database.disconnect();
         res.status(400).json({
             success: false,
             error: "Could not retrieve checkpoint data"
@@ -252,7 +235,6 @@ api.post("/api/contracts/last/update", async(req, res) => {
     const database = await initMongo();
     const newContract = req.body.newContract;
     const checkpoint = await CheckpointModel.findOneAndUpdate({}, {lastContract: newContract});
-    database.disconnect();
     res.status(200).json({
         success: true,
         checkpointData: checkpoint,
@@ -261,7 +243,7 @@ api.post("/api/contracts/last/update", async(req, res) => {
 
 api.get("/api/database/reset", async(req, res) => {
     const database = await initMongo();
-    if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017"){
+    if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017/"){
         await ContractModel.deleteMany({});
         await NFTModel.deleteMany({});
         await TaskQueueItemModel.deleteMany({});
@@ -277,7 +259,6 @@ api.get("/api/database/reset", async(req, res) => {
             totalNFTs: 0
         });
     }
-    database.disconnect();
     res.status(200).json({
         success: true,
     });
@@ -300,7 +281,7 @@ function addTaskIdSQS(taskId: string) {
 }
 
 async function initMongo(){
-    const database = await mongoose.connect((process.env.MONGO_DB_URL + "/universal-nft-vector-database") as string);
+    const database = await mongoose.connect((process.env.MONGO_DB_URL + "universal-nft-vector-database") as string);
     return database;
 }
 
