@@ -4,11 +4,8 @@ import {startSearch} from "../../actions/SearchAction"
 
 export default function SearchPage() {
     const [images, setImages] = useState<FileList | null>()
+    const [response, setResponse] = useState<JSON>()
     
-    useEffect(() => {
-        if (images == null) return;
-    })
-
     function onImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         let files = (e.target as HTMLInputElement).files
         setImages(files)
@@ -19,8 +16,8 @@ export default function SearchPage() {
       if (images != null) {
         const file = images[0]
         let b64: string = (await file2Base64(file))
-        let test = await startSearch(b64)
-        
+        let tempResult: JSON = await startSearch(b64)
+        setResponse(tempResult)
       }
     }
 
@@ -45,6 +42,9 @@ export default function SearchPage() {
           <input type="file" multiple accept="image/*" onChange={onImageChange} />
           {images == null ? "Can't submit": <button className="button" onClick={submitImage}>Submit</button>}
           {images == null ? "No Display": <img src={URL.createObjectURL(images[0])} />}
+          <div>
+            {response == null ? "No response yet" : JSON.stringify(response)}
+          </div>
         </div>
     )
 }
