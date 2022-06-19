@@ -25,7 +25,7 @@ The Universal NFT Vector Database is an initiative started by the Georgia Tech F
 ## System Design
 
 <p align="center">
-    <img src="https://github.com/gtfintechlab/Universal-NFT-Vector-Database/blob/master/system-design.png"/>
+    <img src="https://i.ibb.co/XXWF6wx/system-design.png"/>
 </p>
 
 ## Supporting / Contributing to this Project
