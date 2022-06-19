@@ -1,8 +1,5 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-// import { getFirestore } from 'firebase-admin/firestore';
-// import {initializeApp, cert} from 'firebase-admin/app';
-import { cwd } from 'process';
 import { TaskQueueItem, TaskQueueType, NFT, Contract, BlockchainType, NFTType, TaskQueueStatus} from './Types';
 import { SQS, config } from 'aws-sdk';
 import dotenv from 'dotenv'
@@ -14,12 +11,12 @@ import TaskQueueItemModel from './models/TaskQueueItem';
 import NFTModel from './models/NFT';
 import ContractModel from './models/Contract';
 import CheckpointModel from './models/Checkpoints';
+import { waterfall } from 'async';
 
 const APP_PORT = 4000;
 dotenv.config()
 const api = express();
 api.use(cors());
-const database = initMongo();
 
 // Middleware for Express 
 api.use(bodyParser.urlencoded({ extended: false }));
@@ -31,6 +28,7 @@ config.update({
 })
 
 const sqs = new SQS();
+let client: typeof mongoose | null;
 
 function checkField(field: string | Types.ObjectId): boolean {
     return field != null;
@@ -83,44 +81,73 @@ function isValidTaskQueueItem(taskQueueItem: TaskQueueItem): boolean {
     return false
 }
 
+async function initMongo(){
+    if (!client) {
+        const MONGO_URL = process.env.environment === "development" ? "mongodb://127.0.0.1:27017/" : process.env.MONGO_DB_URL; 
+        client = await mongoose.connect((MONGO_URL + 
+            "universal-nft-vector-database") as string, {
+            socketTimeoutMS: 360000
+        });
+        functions.logger.log("Connected to MongoDB");
+      } else {
+        functions.logger.log("Using existing MongoDB connection");
+      }
+      functions.logger.log("Returning client");
+      return client;
+}
+
+function applyWaterfall(functionToExecute: Function){
+    waterfall([
+        async function(callback: Function){
+            const database = await initMongo();
+            await callback(null, functionToExecute, database);
+        },
+        async function (functionExecution: Function, database: typeof mongoose, callback: Function){
+            await functionExecution();
+            await callback(null, database);
+        },
+        async function (database: typeof mongoose, callback: Function){
+            functions.logger.log("Number of Connections: " + database.connections.length)
+        }
+    ], () => {})
+}
 
 api.get("/api/analytics/get" , async (req, res) => {
-    try{
+    async function getAnalytics(){
         const analyticsDocument = await AnalyticsModel.find({}).exec();
-
         if (analyticsDocument){
             res.status(200).json({
                 success: true,
                 ...analyticsDocument
             });
         } else {
-            res.status(400).json({
-                success: false,
-                error: "Failed to retrieve Analytics"
-            });
+                res.status(400).json({
+                    success: false,
+                    error: "Failed to retrieve Analytics"
+                });
+            }
         }
-    } catch{
-        res.status(400).json({
-            success: false,
-            error: "Something went wrong -- please try again!"
-        });
-    }
 
+    applyWaterfall(getAnalytics);
 });
 
 api.get("/api/taskQueue/get", async (req, res) => {
-    try{
+    async function getTaskQueue(){
         const taskQueueItems = await TaskQueueItemModel.find({status: TaskQueueStatus.IN_PROGRESS}).exec();
-        res.status(200).json({
-            success: true,
-            items: taskQueueItems,
-        });
-    } catch {
-        res.status(400).json({
-            success: false,
-            error: "Something went wrong -- please try again!"
-        });
+        if (taskQueueItems != null){
+            res.status(200).json({
+                success: true,
+                items: taskQueueItems,
+            });
+        } else{
+            res.status(400).json({
+                success: false,
+                error: "Something went wrong -- please try again!"
+            });    
+        }
     }
+
+    applyWaterfall(getTaskQueue);
 })
 
 api.get("/", (req, res) => {
@@ -130,138 +157,152 @@ api.get("/", (req, res) => {
 });
 
 api.post("/api/nfts/add", async (req, res) => {
-    const database = await initMongo();
-    try {
-        const nft: NFT = req.body;
-        const valid = isValidNFT(nft);
-
-        if (!valid) {
-            throw new Error("Invalid NFT Data")
+    async function addNFT(){
+        try {
+            const nft: NFT = req.body;
+            const valid = isValidNFT(nft);
+    
+            if (!valid) {
+                throw new Error("Invalid NFT Data")
+            }
+    
+            const createdNFT = await NFTModel.create(nft);
+            res.status(200).json({
+                "success": true,
+                "data": createdNFT
+            });
+        } catch (error) {
+            let message;
+    
+            if (error instanceof Error){ 
+                message = error.message;
+            } else{
+                message = String(error);
+            }
+            res.status(400).json({
+                "success": false,
+                "error": message
+            });
         }
-
-        const createdNFT = await NFTModel.create(nft);
-        res.status(200).json({
-            "success": true,
-            "data": createdNFT
-        });
-
-    } catch (error) {
-        let message;
-
-        if (error instanceof Error){ 
-            message = error.message;
-        } else{
-            message = String(error);
-        }
-        res.status(400).json({
-            "success": false,
-            "error": message
-        })
     }
-
+    applyWaterfall(addNFT);
 });
 
 api.post("/api/contracts/add", async (req, res) => {
-    const database = await initMongo();
-    try {
-        const contract: Contract = req.body;
-        const valid = isValidContract(contract);
-
-        if (!valid) {
-            throw new Error("Invalid Contract Data")
-        }
-
-        const createdContract = await ContractModel.create(contract);
-        res.status(200).json({
-            "success": true,
-            "data": createdContract
-        })
-    } catch (error) {
-        let message
-
-        if (error instanceof Error) message = error.message
-        else message = String(error)
-        res.status(400).json({
-            "success": false,
-            "error": message
-        })
+    async function addContract(){
+        try {
+            const contract: Contract = req.body;
+            const valid = isValidContract(contract);
+    
+            if (!valid) {
+                throw new Error("Invalid Contract Data")
+            }
+    
+            const createdContract = await ContractModel.create(contract);
+            res.status(200).json({
+                "success": true,
+                "data": createdContract
+            })
+        } catch (error) {
+            let message
+    
+            if (error instanceof Error) message = error.message
+            else message = String(error)
+            res.status(400).json({
+                "success": false,
+                "error": message
+            });
+        }    
     }
+    applyWaterfall(addContract)
 });
 
 api.post("/api/taskQueue/add", async (req, res) => {
-    try {
-        const tQItem: TaskQueueItem = req.body;
-        const valid = isValidTaskQueueItem(tQItem);
-        
-        if (!valid) {
-            throw new Error("Invalid TaskQueueItem Data")
-        }
-
-        const createdTaskQueueItem = await TaskQueueItemModel.create(tQItem);
-        addTaskIdSQS(createdTaskQueueItem._id.toString());
-        res.status(200).json({
-            "success": true,
-            "data": createdTaskQueueItem
-        })
-    } catch (error) {
-        let message
-
-        if (error instanceof Error) message = error.message
-        else message = String(error)
-        res.status(400).json({
-            "success": false,
-            "error": message
-        })
+    async function addTaskQueue(){
+        try {
+            const tQItem: TaskQueueItem = req.body;
+            const valid = isValidTaskQueueItem(tQItem);
+            
+            if (!valid) {
+                throw new Error("Invalid TaskQueueItem Data")
+            }
+    
+            const createdTaskQueueItem = await TaskQueueItemModel.create(tQItem);
+            addTaskIdSQS(createdTaskQueueItem._id.toString());
+            res.status(200).json({
+                "success": true,
+                "data": createdTaskQueueItem
+            });
+        } catch (error) {
+            let message
+    
+            if (error instanceof Error) message = error.message
+            else message = String(error)
+            res.status(400).json({
+                "success": false,
+                "error": message
+            });
+        }    
     }
+
+    applyWaterfall(addTaskQueue);
 });
 
 api.get("/api/contracts/last/get", async(req, res) => {
-    const database = await initMongo();
-    const contractCheckpoint = await CheckpointModel.find({});
-    if (contractCheckpoint){
-        res.status(200).json({
-            "success": true,
-            "lastContract": contractCheckpoint[0].lastContract
-        });
-    } else {
-        res.status(400).json({
-            success: false,
-            error: "Could not retrieve checkpoint data"
-        });
+    async function getLastContract(){
+        const contractCheckpoint = await CheckpointModel.find({});
+        if (contractCheckpoint != null){
+            res.status(200).json({
+                "success": true,
+                "lastContract": contractCheckpoint[0].lastContract
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                error: "Could not retrieve checkpoint data"
+            });
+    
+        }
     }
+
+    applyWaterfall(getLastContract);
 });
 
 api.post("/api/contracts/last/update", async(req, res) => {
-    const database = await initMongo();
-    const newContract = req.body.newContract;
-    const checkpoint = await CheckpointModel.findOneAndUpdate({}, {lastContract: newContract});
-    res.status(200).json({
-        success: true,
-        checkpointData: checkpoint,
-    });
+    async function updateLastContract(){
+        const newContract = req.body.newContract;
+        const checkpoint = await CheckpointModel.findOneAndUpdate({}, {lastContract: newContract});
+        res.status(200).json({
+            success: true,
+            checkpointData: checkpoint,
+        });    
+    }
+    applyWaterfall(updateLastContract);
 });
 
 api.get("/api/database/reset", async(req, res) => {
-    const database = await initMongo();
-    if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017/"){
-        await ContractModel.deleteMany({});
-        await NFTModel.deleteMany({});
-        await TaskQueueItemModel.deleteMany({});
-        await CheckpointModel.findOneAndUpdate({}, {
-            lastContract: ""
-        });
-
-        await AnalyticsModel.findOneAndUpdate({}, {
-            totalContracts: 0,
-            totalERC1155: 0,
-            totalERC721: 0,
-            totalEthereumNFTs: 0,
-            totalNFTs: 0
-        });
+    async function resetDatabase(){
+        if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017/" && process.env.environment === "development"){
+            await ContractModel.deleteMany({});
+            await NFTModel.deleteMany({});
+            await TaskQueueItemModel.deleteMany({});
+            await CheckpointModel.findOneAndUpdate({}, {
+                lastContract: ""
+            });
+    
+            await AnalyticsModel.findOneAndUpdate({}, {
+                totalContracts: 0,
+                totalERC1155: 0,
+                totalERC721: 0,
+                totalEthereumNFTs: 0,
+                totalNFTs: 0
+            });
+        }
+        res.status(200).json({
+            success: true,
+        });    
     }
-    res.status(200).json({
-        success: true,
-    });
+    applyWaterfall(resetDatabase);
 })
 
 function addTaskIdSQS(taskId: string) {
@@ -278,11 +319,6 @@ function addTaskIdSQS(taskId: string) {
     };
 
     sqs.sendMessage(params).send();
-}
-
-async function initMongo(){
-    const database = await mongoose.connect((process.env.MONGO_DB_URL + "universal-nft-vector-database") as string);
-    return database;
 }
 
 api.listen(APP_PORT, () => {
