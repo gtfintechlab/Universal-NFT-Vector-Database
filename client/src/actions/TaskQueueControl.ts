@@ -33,11 +33,9 @@ export async function processNextContracts(amount=10, nftType=NFTType.ERC_721, c
 
         for (const contract of nextContracts){
             const contractToAdd = {
-                id: firebaseId.generate(),
                 type: TaskQueueType.ITEM_CONTRACT,
                 status: TaskQueueStatus.IN_PROGRESS,
                 data: {
-                    id: firebaseId.generate(),
                     address: contract.id,
                     name: contract.name,
                     type: nftType,

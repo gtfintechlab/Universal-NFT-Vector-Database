@@ -1,7 +1,7 @@
 import axios from "axios";
 import { AnalyticsProps, Contract, NFT, TaskQueueItem } from "../utils/Types";
 
-const host = "https://us-central1-universal-nft-vector-database.cloudfunctions.net/api";
+const host = "http://localhost:4000";
 
 async function getTaskQueueItems(){
     const response = await axios.get(host + "/api/taskQueue/get");
@@ -43,9 +43,7 @@ async function getAnalytics(){
 }
 
 async function addToTaskQueue(item: TaskQueueItem){
-    const response = await axios.post(host + "/api/taskQueue/add", {
-        itemToAdd: item
-    });
+    const response = await axios.post(host + "/api/taskQueue/add", item);
     if (response.status === 200){
         return "";
     }

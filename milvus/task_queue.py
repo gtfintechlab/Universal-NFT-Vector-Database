@@ -1,17 +1,19 @@
 import os
 import time
-from google.cloud import firestore
 import boto3
 from dotenv import load_dotenv
 from milvus import insert_data_milvus
 from milvus import initialize_milvus
 from vector import convert_to_vector
 import requests
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 load_dotenv()  
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + os.sep + "firebase_credentials.json"
-database = firestore.Client()
+client = MongoClient(os.getenv("MONGO_DB_URL"))
+database = client['universal-nft-vector-database']
+
 sqs = boto3.client('sqs', region_name='us-east-1', aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
                    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"))
 queue_url = os.getenv("JOB_SQS_URL")
@@ -24,6 +26,7 @@ def main():
         item = pop_queue()
         # If Queue is empty, take a 60 second break
         if not item:
+            print("Sleeping")
             time.sleep(60)
             continue
         
@@ -81,7 +84,9 @@ def pop_queue():
         ReceiptHandle=receipt_handle
     )
 
-    item = database.collection("task_queue").document(task_Id).get().to_dict()
+    item = database['taskqueueitems'].find_one({
+        "_id":ObjectId(task_Id)
+    })
     # Return the first element in the queue
     return item
 
@@ -89,7 +94,11 @@ def update_processed(item, status="success"):
     # Update the status of the item
     item['status'] = status
     # Update the database with new status
-    database.collection('task_queue').document(item['id']).update(item)
+    database['taskqueueitems'].update_one({'_id': item['_id']}, {
+        '$set': {
+            'status': status
+        }
+    })
     return True
 
 
@@ -97,22 +106,21 @@ def process_contract(item):
     token_list = get_collection_tokens(item["data"]["address"])
     for token in token_list:
         # Add token job to task queue in firebase
-        temp_doc = database.collection('task_queue').document()
         task = {
-            'id': temp_doc.id,
             "type": "nft",
             "status": "in progress",
             "data": token
         } 
         
         # Write to firebase
-        database.collection("task_queue").document(task['id']).create(task)
+        database['taskqueueitems'].insert_one(task)
 
         # Add ID To Task Queue
-        push_to_aws_task_queue(task['id'])
+        push_to_aws_task_queue(str(task['_id']))
 
     # Add contract to database
     add_contract_to_database(item)
+    return True
 
 def process_nft(item):
     try:
@@ -129,12 +137,12 @@ def process_nft(item):
 def add_nft_to_database(item, milvus_id):
     try:
         # Get NFT Collection
-        nft_collection = database.collection("all_nfts")
+        nft_collection = database['nfts']
         # Get the nft itself that we will add
         nft_to_add = item["data"]
         # Create a new document in the NFT database to add this
         nft_to_add['milvusId'] = milvus_id
-        nft_collection.document(nft_to_add['id']).create(nft_to_add)
+        nft_collection.insert_one(nft_to_add)
         # update analytics
         update_analytics(totalERC1155=nft_to_add["type"] == "ERC1155", 
                             totalERC721=nft_to_add["type"] == "ERC721",
@@ -148,11 +156,11 @@ def add_nft_to_database(item, milvus_id):
 def add_contract_to_database(item):
     try:
         # Get the Contract Collection
-        contract_collection = database.collection("all_contracts")
+        contract_collection = database['contracts']
         # Get the contract itself that we will add
         contract_to_add = item["data"]
         # Create a new document in the contract's collection to add this
-        contract_collection.document(contract_to_add['id']).create(contract_to_add)
+        contract_collection.insert_one(contract_to_add)
         # update analytics
         update_analytics(totalContracts=True)  
         return True
@@ -161,16 +169,17 @@ def add_contract_to_database(item):
 
 def update_analytics(totalContracts=False, totalERC1155=False, totalERC721=False, totalEthereumNFTs=False, totalNFTs=False):
     # Get Analytics Collection
-    analytics = database.collection("analytics").document("analytics").get().to_dict()
-    # Update Analytics as per paramters
-    analytics["totalContracts"] += int(totalContracts)
-    analytics["totalERC1155"] += int(totalERC1155)
-    analytics["totalERC721"] += int(totalERC721)
-    analytics["totalEthereumNFTs"] += int(totalEthereumNFTs)
-    analytics["totalNFTs"] += int(totalNFTs)
-    # Update Analytics
-    database.collection("analytics").document("analytics").update(analytics)
+    initialStats = database['analytics'].find_one()
 
+    analytics = database['analytics'].update_one({}, {
+        "$set": { "totalContracts": initialStats["totalContracts"] + int(totalContracts),
+                  "totalERC1155": initialStats["totalERC1155"] + int(totalERC1155),
+                  "totalERC721": initialStats["totalERC721"] + int(totalERC721),
+                  "totalEthereumNFTs": initialStats["totalEthereumNFTs"] + int(totalEthereumNFTs),
+                  "totalNFTs": initialStats["totalNFTs"] + int(totalNFTs)                  
+                }
+        })
+    
 def get_collection_tokens(contractAddress, chain="ethereum"):
     # Boolean value for pagnication of Alchemy API Response
     has_next_page = True
@@ -188,11 +197,8 @@ def get_collection_tokens(contractAddress, chain="ethereum"):
         if nfts and len(nfts) > 0:
             # Iterate through the NFTs
             for nft in nfts:
-                # Temporary document to get a firebase id
-                temp_doc = database.collection('all_nfts').document()
                 # Add NFT to token list as per NFT Model specifications
                 token_list.append({
-                    "id": temp_doc.id,
                     "contractAddress": nft.get("contract").get("address"),
                     "tokenId": nft.get("id").get("tokenId"),
                     "media": nft.get("media")[0].get("gateway"),
