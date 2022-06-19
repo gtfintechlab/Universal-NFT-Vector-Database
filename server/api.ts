@@ -250,11 +250,11 @@ api.post("/api/taskQueue/add", async (req, res) => {
 
 api.get("/api/contracts/last/get", async(req, res) => {
     async function getLastContract(){
-        const contractCheckpoint = await CheckpointModel.find({});
+        const contractCheckpoint = await CheckpointModel.findOne({});
         if (contractCheckpoint != null){
             res.status(200).json({
                 "success": true,
-                "lastContract": contractCheckpoint[0].lastContract
+                "lastContract": contractCheckpoint.lastContract
             });
         } else {
             res.status(400).json({
