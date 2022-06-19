@@ -83,7 +83,7 @@ function isValidTaskQueueItem(taskQueueItem: TaskQueueItem): boolean {
 
 async function initMongo(){
     if (!client) {
-        const MONGO_URL = process.env.environment === "development" ? "mongodb://127.0.0.1:27017/" : process.env.MONGO_DB_URL; 
+        const MONGO_URL = process.env.ENVIRONMENT === "development" ? "mongodb://127.0.0.1:27017/" : process.env.MONGO_DB_URL;
         client = await mongoose.connect((MONGO_URL + 
             "universal-nft-vector-database") as string, {
             socketTimeoutMS: 360000
@@ -282,7 +282,7 @@ api.post("/api/contracts/last/update", async(req, res) => {
 
 api.get("/api/database/reset", async(req, res) => {
     async function resetDatabase(){
-        if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017/" && process.env.environment === "development"){
+        if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017/" && process.env.ENVIRONMENT === "development"){
             await ContractModel.deleteMany({});
             await NFTModel.deleteMany({});
             await TaskQueueItemModel.deleteMany({});

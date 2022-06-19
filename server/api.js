@@ -37,40 +37,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const firestore_1 = require("firebase-admin/firestore");
-const app_1 = require("firebase-admin/app");
-const process_1 = require("process");
 const Types_1 = require("./Types");
 const aws_sdk_1 = require("aws-sdk");
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const functions = __importStar(require("firebase-functions"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const Analytics_1 = __importDefault(require("./models/Analytics"));
+const TaskQueueItem_1 = __importDefault(require("./models/TaskQueueItem"));
+const NFT_1 = __importDefault(require("./models/NFT"));
+const Contract_1 = __importDefault(require("./models/Contract"));
+const Checkpoints_1 = __importDefault(require("./models/Checkpoints"));
+const async_1 = require("async");
+const APP_PORT = 4000;
 dotenv_1.default.config();
 const api = (0, express_1.default)();
-api.use((0, cors_1.default)({ origin: true }));
+api.use((0, cors_1.default)());
 // Middleware for Express 
 api.use(body_parser_1.default.urlencoded({ extended: false }));
 api.use(body_parser_1.default.json());
-const serviceAccount = require((0, process_1.cwd)() + '/firebase_credentials.json');
-(0, app_1.initializeApp)({
-    credential: (0, app_1.cert)(serviceAccount),
-});
-const database = (0, firestore_1.getFirestore)();
 // AWS Settings
 aws_sdk_1.config.update({
     region: "us-east-1",
 });
 const sqs = new aws_sdk_1.SQS();
-function checkField(str) {
-    if (str == null || str.length == 0) {
-        return false;
-    }
-    return true;
+let client;
+function checkField(field) {
+    return field != null;
 }
 function isValidNFT(nft) {
     try {
-        if (checkField(nft.id) &&
-            checkField(nft.contractAddress) &&
+        if (checkField(nft.contractAddress) &&
             checkField(nft.tokenId) &&
             checkField(nft.media) &&
             checkField(nft.tokenURI) &&
@@ -87,8 +84,7 @@ function isValidNFT(nft) {
 }
 function isValidContract(contract) {
     try {
-        if (checkField(contract.id) &&
-            checkField(contract.address) &&
+        if (checkField(contract.address) &&
             checkField(contract.name) &&
             (Object.values(Types_1.NFTType).includes(contract.type)) &&
             (Object.values(Types_1.BlockchainType).includes(contract.chain))) {
@@ -101,183 +97,244 @@ function isValidContract(contract) {
     }
 }
 function isValidTaskQueueItem(taskQueueItem) {
-    if (checkField(taskQueueItem.id) &&
-        (Object.values(Types_1.TaskQueueType).includes(taskQueueItem.type)) &&
+    if ((Object.values(Types_1.TaskQueueType).includes(taskQueueItem.type)) &&
         (Object.values(Types_1.TaskQueueStatus).includes(taskQueueItem.status)) &&
-        (isValidNFT(taskQueueItem.data) || isValidContract(taskQueueItem.data))) {
+        ((isValidNFT(taskQueueItem.data) && taskQueueItem.type === Types_1.TaskQueueType.ITEM_NFT) ||
+            (isValidContract(taskQueueItem.data) && taskQueueItem.type === Types_1.TaskQueueType.ITEM_CONTRACT))) {
         return true;
     }
     return false;
 }
-const APP_PORT = 4000;
-api.get("/api/analytics/get", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const analyticsDocument = yield database.collection("analytics").doc("analytics").get();
-        if (analyticsDocument.exists) {
-            const analytics = analyticsDocument.data();
-            res.status(200).json(Object.assign({ success: true }, analytics));
+function initMongo() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!client) {
+            const MONGO_URL = process.env.ENVIRONMENT === "development" ? "mongodb://127.0.0.1:27017/" : process.env.MONGO_DB_URL;
+            client = yield mongoose_1.default.connect((MONGO_URL +
+                "universal-nft-vector-database"), {
+                socketTimeoutMS: 360000
+            });
+            functions.logger.log("Connected to MongoDB");
         }
         else {
-            res.status(400).json({
-                success: false,
-                error: "Failed to retrieve Analytics"
+            functions.logger.log("Using existing MongoDB connection");
+        }
+        functions.logger.log("Returning client");
+        return client;
+    });
+}
+function applyWaterfall(functionToExecute) {
+    (0, async_1.waterfall)([
+        function (callback) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const database = yield initMongo();
+                yield callback(null, functionToExecute, database);
+            });
+        },
+        function (functionExecution, database, callback) {
+            return __awaiter(this, void 0, void 0, function* () {
+                yield functionExecution();
+                yield callback(null, database);
+            });
+        },
+        function (database, callback) {
+            return __awaiter(this, void 0, void 0, function* () {
+                functions.logger.log("Number of Connections: " + database.connections.length);
             });
         }
-    }
-    catch (_a) {
-        res.status(400).json({
-            success: false,
-            error: "Something went wrong -- please try again!"
+    ], () => { });
+}
+api.get("/api/analytics/get", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    function getAnalytics() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const analyticsDocument = yield Analytics_1.default.find({}).exec();
+            if (analyticsDocument) {
+                res.status(200).json(Object.assign({ success: true }, analyticsDocument));
+            }
+            else {
+                res.status(400).json({
+                    success: false,
+                    error: "Failed to retrieve Analytics"
+                });
+            }
         });
     }
+    applyWaterfall(getAnalytics);
 }));
 api.get("/api/taskQueue/get", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const taskQueueItems = yield database.collection("task_queue").where("status", "==", Types_1.TaskQueueStatus.IN_PROGRESS).get();
-        const finalItems = [];
-        taskQueueItems.forEach((item) => {
-            finalItems.push(item.data());
-        });
-        res.status(200).json({
-            success: true,
-            items: finalItems,
+    function getTaskQueue() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const taskQueueItems = yield TaskQueueItem_1.default.find({ status: Types_1.TaskQueueStatus.IN_PROGRESS }).exec();
+            if (taskQueueItems != null) {
+                res.status(200).json({
+                    success: true,
+                    items: taskQueueItems,
+                });
+            }
+            else {
+                res.status(400).json({
+                    success: false,
+                    error: "Something went wrong -- please try again!"
+                });
+            }
         });
     }
-    catch (_b) {
-        res.status(400).json({
-            success: false,
-            error: "Something went wrong -- please try again!"
-        });
-    }
+    applyWaterfall(getTaskQueue);
 }));
 api.get("/", (req, res) => {
     res.status(200).json({
         "Hello": "World"
     });
 });
-api.post("/api/nfts/addAll", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const nft = req.body;
-        const valid = isValidNFT(nft);
-        if (!valid) {
-            throw new Error("Invalid NFT Data");
-        }
-        yield database.collection("all_nfts").doc(nft.id).set(nft);
-        res.status(200).json({
-            "success": true,
-            "data": nft
+api.post("/api/nfts/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    function addNFT() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const nft = req.body;
+                const valid = isValidNFT(nft);
+                if (!valid) {
+                    throw new Error("Invalid NFT Data");
+                }
+                const createdNFT = yield NFT_1.default.create(nft);
+                res.status(200).json({
+                    "success": true,
+                    "data": createdNFT
+                });
+            }
+            catch (error) {
+                let message;
+                if (error instanceof Error) {
+                    message = error.message;
+                }
+                else {
+                    message = String(error);
+                }
+                res.status(400).json({
+                    "success": false,
+                    "error": message
+                });
+            }
         });
     }
-    catch (error) {
-        let message;
-        if (error instanceof Error) {
-            message = error.message;
-        }
-        else {
-            message = String(error);
-        }
-        res.status(400).json({
-            "success": false,
-            "error": message
-        });
-    }
+    applyWaterfall(addNFT);
 }));
-api.post("/api/contracts/addAll", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const contract = req.body;
-        const valid = isValidContract(contract);
-        if (!valid) {
-            throw new Error("Invalid Contract Data");
-        }
-        yield database.collection("all_contracts").doc(contract.id).set(contract);
-        res.status(200).json({
-            "success": true,
-            "data": contract
+api.post("/api/contracts/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    function addContract() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const contract = req.body;
+                const valid = isValidContract(contract);
+                if (!valid) {
+                    throw new Error("Invalid Contract Data");
+                }
+                const createdContract = yield Contract_1.default.create(contract);
+                res.status(200).json({
+                    "success": true,
+                    "data": createdContract
+                });
+            }
+            catch (error) {
+                let message;
+                if (error instanceof Error)
+                    message = error.message;
+                else
+                    message = String(error);
+                res.status(400).json({
+                    "success": false,
+                    "error": message
+                });
+            }
         });
     }
-    catch (error) {
-        let message;
-        if (error instanceof Error)
-            message = error.message;
-        else
-            message = String(error);
-        res.status(400).json({
-            "success": false,
-            "error": message
-        });
-    }
+    applyWaterfall(addContract);
 }));
 api.post("/api/taskQueue/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const tQItem = req.body.itemToAdd;
-        const valid = isValidTaskQueueItem(tQItem);
-        if (!valid) {
-            throw new Error("Invalid TaskQueueItem Data");
-        }
-        yield database.collection("task_queue").doc(tQItem.id).set(tQItem);
-        addTaskIdSQS(tQItem.id);
-        res.status(200).json({
-            "success": true,
-            "data": tQItem
+    function addTaskQueue() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const tQItem = req.body;
+                const valid = isValidTaskQueueItem(tQItem);
+                if (!valid) {
+                    throw new Error("Invalid TaskQueueItem Data");
+                }
+                const createdTaskQueueItem = yield TaskQueueItem_1.default.create(tQItem);
+                addTaskIdSQS(createdTaskQueueItem._id.toString());
+                res.status(200).json({
+                    "success": true,
+                    "data": createdTaskQueueItem
+                });
+            }
+            catch (error) {
+                let message;
+                if (error instanceof Error)
+                    message = error.message;
+                else
+                    message = String(error);
+                res.status(400).json({
+                    "success": false,
+                    "error": message
+                });
+            }
         });
     }
-    catch (error) {
-        let message;
-        if (error instanceof Error)
-            message = error.message;
-        else
-            message = String(error);
-        res.status(400).json({
-            "success": false,
-            "error": message
-        });
-    }
+    applyWaterfall(addTaskQueue);
 }));
 api.get("/api/contracts/last/get", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const contractCheckpoint = yield database.collection("checkpoints").doc("contracts").get();
-    if (contractCheckpoint.exists) {
-        const checkpointData = contractCheckpoint.data();
-        if (checkpointData) {
-            res.status(200).json({
-                "success": true,
-                "lastContract": checkpointData.lastContract
-            });
-        }
-        else {
-            res.status(400).json({
-                success: false,
-                error: "Could not retrieve checkpoint data"
-            });
-        }
-    }
-    else {
-        res.status(400).json({
-            success: false,
-            error: "Could not retrieve checkpoint"
+    function getLastContract() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contractCheckpoint = yield Checkpoints_1.default.findOne({});
+            if (contractCheckpoint != null) {
+                res.status(200).json({
+                    "success": true,
+                    "lastContract": contractCheckpoint.lastContract
+                });
+            }
+            else {
+                res.status(400).json({
+                    success: false,
+                    error: "Could not retrieve checkpoint data"
+                });
+            }
         });
     }
+    applyWaterfall(getLastContract);
 }));
 api.post("/api/contracts/last/update", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newContract = req.body.newContract;
-    const checkpoint = database.collection("checkpoints").doc("contracts");
-    const checkpointGet = yield checkpoint.get();
-    if (checkpointGet.exists) {
-        const checkpointData = checkpointGet.data();
-        if (checkpointData) {
-            checkpointData.lastContract = newContract;
-            checkpoint.update(checkpointData);
-        }
-        res.status(200).json({
-            success: true,
-            checkpointData: checkpointData,
+    function updateLastContract() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const newContract = req.body.newContract;
+            const checkpoint = yield Checkpoints_1.default.findOneAndUpdate({}, { lastContract: newContract });
+            res.status(200).json({
+                success: true,
+                checkpointData: checkpoint,
+            });
         });
     }
-    else {
-        res.status(400).json({
-            success: true,
-            error: "Failed to retrieve current checkpoint data",
+    applyWaterfall(updateLastContract);
+}));
+api.get("/api/database/reset", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    function resetDatabase() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017/" && process.env.ENVIRONMENT === "development") {
+                yield Contract_1.default.deleteMany({});
+                yield NFT_1.default.deleteMany({});
+                yield TaskQueueItem_1.default.deleteMany({});
+                yield Checkpoints_1.default.findOneAndUpdate({}, {
+                    lastContract: ""
+                });
+                yield Analytics_1.default.findOneAndUpdate({}, {
+                    totalContracts: 0,
+                    totalERC1155: 0,
+                    totalERC721: 0,
+                    totalEthereumNFTs: 0,
+                    totalNFTs: 0
+                });
+            }
+            res.status(200).json({
+                success: true,
+            });
         });
     }
+    applyWaterfall(resetDatabase);
 }));
 function addTaskIdSQS(taskId) {
     const params = {

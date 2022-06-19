@@ -22,6 +22,12 @@ The Universal NFT Vector Database is an initiative started by the Georgia Tech F
 | Deploy Milvus Instance                        | In Progress  |
 | Search Page                                   |              |
 
+## System Design
+
+<p align="center">
+    <img src="https://github.com/gtfintechlab/Universal-NFT-Vector-Database/blob/master/system-design.png"/>
+</p>
+
 ## Supporting / Contributing to this Project
 
 We always welcome pull requests to this repository for fixing and further improving our database. Alternatively, if you would like to sponsor this project, please reach out to ssahoo61@gatech.edu
