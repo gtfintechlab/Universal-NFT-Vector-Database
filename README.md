@@ -20,7 +20,7 @@ The Universal NFT Vector Database is an initiative started by the Georgia Tech F
 | Deploy Vector Processing Script               |              |
 | Deploy Backend Server                         | ✅           |
 | Deploy Milvus Instance                        | In Progress  |
-| Search Page                                   |              |
+| Search Page                                   | ✅           |
 
 ## System Design
 
