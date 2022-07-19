@@ -24,7 +24,7 @@ const mockNFT: NFT = {
     tokenURI: "https://ipfs.io/ipfs/QmYzZZEp7hCS5GnQG4Rw4Loa33EoMYXUx2fgzPT14d2s5V",
     chain: BlockchainType.ETHEREUM,
     type: NFTType.ERC_721,
-    milvusId: 4685408067
+    vectorId: 4685408067
 } as NFT;
 
 export {mockContract, mockTaskQueueItem, mockNFT};

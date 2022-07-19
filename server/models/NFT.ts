@@ -27,7 +27,7 @@ const NFTSchema = new Schema<NFT>(
         type: String,
         required: true,
       },
-      milvusId: {
+      vectorId: {
         type: Number,
         required: true,
       },

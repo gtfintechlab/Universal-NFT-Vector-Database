@@ -2,7 +2,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { TaskQueueItem, TaskQueueType, NFT, Contract, BlockchainType, NFTType, TaskQueueStatus} from './Types';
 import { SQS, config } from 'aws-sdk';
-import dotenv from 'dotenv'
 import cors from 'cors';
 import * as functions from "firebase-functions";
 import mongoose, { Types } from 'mongoose';
@@ -12,9 +11,9 @@ import NFTModel from './models/NFT';
 import ContractModel from './models/Contract';
 import CheckpointModel from './models/Checkpoints';
 import { waterfall } from 'async';
+import getSecrets from './utils/secrets';
 
 const APP_PORT = 4000;
-dotenv.config()
 const api = express();
 api.use(cors());
 
@@ -41,7 +40,7 @@ function isValidNFT(nft: NFT): boolean {
             checkField(nft.tokenId) &&
             checkField(nft.media) &&
             checkField(nft.tokenURI) &&
-            !isNaN(nft.milvusId) &&
+            !isNaN(nft.vectorId) &&
             (Object.values(NFTType).includes(nft.type)) &&
             (Object.values(BlockchainType).includes(nft.chain))
         ){
@@ -83,7 +82,7 @@ function isValidTaskQueueItem(taskQueueItem: TaskQueueItem): boolean {
 
 async function initMongo(){
     if (!client) {
-        const MONGO_URL = process.env.ENVIRONMENT === "development" ? "mongodb://127.0.0.1:27017/" : process.env.MONGO_DB_URL;
+        const MONGO_URL = "mongodb://127.0.0.1:27017/";
         client = await mongoose.connect((MONGO_URL + 
             "universal-nft-vector-database") as string, {
             socketTimeoutMS: 360000
@@ -150,7 +149,8 @@ api.get("/api/taskQueue/get", async (req, res) => {
     applyWaterfall(getTaskQueue);
 })
 
-api.get("/", (req, res) => {
+api.get("/", async (req, res) => {
+    const secrets = getSecrets()
     res.status(200).json({
         "Hello": "World"
     });

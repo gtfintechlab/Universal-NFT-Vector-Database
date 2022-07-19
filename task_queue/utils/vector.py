@@ -1,7 +1,5 @@
-import io
-import requests
+import pinecone
 from towhee import pipeline
-from PIL import Image
 
 def convert_to_vector(image_path):
     try:
@@ -12,6 +10,11 @@ def convert_to_vector(image_path):
     except Exception as e:
         print(e)
         return {"success": False, "vector": None}
+
+def insert_pinecone(index, input_vector, vector_id, vector_metadata):
+    index = pinecone.Index("pinecone-index")
+    index.upsert(vector_id, input_vector, vector_metadata)
+    return True
 
 if __name__ == '__main__':
     embedding_pipeline = pipeline('image-embedding')

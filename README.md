@@ -4,23 +4,21 @@ The Universal NFT Vector Database is an initiative started by the Georgia Tech F
 
 ## Project Milestones
 
-| **Milestone**                                 | **Progress** |
-| --------------------------------------------- | ------------ |
-| Initial Project Setup                         | ✅           |
-| Analytics Dashboard                           | ✅           |
-| Integrate the Graph Protocol                  | ✅           |
-| Integrate Alchemy API                         | ✅           |
-| Create Backend Server                         | ✅           |
-| Integrate Milvus with Towhee Image Embeddings | ✅           |
-| Vector Database Search API                    | ✅           |
-| Vector Processing Script                      | ✅           |
-| Deploy Search API                             | ✅           |
-| Connect Milvus to S3 Storage                  | ✅           |
-| Deploy Dashboard                              | ✅           |
-| Deploy Vector Processing Script               |              |
-| Deploy Backend Server                         | ✅           |
-| Deploy Milvus Instance                        | In Progress  |
-| Search Page                                   | ✅           |
+| **Milestone**                                   | **Progress** |
+| ----------------------------------------------- | ------------ |
+| Initial Project Setup                           | ✅           |
+| Analytics Dashboard                             | ✅           |
+| Integrate the Graph Protocol                    | ✅           |
+| Integrate Alchemy API                           | ✅           |
+| Create Backend Server                           | ✅           |
+| Integrate Pinecone with Towhee Image Embeddings | ✅           |
+| Vector Database Search API                      | ✅           |
+| Vector Processing Script                        | ✅           |
+| Deploy Search API                               | ✅           |
+| Deploy Dashboard                                | ✅           |
+| Deploy Vector Processing Script                 |              |
+| Deploy Backend Server                           | ✅           |
+| Search Page                                     | ✅           |
 
 ## System Design
 

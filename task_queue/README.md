@@ -9,15 +9,3 @@ python3.8 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
 ```
-
-## Start Milvus
-
-```
-sudo ./milvus.sh "start"
-```
-
-## End Milvus
-
-```
-sudo ./milvus.sh "end"
-```

@@ -1,25 +1,22 @@
-import os
 import time
+import uuid
 import boto3
-from dotenv import load_dotenv
-from milvus import insert_data_milvus
-from milvus import initialize_milvus
-from vector import convert_to_vector
+from utils.vector import convert_to_vector, insert_pinecone
 import requests
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from utils.secrets import get_all_secrets
 
-load_dotenv()  
+secrets_dict = get_all_secrets()
 
-client = MongoClient(os.getenv("MONGO_DB_URL"))
+client = MongoClient(secrets_dict["MONGO_DB_URL"])
 database = client['universal-nft-vector-database']
 
-sqs = boto3.client('sqs', region_name='us-east-1', aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-                   aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"))
-queue_url = os.getenv("JOB_SQS_URL")
+sqs = boto3.client('sqs', region_name='us-east-1', aws_access_key_id=secrets_dict["AWS_ACCESS_KEY_ID"],
+                   aws_secret_access_key=secrets_dict["AWS_SECRET_ACCESS_KEY"])
+queue_url = secrets_dict["TASK_QUEUE_SQS_URL"]
 
 def main():
-    initialize_milvus()
     # While True for Task Queue Script
     while True:
         # Get Item id from Top of Queue
@@ -37,20 +34,16 @@ def main():
             if not result:
                 update_processed(item, "failure")
                 continue
-            # Add contract to the appropriate contracts collection
-            add_contract_to_database(item)
             # Move the id from the queue to the success
             update_processed(item, "success")
         
         # If the item is an NFT, process as per NFT guidelines
         elif item["type"] == "nft":
             # Process the NFT as necessary
-            result, milvus_id = process_nft(item)
+            result, vector_id = process_nft(item)
             if not result:
                 update_processed(item, "failure")
                 continue
-            # Add NFT to the appropriate NFT collections
-            add_nft_to_database(item, milvus_id)
             # Move the id from the queue to the success
             update_processed(item, "success")
 
@@ -112,7 +105,7 @@ def process_contract(item):
             "data": token
         } 
         
-        # Write to firebase
+        # Write to mongodb
         database['taskqueueitems'].insert_one(task)
 
         # Add ID To Task Queue
@@ -126,22 +119,31 @@ def process_nft(item):
     try:
         # Get Raw Vector from Pillow Image
         vector_image = convert_to_vector(item["data"]["media"])['vector']
+        # Generate an id to store in pinecone
+        vector_id = str(uuid.uuid4().hex)
         # Inser the data and get the id of the inserted image
-        milvus_insert = insert_data_milvus(nftVector=vector_image)
-        milvus_id = milvus_insert.timestamp
+        pinecone_insert = insert_pinecone(index="all-nfts",
+                                          input_vector=vector_image,
+                                          vector_id=vector_id,
+                                          vector_metadata={
+                                            "contract_address": item["contractAddress"],
+                                            "token_id": item["tokenId"]
+                                          })
+        # Add NFT to the appropriate NFT collections
+        add_nft_to_database(item, vector_id)
         # Return the status and id
-        return True, milvus_id
+        return True, vector_id
     except:
         return False, -1
 
-def add_nft_to_database(item, milvus_id):
+def add_nft_to_database(item, vector_id):
     try:
         # Get NFT Collection
         nft_collection = database['nfts']
         # Get the nft itself that we will add
         nft_to_add = item["data"]
         # Create a new document in the NFT database to add this
-        nft_to_add['milvusId'] = milvus_id
+        nft_to_add['vectorId'] = vector_id
         nft_collection.insert_one(nft_to_add)
         # update analytics
         update_analytics(totalERC1155=nft_to_add["type"] == "ERC1155", 
@@ -221,7 +223,7 @@ def get_collection_tokens_helper(contractAddress, startToken="", chain="ethereum
     try:
         # Check what chain we are on and the appropriate URL
         if chain == "ethereum":
-            base_url = os.getenv("ETHERUEM_NODE") + "/getNFTsForCollection"
+            base_url = secrets_dict["ETHERUEM_NODE"] + "/getNFTsForCollection"
         
         # Get response with metadata
         with_metadata = "true";
