@@ -1,6 +1,8 @@
 from flask import Flask, request
-import os
 from utils.vector import convert_to_vector, search_pinecone
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 app = Flask(__name__)
 

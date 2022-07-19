@@ -1,5 +1,5 @@
 import boto3
-from utils.secrets import get_all_secrets
+from utils.get_secrets import get_all_secrets
 secrets_dict = get_all_secrets()
 
 if __name__ == '__main__':

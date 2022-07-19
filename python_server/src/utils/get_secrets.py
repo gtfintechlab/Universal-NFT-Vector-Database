@@ -1,9 +1,10 @@
-from dotenv import load_dotenv
 import requests
 from requests.auth import HTTPBasicAuth
 import os
+from dotenv import load_dotenv, find_dotenv
 
-load_dotenv()
+load_dotenv(find_dotenv())
+
 def get_all_secrets():
     result = requests.get("https://api.doppler.com/v3/configs/config/secrets/download?format=json",
                             verify=True,

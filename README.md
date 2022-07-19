@@ -48,6 +48,6 @@ sudo ./run.sh
 
 Directories with env File:
 
-- `python_server/src/utils/`
+- `python_server/src/`
 - `server/`
-- `task_queue/utils/`
+- `task_queue/`

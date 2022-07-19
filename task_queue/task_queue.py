@@ -5,7 +5,7 @@ from utils.vector import convert_to_vector, insert_pinecone
 import requests
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-from utils.secrets import get_all_secrets
+from utils.get_secrets import get_all_secrets
 
 secrets_dict = get_all_secrets()
 

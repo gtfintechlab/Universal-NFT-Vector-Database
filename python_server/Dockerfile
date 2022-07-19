@@ -2,6 +2,8 @@ FROM python:3.8
 
 COPY src/ app/
 WORKDIR /app
+
+ENV TORCH_HOME=/tmp/torch
 RUN pip install -r requirements.txt
 
 ENV PORT 5000
