@@ -11,11 +11,15 @@ import NFTModel from './models/NFT';
 import ContractModel from './models/Contract';
 import CheckpointModel from './models/Checkpoints';
 import { waterfall } from 'async';
-import getSecrets from './utils/secrets';
+import { getSecrets } from './utils/secrets';
 
 const APP_PORT = 4000;
 const api = express();
 api.use(cors());
+
+const SECRETS = (async () => {
+    return  await getSecrets()
+ })();
 
 // Middleware for Express 
 api.use(bodyParser.urlencoded({ extended: false }));
@@ -150,7 +154,6 @@ api.get("/api/taskQueue/get", async (req, res) => {
 })
 
 api.get("/", async (req, res) => {
-    const secrets = getSecrets()
     res.status(200).json({
         "Hello": "World"
     });
@@ -282,7 +285,8 @@ api.post("/api/contracts/last/update", async(req, res) => {
 
 api.get("/api/database/reset", async(req, res) => {
     async function resetDatabase(){
-        if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017/" && process.env.ENVIRONMENT === "development"){
+        const evalSecrets = await SECRETS;
+        if (evalSecrets.MONGO_DB_URL === "mongodb://127.0.0.1:27017/"){
             await ContractModel.deleteMany({});
             await NFTModel.deleteMany({});
             await TaskQueueItemModel.deleteMany({});
@@ -305,9 +309,10 @@ api.get("/api/database/reset", async(req, res) => {
     applyWaterfall(resetDatabase);
 })
 
-function addTaskIdSQS(taskId: string) {
+async function addTaskIdSQS(taskId: string) {
+    const evalSecrets = await SECRETS;
     const params = {
-        QueueUrl: process.env.JOB_SQS_URL as string,
+        QueueUrl: evalSecrets.TASK_QUEUE_SQS_URL as string,
         DelaySeconds: 0,
         MessageAttributes: {
             'TaskId': {
