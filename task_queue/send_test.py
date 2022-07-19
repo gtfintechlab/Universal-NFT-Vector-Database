@@ -1,13 +1,11 @@
-import os
-import uuid
 import boto3
-from dotenv import load_dotenv
-load_dotenv()  
+from utils.secrets import get_all_secrets
+secrets_dict = get_all_secrets()
 
 if __name__ == '__main__':
-    sqs = boto3.client('sqs', region_name='us-east-1', aws_access_key_id=os.getenv("CLIENT_KEY"),
-                    aws_secret_access_key=os.getenv("CLIENT_SECRET"))
-    queue_url = os.getenv("AWS_SQS_URL")
+    sqs = boto3.client('sqs', region_name='us-east-1', aws_access_key_id=secrets_dict["AWS_ACCESS_KEY_ID"],
+                    aws_secret_access_key=secrets_dict["AWS_SECRET_ACCESS_KEY"])
+    queue_url = secrets_dict["TASK_QUEUE_SQS_URL"]
             
 
 

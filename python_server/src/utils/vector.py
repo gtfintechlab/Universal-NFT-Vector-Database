@@ -4,12 +4,10 @@ from PIL import Image
 from uuid import uuid4
 from towhee import pipeline
 import os
-import pinecone
 from utils.secrets import get_all_secrets
+import requests
 
-secrets = get_all_secrets()
-
-pinecone.init(api_key=secrets['PINECONE_API_KEY'], environment="us-west1-gcp")
+secrets_dict = get_all_secrets()
 
 def convert_to_vector(base64String):
     try:
@@ -26,12 +24,17 @@ def convert_to_vector(base64String):
         return {"success": False, "vector": None}
 
 def search_pinecone(index, input_vector, amount=3):
-    index = pinecone.Index(index)
-    result = index.query(
-        vector=input_vector,
-        top_k=amount,
-        include_values=True,
-        include_metadata=True
-    )
-
-    return result
+    headers = {
+        'Api-Key': secrets_dict['PINECONE_API_KEY'],
+    }
+    input_vector = list(input_vector)
+    input_vector = [float(num) for num in input_vector]
+    json_data = {
+        'topK': amount,
+        'includeValues': True,
+        'includeMetadata': True,
+        'vector': input_vector
+    }
+    response = requests.post(secrets_dict['ALL_NFTS_PINECONE_ENDPOINT'] +'/query', 
+                            headers=headers, json=json_data)    
+    return response

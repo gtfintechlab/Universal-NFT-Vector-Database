@@ -5,9 +5,19 @@ if [[ $1 == "start" && $OSTYPE == "linux-gnu"* ]]; then
     nohup bash -c 'mongod --fork --logpath /var/log/mongodb.log' &
     nohup bash -c 'npm start --prefix server/' &
     nohup bash -c 'npm start --prefix client/' &
-    nohup bash -c 'python_server/src/venv/bin/python python_server/src/app.py' &
-    nohup bash -c 'task_queue/venv/bin/python task_queue/task_queue.py' &
-    echo $! > pids/task_queue.pid;
+
+    cd python_server/src
+    source venv/bin/activate
+    nohup bash -c 'python app.py' &
+    cd ..
+    cd ..
+
+    cd task_queue
+    source venv/bin/activate
+    nohup bash -c 'python task_queue.py' &
+    TASK_QUEUE_PID=$!
+    cd ..
+    echo ${TASK_QUEUE_PID} > pids/task_queue.pid;
 fi
 
 if [[ $1 == "end" && $OSTYPE == "linux-gnu"* ]]; then
@@ -17,4 +27,11 @@ if [[ $1 == "end" && $OSTYPE == "linux-gnu"* ]]; then
     mongod --shutdown
     kill `cat pids/task_queue.pid`;
     rm -rf pids/
+
+    cd python_server/src
+    rm nohup.out
+    cd ..
+    cd ..
+
+    rm nohup.out
 fi

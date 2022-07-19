@@ -16,11 +16,11 @@ def search():
     
     results = search_pinecone(
                             index="all-nfts", 
-                            input_vector=[input_vector['vector']], 
+                            input_vector=input_vector['vector'], 
                             amount=amount
-                            )['matches']
+                            )
 
-    return { "results": results}
+    return results.json()
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000)
