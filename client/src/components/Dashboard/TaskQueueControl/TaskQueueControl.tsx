@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Button, HStack, VStack, Text, Stack } from '@chakra-ui/react'
 import {processNextContracts} from '../../../actions/TaskQueueControl';
-import { getLastContract } from "../../../actions/Firebase";
+import { getLastContract } from "../../../actions/Backend";
 
 function TaskQueueControl(){
     const [processing, setProcesssing] = React.useState(false);

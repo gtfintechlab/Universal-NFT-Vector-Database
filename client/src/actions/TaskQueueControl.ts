@@ -1,6 +1,6 @@
 import { BlockchainType, Contract, NFTType, TaskQueueItem, TaskQueueStatus, TaskQueueType } from "../utils/Types";
 import { Client, createClient, gql } from "urql";
-import { addToTaskQueue, getLastContract, updateLastContract } from "./Firebase";
+import { addToTaskQueue, getLastContract, updateLastContract } from "./Backend";
 import { firebaseId } from "../utils/FirebaseId";
 
 const EIP_721_SUBGRAPH = "https://api.thegraph.com/subgraphs/name/wighawag/eip721-subgraph";

@@ -117,11 +117,15 @@ function applyWaterfall(functionToExecute: Function){
 
 api.get("/api/analytics/get" , async (req, res) => {
     async function getAnalytics(){
-        const analyticsDocument = await AnalyticsModel.find({}).exec();
+        const analyticsDocument = await AnalyticsModel.findOne({}).exec();
         if (analyticsDocument){
             res.status(200).json({
                 success: true,
-                ...analyticsDocument
+                totalContracts: analyticsDocument.totalContracts,
+                totalERC1155: analyticsDocument.totalERC1155,
+                totalERC721: analyticsDocument.totalERC721,
+                totalEthereumNFTs: analyticsDocument.totalEthereumNFTs,
+                totalNFTs: analyticsDocument.totalNFTs
             });
         } else {
                 res.status(400).json({

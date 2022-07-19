@@ -29,3 +29,25 @@ The Universal NFT Vector Database is an initiative started by the Georgia Tech F
 ## Supporting / Contributing to this Project
 
 We always welcome pull requests to this repository for fixing and further improving our database. Alternatively, if you would like to sponsor this project, please reach out to ssahoo61@gatech.edu
+
+## Dev Notes
+
+To Setup this Project (WSL or Ubuntu Only):
+
+```
+sudo chmod +x ./setup.sh
+sudo ./setup.sh
+```
+
+To Run this Project:
+
+```
+sudo chmod +x ./run.sh
+sudo ./run.sh
+```
+
+Directories with env File:
+
+- `python_server/src/utils/`
+- `server/`
+- `task_queue/utils/`
