@@ -290,6 +290,9 @@ api.post("/api/contracts/last/update", async(req, res) => {
 api.get("/api/database/reset", async(req, res) => {
     async function resetDatabase(){
         const evalSecrets = await SECRETS;
+        process.env.AWS_ACCESS_KEY_ID = evalSecrets.AWS_ACCESS_KEY_ID;
+        process.env.AWS_SECRET_ACCESS_KEY = evalSecrets.AWS_SECRET_ACCESS_KEY; 
+        const sqs = new SQS();
         if (evalSecrets.MONGO_DB_URL === "mongodb://127.0.0.1:27017/"){
             await ContractModel.deleteMany({});
             await NFTModel.deleteMany({});
@@ -305,6 +308,10 @@ api.get("/api/database/reset", async(req, res) => {
                 totalEthereumNFTs: 0,
                 totalNFTs: 0
             });
+            const params = {
+                QueueUrl: evalSecrets.TASK_QUEUE_SQS_URL as string
+            }
+            sqs.purgeQueue(params).send();
         }
         res.status(200).json({
             success: true,

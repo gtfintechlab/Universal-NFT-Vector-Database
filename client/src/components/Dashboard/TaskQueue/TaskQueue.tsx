@@ -27,19 +27,25 @@ function TaskQueue(props: TaskQueueProps){
                         </Thead>
                         <Tbody>
                         {props.data.map((value, index) => {
-                            return <Tr key={index}>
+                            {console.log(value.type === TaskQueueType.ITEM_CONTRACT)}
+                            return (
+                            <Tr key={index}>
                                 <Td fontSize={['lg']} fontWeight="bold">{index}</Td>
+
                                 {value.type === TaskQueueType.ITEM_NFT && 
                                 <Td fontSize={['xs','sm','lg']}>
                                     {(value.data as NFT).media}
                                 </Td>}
-                                {value.type === TaskQueueType.ITEM_CONTRACT || value.type == TaskQueueType.ITEM_NOT_APPLICABLE && 
+
+                                {(value.type === TaskQueueType.ITEM_CONTRACT || value.type == TaskQueueType.ITEM_NOT_APPLICABLE) && 
                                 <Td fontSize={['xs','sm','lg']}>
                                     {(value.data as Contract).address}
                                 </Td>}
-                                <Td fontSize={['xs','sm','lg']} display={['none','none', 'block','block']}>{value.type}</Td>
 
-                            </Tr>
+                                <Td fontSize={['xs','sm','lg']} 
+                                    display={['none','none', 'block','block']}>{value.type}</Td>
+
+                            </Tr>)
                         })}
                         </Tbody>
                     </Table>

@@ -22,9 +22,10 @@ function Dashboard(){
     useEffect(() => {
         document.body.style.backgroundColor = '#f7f7f7';
         async function getDashbordInfo(){
-            const taskQueueItems: TaskQueueItem[] = await getTaskQueueItems();
+            let taskQueueItems: TaskQueueItem[] = await getTaskQueueItems();
             const analytics: AnalyticsProps = await getAnalytics();
-            taskQueueItems.splice(0,10);
+            taskQueueItems = taskQueueItems.splice(0,5);
+            console.log(taskQueueItems);
             if (taskQueueItems.length === 0){
                 taskQueueItems.push(mockTaskQueueItem);
             }

@@ -2,7 +2,7 @@ import base64
 import io
 from PIL import Image
 from img2vec_pytorch import Img2Vec
-from get_secrets import get_all_secrets
+from utils.get_secrets import get_all_secrets
 import requests
 
 secrets_dict = get_all_secrets()
@@ -18,7 +18,7 @@ def convert_to_vector(base64String):
         print(e)
         return {"success": False, "vector": None}
 
-def search_pinecone(index, input_vector, amount=3):
+def search_pinecone(index, input_vector, amount=3, withVector=False, withMetadata=True):
     headers = {
         'Api-Key': secrets_dict['PINECONE_API_KEY'],
     }
@@ -26,8 +26,8 @@ def search_pinecone(index, input_vector, amount=3):
     input_vector = [float(num) for num in input_vector]
     json_data = {
         'topK': amount,
-        'includeValues': True,
-        'includeMetadata': True,
+        'includeValues': withVector,
+        'includeMetadata': withMetadata,
         'vector': input_vector
     }
     response = requests.post(secrets_dict['ALL_NFTS_PINECONE_ENDPOINT'] +'/query', 

@@ -1,7 +1,7 @@
 import time
 import uuid
 import boto3
-from utils.vector import convert_to_vector, insert_pinecone
+from vector import convert_to_vector, insert_pinecone
 import requests
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -30,6 +30,7 @@ def main():
             
             # If the item type is a contract, process as per contract guidlines
             if item["type"] == "contract":
+                print("Processing Contract:", item['data']['address'])
                 # Process the contract as necessary
                 result = process_contract(item)
                 if not result:
@@ -40,6 +41,7 @@ def main():
             
             # If the item is an NFT, process as per NFT guidelines
             elif item["type"] == "nft":
+                print("Processing NFT:", item["data"]["media"])
                 # Process the NFT as necessary
                 result, vector_id = process_nft(item)
                 if not result:
@@ -129,8 +131,9 @@ def process_nft(item):
                                           input_vector=vector_image,
                                           vector_id=vector_id,
                                           vector_metadata={
-                                            "contract_address": item["contractAddress"],
-                                            "token_id": item["tokenId"]
+                                            "contract_address": item["data"]["contractAddress"],
+                                            "token_id": item["data"]["tokenId"],
+                                            "media": item["data"]["media"]
                                           })
         # Add NFT to the appropriate NFT collections
         add_nft_to_database(item, vector_id)
