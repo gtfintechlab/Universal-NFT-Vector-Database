@@ -4,9 +4,11 @@ certifi==2022.6.15
 charset-normalizer==2.1.0
 dnspython==2.2.1
 idna==3.3
+img2vec-pytorch==1.0.1
 jmespath==1.0.1
 loguru==0.6.0
 numpy==1.23.1
+Pillow==9.2.0
 pinecone-client==2.0.11
 pyarrow==8.0.0
 pymongo==4.1.1
@@ -18,6 +20,8 @@ ruamel.yaml==0.16.6
 s3transfer==0.6.0
 six==1.16.0
 tabulate==0.8.10
+torch==1.12.0
+torchvision==0.13.0
 towhee==0.7.2
 tqdm==4.64.0
 typing-extensions==4.3.0

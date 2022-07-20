@@ -19,33 +19,36 @@ queue_url = secrets_dict["TASK_QUEUE_SQS_URL"]
 def main():
     # While True for Task Queue Script
     while True:
-        # Get Item id from Top of Queue
-        item = pop_queue()
-        # If Queue is empty, take a 60 second break
-        if not item:
-            print("Sleeping")
-            time.sleep(60)
-            continue
-        
-        # If the item type is a contract, process as per contract guidlines
-        if item["type"] == "contract":
-            # Process the contract as necessary
-            result = process_contract(item)
-            if not result:
-                update_processed(item, "failure")
+        try:
+            # Get Item id from Top of Queue
+            item = pop_queue()
+            # If Queue is empty, take a 60 second break
+            if not item:
+                print("Sleeping")
+                time.sleep(60)
                 continue
-            # Move the id from the queue to the success
-            update_processed(item, "success")
-        
-        # If the item is an NFT, process as per NFT guidelines
-        elif item["type"] == "nft":
-            # Process the NFT as necessary
-            result, vector_id = process_nft(item)
-            if not result:
-                update_processed(item, "failure")
-                continue
-            # Move the id from the queue to the success
-            update_processed(item, "success")
+            
+            # If the item type is a contract, process as per contract guidlines
+            if item["type"] == "contract":
+                # Process the contract as necessary
+                result = process_contract(item)
+                if not result:
+                    update_processed(item, "failure")
+                    continue
+                # Move the id from the queue to the success
+                update_processed(item, "success")
+            
+            # If the item is an NFT, process as per NFT guidelines
+            elif item["type"] == "nft":
+                # Process the NFT as necessary
+                result, vector_id = process_nft(item)
+                if not result:
+                    update_processed(item, "failure")
+                    continue
+                # Move the id from the queue to the success
+                update_processed(item, "success")
+        except Exception as e:
+            print(e)
 
 def pop_queue():
     # Get the queue from the task queue checkpoints

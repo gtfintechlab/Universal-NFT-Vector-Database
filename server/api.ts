@@ -30,7 +30,7 @@ config.update({
     region: "us-east-1",
 })
 
-const sqs = new SQS();
+
 let client: typeof mongoose | null;
 
 function checkField(field: string | Types.ObjectId): boolean {
@@ -235,7 +235,7 @@ api.post("/api/taskQueue/add", async (req, res) => {
             }
     
             const createdTaskQueueItem = await TaskQueueItemModel.create(tQItem);
-            addTaskIdSQS(createdTaskQueueItem._id.toString());
+            await addTaskIdSQS(createdTaskQueueItem._id.toString());
             res.status(200).json({
                 "success": true,
                 "data": createdTaskQueueItem
@@ -315,6 +315,9 @@ api.get("/api/database/reset", async(req, res) => {
 
 async function addTaskIdSQS(taskId: string) {
     const evalSecrets = await SECRETS;
+    process.env.AWS_ACCESS_KEY_ID = evalSecrets.AWS_ACCESS_KEY_ID;
+    process.env.AWS_SECRET_ACCESS_KEY = evalSecrets.AWS_SECRET_ACCESS_KEY; 
+    const sqs = new SQS();
     const params = {
         QueueUrl: evalSecrets.TASK_QUEUE_SQS_URL as string,
         DelaySeconds: 0,
@@ -326,9 +329,8 @@ async function addTaskIdSQS(taskId: string) {
         },
         MessageBody: taskId
     };
-
     sqs.sendMessage(params).send();
-}
+    }
 
 api.listen(APP_PORT, () => {
     console.log(`api listening at http://localhost:${APP_PORT}`);

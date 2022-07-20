@@ -2,7 +2,7 @@ import base64
 import io
 from PIL import Image
 from img2vec_pytorch import Img2Vec
-from utils.get_secrets import get_all_secrets
+from get_secrets import get_all_secrets
 import requests
 
 secrets_dict = get_all_secrets()
