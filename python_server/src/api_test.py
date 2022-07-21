@@ -9,10 +9,9 @@ data = {
     'image': encoded_string,
     'amount': 1,
     'withVector': False,
-    'withMetadata': True
+    'withMetadata': False
 }
 
-url = 'http://127.0.0.1:5000/api/search'
+url = 'https://universal-nft-vector-database.web.app/api/search'
 x = requests.post(url, json=data, headers={'Content-Type': 'application/json'})
 print(json.dumps(x.json(), indent=4, sort_keys=True))
-# print(x.json())
