@@ -12,7 +12,7 @@ function OverallAnalytics (props: AnalyticsProps){
                         <Box boxShadow='md' bg="white"
                         w={["90vw","90vw","45vw","45vw"]}> 
 
-                            <Text fontSize={['2xl', '2xl', '2xl', '2xl']} fontWeight="bold" ml={["15px","15px","15px","15px"]} mt={["15px"]}>Total NFTs in Milvus</Text>
+                            <Text fontSize={['2xl', '2xl', '2xl', '2xl']} fontWeight="bold" ml={["15px","15px","15px","15px"]} mt={["15px"]}>Total NFTs in the Vector Database</Text>
 
                             <Text fontSize='4xl' ml={["15px","15px","15px","15px"]} fontWeight="bold" mt='2vh'>{props.totalNFTs}</Text>
                         </Box>

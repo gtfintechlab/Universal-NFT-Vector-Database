@@ -1,10 +1,8 @@
 from flask import Flask, request
-from PIL import Image
-from io import BytesIO
-import os
-from milvus import search_data_milvus, initialize_milvus
-from vector import convert_to_vector
-from pymilvus import connections
+from vector import convert_to_vector, search_pinecone
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 app = Flask(__name__)
 
@@ -12,28 +10,23 @@ app = Flask(__name__)
 def home():
     return {"Hello": "World"}
 
-@app.route("/api/milvus/search", methods=['POST'])
+@app.route("/api/search", methods=['POST'])
 def search():
     base_64_image = request.json['image']
     amount = request.json['amount']
+    withVector = request.json.get('withVector', False)
+    withMetadata = request.json.get('withMetadata', True)
     input_vector = convert_to_vector(base_64_image)
     
-    initialize_milvus()
-    results = search_data_milvus([input_vector['vector']], amount=amount)
-    ids = list(results[0].ids)
-    distances = list(results[0].distances)
-    result_json = {
+    results = search_pinecone(
+                            index="all-nfts", 
+                            input_vector=input_vector['vector'], 
+                            amount=amount,
+                            withVector=withVector,
+                            withMetadata=withMetadata
+                            )
 
-    }
-
-    for index, milvus_id in enumerate(ids):
-        result_json[index] = {}
-        result_json[index]['milvusId'] = milvus_id
-        result_json[index]['distance'] = distances[index]
-    
-    connections.disconnect("default")
-
-    return { "results": result_json}
+    return results.json()
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=os.environ.get("PORT", 5000))
+    app.run(debug=True, host="0.0.0.0", port=5000)

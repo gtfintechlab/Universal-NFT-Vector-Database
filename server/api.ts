@@ -2,7 +2,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { TaskQueueItem, TaskQueueType, NFT, Contract, BlockchainType, NFTType, TaskQueueStatus} from './Types';
 import { SQS, config } from 'aws-sdk';
-import dotenv from 'dotenv'
 import cors from 'cors';
 import * as functions from "firebase-functions";
 import mongoose, { Types } from 'mongoose';
@@ -12,11 +11,15 @@ import NFTModel from './models/NFT';
 import ContractModel from './models/Contract';
 import CheckpointModel from './models/Checkpoints';
 import { waterfall } from 'async';
+import { getSecrets } from './utils/secrets';
 
 const APP_PORT = 4000;
-dotenv.config()
 const api = express();
 api.use(cors());
+
+const SECRETS = (async () => {
+    return  await getSecrets()
+ })();
 
 // Middleware for Express 
 api.use(bodyParser.urlencoded({ extended: false }));
@@ -27,7 +30,7 @@ config.update({
     region: "us-east-1",
 })
 
-const sqs = new SQS();
+
 let client: typeof mongoose | null;
 
 function checkField(field: string | Types.ObjectId): boolean {
@@ -41,7 +44,7 @@ function isValidNFT(nft: NFT): boolean {
             checkField(nft.tokenId) &&
             checkField(nft.media) &&
             checkField(nft.tokenURI) &&
-            !isNaN(nft.milvusId) &&
+            !isNaN(nft.vectorId) &&
             (Object.values(NFTType).includes(nft.type)) &&
             (Object.values(BlockchainType).includes(nft.chain))
         ){
@@ -83,7 +86,7 @@ function isValidTaskQueueItem(taskQueueItem: TaskQueueItem): boolean {
 
 async function initMongo(){
     if (!client) {
-        const MONGO_URL = process.env.ENVIRONMENT === "development" ? "mongodb://127.0.0.1:27017/" : process.env.MONGO_DB_URL;
+        const MONGO_URL = "mongodb://127.0.0.1:27017/";
         client = await mongoose.connect((MONGO_URL + 
             "universal-nft-vector-database") as string, {
             socketTimeoutMS: 360000
@@ -114,11 +117,15 @@ function applyWaterfall(functionToExecute: Function){
 
 api.get("/api/analytics/get" , async (req, res) => {
     async function getAnalytics(){
-        const analyticsDocument = await AnalyticsModel.find({}).exec();
+        const analyticsDocument = await AnalyticsModel.findOne({}).exec();
         if (analyticsDocument){
             res.status(200).json({
                 success: true,
-                ...analyticsDocument
+                totalContracts: analyticsDocument.totalContracts,
+                totalERC1155: analyticsDocument.totalERC1155,
+                totalERC721: analyticsDocument.totalERC721,
+                totalEthereumNFTs: analyticsDocument.totalEthereumNFTs,
+                totalNFTs: analyticsDocument.totalNFTs
             });
         } else {
                 res.status(400).json({
@@ -150,7 +157,7 @@ api.get("/api/taskQueue/get", async (req, res) => {
     applyWaterfall(getTaskQueue);
 })
 
-api.get("/", (req, res) => {
+api.get("/", async (req, res) => {
     res.status(200).json({
         "Hello": "World"
     });
@@ -228,7 +235,7 @@ api.post("/api/taskQueue/add", async (req, res) => {
             }
     
             const createdTaskQueueItem = await TaskQueueItemModel.create(tQItem);
-            addTaskIdSQS(createdTaskQueueItem._id.toString());
+            await addTaskIdSQS(createdTaskQueueItem._id.toString());
             res.status(200).json({
                 "success": true,
                 "data": createdTaskQueueItem
@@ -282,7 +289,11 @@ api.post("/api/contracts/last/update", async(req, res) => {
 
 api.get("/api/database/reset", async(req, res) => {
     async function resetDatabase(){
-        if (process.env.MONGO_DB_URL === "mongodb://127.0.0.1:27017/" && process.env.ENVIRONMENT === "development"){
+        const evalSecrets = await SECRETS;
+        process.env.AWS_ACCESS_KEY_ID = evalSecrets.AWS_ACCESS_KEY_ID;
+        process.env.AWS_SECRET_ACCESS_KEY = evalSecrets.AWS_SECRET_ACCESS_KEY; 
+        const sqs = new SQS();
+        if (evalSecrets.MONGO_DB_URL === "mongodb://127.0.0.1:27017/"){
             await ContractModel.deleteMany({});
             await NFTModel.deleteMany({});
             await TaskQueueItemModel.deleteMany({});
@@ -297,6 +308,10 @@ api.get("/api/database/reset", async(req, res) => {
                 totalEthereumNFTs: 0,
                 totalNFTs: 0
             });
+            const params = {
+                QueueUrl: evalSecrets.TASK_QUEUE_SQS_URL as string
+            }
+            sqs.purgeQueue(params).send();
         }
         res.status(200).json({
             success: true,
@@ -305,9 +320,13 @@ api.get("/api/database/reset", async(req, res) => {
     applyWaterfall(resetDatabase);
 })
 
-function addTaskIdSQS(taskId: string) {
+async function addTaskIdSQS(taskId: string) {
+    const evalSecrets = await SECRETS;
+    process.env.AWS_ACCESS_KEY_ID = evalSecrets.AWS_ACCESS_KEY_ID;
+    process.env.AWS_SECRET_ACCESS_KEY = evalSecrets.AWS_SECRET_ACCESS_KEY; 
+    const sqs = new SQS();
     const params = {
-        QueueUrl: process.env.JOB_SQS_URL as string,
+        QueueUrl: evalSecrets.TASK_QUEUE_SQS_URL as string,
         DelaySeconds: 0,
         MessageAttributes: {
             'TaskId': {
@@ -317,9 +336,8 @@ function addTaskIdSQS(taskId: string) {
         },
         MessageBody: taskId
     };
-
     sqs.sendMessage(params).send();
-}
+    }
 
 api.listen(APP_PORT, () => {
     console.log(`api listening at http://localhost:${APP_PORT}`);

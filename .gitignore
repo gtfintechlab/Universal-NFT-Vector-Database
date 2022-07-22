@@ -245,3 +245,5 @@ secrets.yml
 milvus.yaml
 
 my.secrets
+
+pids/

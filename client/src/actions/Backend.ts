@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AnalyticsProps, Contract, NFT, TaskQueueItem } from "../utils/Types";
+import { AnalyticsProps, TaskQueueItem } from "../utils/Types";
 
 const host = "http://localhost:4000";
 
