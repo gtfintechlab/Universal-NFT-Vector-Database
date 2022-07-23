@@ -1,26 +1,41 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2018",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+      "ESNext",
+      "ESNext.AsyncIterable",
+      "DOM"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "sourceMap": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [
+        "./*"
+      ],
+      "@/*": [
+        "./*"
+      ],
+    },
+    "types": [
+      "@nuxt/types",
+      "@nuxtjs/axios",
+      "@types/node"
+    ]
   },
-  "include": [
-    "src"
-  ]
+  "exclude": [
+    "node_modules",
+    ".nuxt",
+    "dist"
+  ],
+  "vueCompilerOptions": {
+    "experimentalDisableTemplateSupport": true,
+    "jsx": "preserve"
+    }
 }
