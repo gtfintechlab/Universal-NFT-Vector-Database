@@ -55,7 +55,7 @@ aside{
   left: 0;
   display: flex;
   background-color: #16324C;
-  width: 300px;
+  width: 260px;
   overflow: hidden;
   min-height: calc(100vh);
   padding: 1rem;

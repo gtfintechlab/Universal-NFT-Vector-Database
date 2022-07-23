@@ -8,7 +8,7 @@
 <style lang="scss">
 
 // 2 rem to account for padding, 300px = width of sidebar
-$margin-width: calc(2rem + 300px);
+$margin-width: calc(2rem + 260px);
 .inner-container {
   margin-left: $margin-width;
 }
