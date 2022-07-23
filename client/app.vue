@@ -7,9 +7,10 @@
 
 <style lang="scss">
 
-// Probably a better way to do this -- fix later
+// 2 rem to account for padding, 300px = width of sidebar
+$margin-width: calc(2rem + 300px);
 .inner-container {
-  margin-left: 340px;
+  margin-left: $margin-width;
 }
 
 @font-face {

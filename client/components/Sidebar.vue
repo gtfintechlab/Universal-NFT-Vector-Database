@@ -59,10 +59,9 @@ aside{
   overflow: hidden;
   min-height: calc(100vh);
   padding: 1rem;
-  transition: 0.2s ease-in-out;
 
 }
-  .sidebar-header{
+.sidebar-header{
     margin-top: 2rem;
     margin-bottom: 2rem;
     font-family: 'Outfit';
@@ -100,6 +99,11 @@ aside{
   .tab-subheader{
     font-size: 20px;
     font-family: 'Outfit';
+  }
+
+  span.tab-subheader:hover{
+    color: #A5DEFF !important;
+    transition: color 0.25s ease-in-out;
   }
 
   h3{
