@@ -20,6 +20,11 @@ $margin-width: calc(2rem + 260px);
   src: local("Outfit"),   url("./assets/fonts/Outfit-Regular.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "Inter";
+  src: local("Inter"),   url("./assets/fonts/Inter.ttf") format("truetype");
+}
+
 html, body {
   margin: 0px !important;
   padding: 0px !important;
