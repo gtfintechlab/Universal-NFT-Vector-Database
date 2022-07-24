@@ -45,7 +45,6 @@ h1, h2, h3{
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    /* width: v-bind('width') */
 }
 
 .title-text{
@@ -53,15 +52,15 @@ h1, h2, h3{
     color: #000000;
     opacity: 50%;
     font-size: 1.4rem;
-    font-weight: lighter;
-    margin-bottom: 30px;
+    font-weight: 400;
+    margin-bottom: 23px;
 }
 
 .statistic-text{
     font-family: "Inter";
     font-weight: 900;
     font-size: 2rem;
-    margin-bottom: 17px;
+    margin-bottom: 12px;
 }
 .subtitle-text{
     font-family: "Inter";

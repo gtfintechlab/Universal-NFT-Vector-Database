@@ -19,6 +19,11 @@ export default{
             type: null,
             default: mockAnalyticsCardGroup,
             required: false
+        },
+        direction: {
+            type: String,
+            default: "row",
+            required: false
         }
     },
     components: { AnalyticsCard }
@@ -28,7 +33,7 @@ export default{
 <style scoped>
 .card-group-container{
     display: flex;
-    flex-direction: row;
+    flex-direction: v-bind('direction');
     margin: 25px;
     gap: 20px;
     flex-wrap: wrap;

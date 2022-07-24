@@ -17,7 +17,7 @@ $margin-width: calc(2rem + 260px);
 
 @font-face {
   font-family: "Outfit";
-  src: local("Outfit"),   url("./assets/fonts/Outfit-Regular.ttf") format("truetype");
+  src: local("Outfit"),   url("./assets/fonts/Outfit.ttf") format("truetype");
 }
 
 @font-face {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <h1>Dashboard Page</h1> -->
+    <AnalyticsCardGroup></AnalyticsCardGroup>
     <AnalyticsCardGroup></AnalyticsCardGroup>
   </div>
 </template>
