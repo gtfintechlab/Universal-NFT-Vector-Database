@@ -1,3 +1,9 @@
 <template>
-  <h1>Index Page!</h1>
 </template>
+
+<script>
+  definePageMeta({
+  middleware: 'redirect-dashboard'
+})
+
+</script>

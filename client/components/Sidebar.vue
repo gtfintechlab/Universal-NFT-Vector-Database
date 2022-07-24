@@ -9,9 +9,26 @@
           <h3>{{ section }}</h3>
           <div class="section-container">
             <div v-for="(page, index2) in Object.keys(config[section])" :key="index2">
-              <NuxtLink class="tab-container" :to="config[section][page]['link']">
-                <Icon width="30px" :icon="config[section][page]['icon']" :color="config[section][page]['color']" />
-                <span class="tab-subheader">{{ page }}</span>
+              <NuxtLink class="tab-container" 
+                        :to="config[section][page]['link']"
+                        @mouseleave="setHover('','')" 
+                        @mouseenter="setHover(index, index2)">
+                
+                <Icon width="30px" 
+                      :icon="config[section][page]['icon']" 
+                      :class="{'tab-hover': checkHover(index, index2),
+                               'tab-selected': checkRoute(config[section][page]['link'])
+                              }
+                      "
+                      />
+                <span
+                      @mouseenter="setHover(index, index2)"
+                      @mouseleave="setHover('','')"
+                      :class="{ 'tab-subheader': true, 
+                                'tab-hover': checkHover(index, index2),
+                                'tab-selected': checkRoute(config[section][page]['link']) 
+                              }" >{{ page }}
+                      </span>
               </NuxtLink>
             </div>
           </div>
@@ -38,6 +55,24 @@ export default {
   },
   data () {
     return {
+      hovering: -1,
+      backgroundStyle:{
+        backgroundColor:"#16a085" 
+      }
+    }
+  },
+
+  methods: {
+    setHover(index, index2){
+      this.hovering = (index + ' ' + index2)
+    },
+
+    checkHover(index, index2){
+      return this.hovering === (index + ' ' + index2)
+    },
+
+    checkRoute(bindedRoute){
+      return ('/'+ this.$route.name).toLowerCase() === bindedRoute.toLowerCase()
     }
   }
 }
@@ -101,9 +136,12 @@ aside{
     font-family: 'Outfit';
   }
 
-  span.tab-subheader:hover{
-    color: #A5DEFF !important;
-    transition: color 0.25s ease-in-out;
+  .tab-hover{
+    color: #d4d4fe !important;
+  }
+
+  .tab-selected{
+    color: #28b0ff !important;
   }
 
   h3{

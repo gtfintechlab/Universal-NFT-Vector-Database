@@ -1,10 +1,6 @@
 <template>
   <div>
-    <h1>{{ analytics }}</h1>
-    <button @click="loadAnalytics()" />
-    <h2 v-if="error !== null">
-      {{ error }}
-    </h2>
+    <h1>Dashboard Page</h1>
   </div>
 </template>
 
