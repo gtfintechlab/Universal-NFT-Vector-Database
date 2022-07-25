@@ -1,6 +1,7 @@
 from flask import Flask, request
 from vector import convert_to_vector, search_pinecone
 from dotenv import load_dotenv, find_dotenv
+from sklearn.manifold import MDS
 
 load_dotenv(find_dotenv())
 
@@ -27,6 +28,18 @@ def search():
                             )
 
     return results.json()
+
+@app.route("/api/mds", methods=['POST'])
+def multidimensional_scaling():
+    vectors = request.json['vectors']
+    individual_ids = list(vectors.keys())
+    individual_vectors = [vectors[vector_id] for vector_id in individual_ids]
+    mds = MDS()
+    points = mds.fit_transform(individual_vectors)
+    result = {}
+    for index, point in enumerate(points):
+        result[individual_ids[index]] = list(point)
+    return result
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000)
