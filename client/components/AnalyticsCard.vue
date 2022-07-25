@@ -1,12 +1,15 @@
 <template>
     <div class="card-container">
-        <h1 class="title-text">{{title}}</h1>
-        <h2 class="statistic-text">{{statistic}}</h2>
-        <h3 class="subtitle-text">{{subtitle}}</h3>
+        <h1 v-if="!isLoading" class="title-text">{{title}}</h1>
+        <h2 v-if="!isLoading" class="statistic-text">{{statistic}}</h2>
+        <h3 v-if="!isLoading" class="subtitle-text">{{subtitle}}</h3>
+        <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner"></PulseLoader>
     </div>
 </template>
 
 <script>
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
+
 export default{
     name: 'AnalyticsCard',
     props: {
@@ -29,8 +32,14 @@ export default{
             type: String,
             default: "40%",
             required: false
+        },
+        isLoading: {
+            type: Boolean,
+            default: true,
+            required: false
         }
-    }
+    },
+    components:{ PulseLoader, PulseLoader }
 }
 </script>
 
@@ -45,6 +54,11 @@ h1, h2, h3{
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+}
+
+.vue-spinner{
+    align-self: center;
+    justify-self: center;
 }
 
 .title-text{

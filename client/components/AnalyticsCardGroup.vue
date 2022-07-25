@@ -4,6 +4,7 @@
                         :title="card.title"
                         :statistic="card.statistic"
                         :subtitle="card.subtitle"
+                        :isLoading="isLoading"
                         class="card"></AnalyticsCard>
     </div>
 </template>
@@ -23,6 +24,11 @@ export default{
         direction: {
             type: String,
             default: "row",
+            required: false
+        },
+        isLoading: {
+            type: Boolean,
+            default: true,
             required: false
         }
     },

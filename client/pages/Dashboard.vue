@@ -1,7 +1,7 @@
 <template>
   <div>
-    <AnalyticsCardGroup></AnalyticsCardGroup>
-    <AnalyticsCardGroup></AnalyticsCardGroup>
+    <AnalyticsCardGroup :isLoading="true"></AnalyticsCardGroup>
+    <AnalyticsCardGroup :isLoading="false"></AnalyticsCardGroup>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
     data() {
         return {
             analytics: {},
-            error: null
+            error: null,
         };
     },
     methods: {
@@ -26,7 +26,7 @@ export default {
             catch (e) {
                 this.error = e;
             }
-        }
+        },
     },
     components: { AnalyticsCard }
 }
