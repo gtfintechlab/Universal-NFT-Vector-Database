@@ -1,53 +1,48 @@
 <template>
-  <div class="card-container">
-    <h1 v-if="!isLoading" class="title-text">
-      {{ title }}
-    </h1>
-    <h2 v-if="!isLoading" class="statistic-text">
-      {{ statistic }}
-    </h2>
-    <h3 v-if="!isLoading" class="subtitle-text">
-      {{ subtitle }}
-    </h3>
-    <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner" />
-  </div>
+    <div class="card-container">
+        <h1 v-if="!isLoading" class="title-text">{{title}}</h1>
+        <h2 v-if="!isLoading" class="statistic-text">{{statistic}}</h2>
+        <h3 v-if="!isLoading" class="subtitle-text">{{subtitle}}</h3>
+        <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner"></PulseLoader>
+    </div>
 </template>
 
 <script>
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
-export default {
-  name: 'AnalyticsCard',
-  components: { PulseLoader },
-  props: {
-    title: {
-      type: String,
-      default: 'Total NFTs in Vector Database',
-      required: false
+export default{
+    name: 'AnalyticsCard',
+    props: {
+        title: {
+            type: String,
+            default: "Total NFTs in Vector Database",
+            required: false
+        },
+        statistic: {
+            type: String,
+            default: "500,230",
+            required: false
+        },
+        subtitle: {
+            type: String,
+            default: "432,000 in Task Queue",
+            required: false
+        },
+        width: {
+            type: String,
+            default: "40%",
+            required: false
+        },
+        isLoading: {
+            type: Boolean,
+            default: true,
+            required: false
+        }
     },
-    statistic: {
-      type: String,
-      default: '500,230',
-      required: false
-    },
-    subtitle: {
-      type: String,
-      default: '432,000 in Task Queue',
-      required: false
-    },
-    width: {
-      type: String,
-      default: '40%',
-      required: false
-    },
-    isLoading: {
-      type: Boolean,
-      default: true,
-      required: false
-    }
-  }
+    components:{ PulseLoader, PulseLoader }
 }
 </script>
+
 
 <style scoped>
 h1, h2, h3{

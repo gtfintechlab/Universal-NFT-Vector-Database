@@ -1,16 +1,18 @@
 <template>
   <div>
-    <CardGroup :is-loading="false" />
+    <AnalyticsCardGroup :is-loading="false" />
+    <ImageCardGroup/>
   </div>
 </template>
 
 <script>
 import { getAnalytics } from '../api/Analytics'
-import CardGroup from '~~/components/CardGroup.vue'
+import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue';
+import ImageCardGroup from '../components/Groups/ImageCardGroup.vue';
 
 export default {
   name: 'DashboardPage',
-  components: { CardGroup },
+  components: { AnalyticsCardGroup, ImageCardGroup },
   data () {
     return {
       analytics: {},

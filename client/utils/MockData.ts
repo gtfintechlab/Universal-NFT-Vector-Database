@@ -59,7 +59,7 @@ export const mockScatterChartPoints = {
   ]
 }
 
-export const mockCardGroup = [
+export const mockAnalyticsCardGroup = [
   {
     type: 'Analytics',
     title: 'Total NFTs in Vector Database',
@@ -67,8 +67,16 @@ export const mockCardGroup = [
     subtitle: '432,000 NFTs in Task Queue'
   },
   {
-    chartHeight: 300,
-    type: 'Scatter Chart',
-    chartData: mockScatterChartPoints
+    type: 'Analytics',
+    title: 'Total NFTs in Vector Database',
+    statistic: '500,223',
+    subtitle: '432,000 NFTs in Task Queue'
+  }, {
+    type: 'Analytics',
+    title: 'Total NFTs in Vector Database',
+    statistic: '500,223',
+    subtitle: '432,000 NFTs in Task Queue'
   }
 ]
+
+export const mockImageCardGroup = [{},{}, {}, {}]
