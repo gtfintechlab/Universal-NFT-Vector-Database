@@ -1,8 +1,7 @@
-<template>
-</template>
+<template><div /></template>
 
 <script>
-  definePageMeta({
+definePageMeta({
   middleware: 'redirect-dashboard'
 })
 

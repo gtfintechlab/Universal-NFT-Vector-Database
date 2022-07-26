@@ -1,3 +1,3 @@
-export default function ({ to, from }) {
-    return '/dashboard'
-  }
+export default function () {
+  return '/dashboard'
+}
