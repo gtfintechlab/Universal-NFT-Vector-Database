@@ -1,48 +1,51 @@
 <template>
-    <div class="card-group-container">
-        <ImageCard v-for="card in config"
-                        :title="card.title"
-                        :imageURL="card.imageURL"
-                        :subtitle="card.subtitle"
-                        :isLoading="isLoading"
-                        class="card"></ImageCard>
-    </div>
+  <div class="card-group-container">
+    <ImageCard
+      v-for="(card, index) in config"
+      :key="index"
+      :title="card.title"
+      :image-u-r-l="card.imageURL"
+      :subtitle="card.subtitle"
+      :is-loading="isLoading"
+      class="card"
+    />
+  </div>
 </template>
 
 <script>
-import { mockImageCardGroup } from '../../utils/MockData';
-import ImageCard from '../ImageCard.vue';
+import { mockImageCardGroup } from '../../utils/MockData'
+import ImageCard from '../ImageCard.vue'
 
-export default{
-    name: 'ImageCardGroup',
-    data(){
-        return {
-            configLength: this.config.length,
-        }
+export default {
+  name: 'ImageCardGroup',
+  components: { ImageCard },
+  props: {
+    config: {
+      type: null,
+      default: mockImageCardGroup,
+      required: false
     },
-    props: {
-        config: {
-            type: null,
-            default: mockImageCardGroup,
-            required: false
-        },
-        direction: {
-            type: String,
-            default: "row",
-            required: false
-        },
-        isLoading: {
-            type: Boolean,
-            default: false,
-            required: false
-        },
-        numCards: {
-            type: Number,
-            default: 4,
-            required: false
-        }
+    direction: {
+      type: String,
+      default: 'row',
+      required: false
     },
-    components: { ImageCard }
+    isLoading: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+    numCards: {
+      type: Number,
+      default: 4,
+      required: false
+    }
+  },
+  data () {
+    return {
+      configLength: this.config.length
+    }
+  }
 }
 </script>
 

@@ -79,4 +79,4 @@ export const mockAnalyticsCardGroup = [
   }
 ]
 
-export const mockImageCardGroup = [{},{}, {}, {}]
+export const mockImageCardGroup = [{}, {}, {}, {}]

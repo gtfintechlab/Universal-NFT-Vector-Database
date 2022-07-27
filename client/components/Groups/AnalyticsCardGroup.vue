@@ -1,38 +1,41 @@
 <template>
-    <div class="card-group-container">
-        <AnalyticsCard v-for="card in config"
-                        :title="card.title"
-                        :statistic="card.statistic"
-                        :subtitle="card.subtitle"
-                        :isLoading="isLoading"
-                        class="card"></AnalyticsCard>
-    </div>
+  <div class="card-group-container">
+    <AnalyticsCard
+      v-for="(card,index) in config"
+      :key="index"
+      :title="card.title"
+      :statistic="card.statistic"
+      :subtitle="card.subtitle"
+      :is-loading="isLoading"
+      class="card"
+    />
+  </div>
 </template>
 
 <script>
-import { mockAnalyticsCardGroup } from '../../utils/MockData';
-import AnalyticsCard from '../AnalyticsCard.vue';
+import { mockAnalyticsCardGroup } from '../../utils/MockData'
+import AnalyticsCard from '../AnalyticsCard.vue'
 
-export default{
-    name: 'AnalyticsCardGroup',
-    props: {
-        config: {
-            type: null,
-            default: mockAnalyticsCardGroup,
-            required: false
-        },
-        direction: {
-            type: String,
-            default: "row",
-            required: false
-        },
-        isLoading: {
-            type: Boolean,
-            default: true,
-            required: false
-        }
+export default {
+  name: 'AnalyticsCardGroup',
+  components: { AnalyticsCard },
+  props: {
+    config: {
+      type: null,
+      default: mockAnalyticsCardGroup,
+      required: false
     },
-    components: { AnalyticsCard }
+    direction: {
+      type: String,
+      default: 'row',
+      required: false
+    },
+    isLoading: {
+      type: Boolean,
+      default: true,
+      required: false
+    }
+  }
 }
 </script>
 

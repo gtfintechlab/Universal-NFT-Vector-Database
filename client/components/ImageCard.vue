@@ -3,7 +3,7 @@
     <h1 v-if="!isLoading" class="title-text">
       {{ title }}
     </h1>
-    <img v-if="!isLoading" :src="imageURL"/>
+    <img v-if="!isLoading" :src="imageURL">
     <h3 v-if="!isLoading" class="subtitle-text">
       {{ subtitle }}
     </h3>
@@ -42,7 +42,7 @@ export default {
       type: Boolean,
       default: false,
       required: false
-    },
+    }
   }
 }
 </script>
@@ -72,7 +72,7 @@ h1, h2, h3{
     font-size: 1.4rem;
     font-weight: 400;
     margin-bottom: 23px;
-    word-wrap: break-word; 
+    word-wrap: break-word;
 }
 
 img {

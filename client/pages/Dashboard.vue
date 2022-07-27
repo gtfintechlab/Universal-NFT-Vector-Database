@@ -1,14 +1,14 @@
 <template>
   <div>
     <AnalyticsCardGroup :is-loading="false" />
-    <ImageCardGroup/>
+    <ImageCardGroup />
   </div>
 </template>
 
 <script>
 import { getAnalytics } from '../api/Analytics'
-import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue';
-import ImageCardGroup from '../components/Groups/ImageCardGroup.vue';
+import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue'
+import ImageCardGroup from '../components/Groups/ImageCardGroup.vue'
 
 export default {
   name: 'DashboardPage',

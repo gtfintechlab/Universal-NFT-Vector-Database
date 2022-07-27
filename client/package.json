@@ -10,6 +10,17 @@
     "lintfix": "npm run lint:js -- --fix"
   },
   "devDependencies": {
+    "nuxt": "3.0.0-rc.6",
+    "axios": "^0.27.2",
+    "chart.js": "^3.8.2",
+    "sass": "^1.54.0",
+    "sass-loader": "^13.0.2",
+    "typescript": "^4.7.4",
+    "unplugin-vue-components": "^0.21.1",
+    "vue": "^3.2.37",
+    "vue-chartjs": "^4.1.1",
+    "vue-spinner": "^1.0.4",
+    "unplugin-icons": "^0.14.7",
     "@babel/eslint-parser": "^7.18.9",
     "@iconify/json": "^2.1.81",
     "@iconify/vue": "^3.2.1",
@@ -17,18 +28,6 @@
     "@nuxtjs/eslint-module": "^3.1.0",
     "eslint": "^8.20.0",
     "eslint-plugin-nuxt": "^3.2.0",
-    "eslint-plugin-vue": "^9.2.0",
-    "nuxt": "3.0.0-rc.6",
-    "unplugin-icons": "^0.14.7"
-  },
-  "dependencies": {
-    "axios": "^0.27.2",
-    "chart.js": "^3.8.2",
-    "sass": "^1.54.0",
-    "sass-loader": "^13.0.2",
-    "unplugin-vue-components": "^0.21.1",
-    "vue": "^3.2.37",
-    "vue-chartjs": "^4.1.1",
-    "vue-spinner": "^1.0.4"
+    "eslint-plugin-vue": "^9.2.0"
   }
 }
