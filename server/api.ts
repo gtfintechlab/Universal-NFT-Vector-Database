@@ -151,6 +151,38 @@ api.get("/api/taskQueue/get", async (req, res) => {
 
     applyWaterfall(getTaskQueue);
 })
+api.get("/api/taskQueue/nfts/amount", async (req, res) => {
+    async function getNftAmountTaskQueue(){
+        const nftTaskQueue = await TaskQueueItemModel.find({
+            status: TaskQueueStatus.IN_PROGRESS, 
+            type:TaskQueueType.ITEM_NFT}).exec();
+        
+        res.status(200).json({
+            success: true,
+            amount: nftTaskQueue.length,
+        });
+         
+    }
+    applyWaterfall(getNftAmountTaskQueue);
+})
+
+api.get("/api/taskQueue/contracts/amount", async (req, res) => {
+    async function getContractAmountTaskQueue(){
+        const contractTaskQueue = await TaskQueueItemModel.find({
+            status: TaskQueueStatus.IN_PROGRESS, 
+            type:TaskQueueType.ITEM_CONTRACT}).exec();
+        
+        res.status(200).json({
+            success: true,
+            amount: contractTaskQueue.length,
+        });
+         
+    }
+    applyWaterfall(getContractAmountTaskQueue);
+})
+
+
+
 
 api.get("/", async (req, res) => {
     res.status(200).json({

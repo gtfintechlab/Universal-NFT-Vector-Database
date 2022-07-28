@@ -71,12 +71,7 @@ export const mockAnalyticsCardGroup = [
     title: 'Total NFTs in Vector Database',
     statistic: '500,223',
     subtitle: '432,000 NFTs in Task Queue'
-  }, {
-    type: 'Analytics',
-    title: 'Total NFTs in Vector Database',
-    statistic: '500,223',
-    subtitle: '432,000 NFTs in Task Queue'
   }
 ]
 
-export const mockImageCardGroup = [{}, {}, {}, {}, {},{}]
+export const mockImageCardGroup = [{}, {}, {}, {}, {}, {}]

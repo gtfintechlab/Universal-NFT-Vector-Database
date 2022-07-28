@@ -1,33 +1,78 @@
 <template>
   <div>
-    <AnalyticsCardGroup :is-loading="false" />
-    <ImageCardGroup />
+    <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" />
+    <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" />
   </div>
 </template>
 
 <script>
 import { getAnalytics } from '../api/Analytics'
+import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '../api/TaskQueue'
 import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue'
-import ImageCardGroup from '../components/Groups/ImageCardGroup.vue'
+import { mockAnalyticsCardGroup } from '../utils/MockData'
 
 export default {
   name: 'DashboardPage',
-  components: { AnalyticsCardGroup, ImageCardGroup },
+  components: { AnalyticsCardGroup },
   data () {
     return {
       analytics: {},
+      topCardLoad: true,
+      topCardConfig: mockAnalyticsCardGroup,
+      bottomCardLoad: true,
+      bottomCardConfig: mockAnalyticsCardGroup,
       error: null
     }
   },
   methods: {
-    async loadAnalytics () {
-      try {
-        const dbAnalytics = await getAnalytics()
-        this.analytics = dbAnalytics
-      } catch (e) {
-        this.error = e
+    async getConfigTopCards () {
+      const cards = []
+      const nftsInTaskQueue = (await getNftAmountTaskQueue()).amount;
+      let nftSuccessRate = 100
+      if (parseInt(this.analytics.totalNFTs) !== 0){
+        nftSuccessRate = (parseInt((this.analytics.nftSuccess)) / parseInt((this.analytics.totalNFTs)))*100
       }
+      cards.push({
+        title: 'Total NFTs in Vector Database',
+        statistic: this.analytics.totalNFTs,
+        subtitle: nftsInTaskQueue.toLocaleString() + ' NFTs in Task Queue'
+      },
+      {
+        title: 'NFT Processing Success Rate',
+        statistic: Number(nftSuccessRate).toFixed(2) + "%",
+        subtitle: this.analytics.nftSuccess.toLocaleString() + ' of ' + this.analytics.totalNFTs.toLocaleString() + ' Successful'
+      }
+      )
+      this.topCardConfig = cards;
+      this.topCardLoad = false
+    },
+    async getConfigBottomCards () {
+      const cards = []
+      let contractSuccessRate = 100;
+      const contractsInTaskQueue = (await getCollectionAmountTaskQueue()).amount;
+      if (parseInt(this.analytics.totalContracts) !== 0){
+        contractSuccessRate = parseInt((this.analytics.contractsSuccess)) / parseInt((this.analytics.totalContracts))
+      }
+
+      cards.push({
+        title: 'Total NFT Collections Processed',
+        statistic: this.analytics.totalContracts,
+        subtitle: contractsInTaskQueue.toLocaleString() + ' NFT Collections in Task Queue'
+      },
+      {
+        title: 'NFT Collection Processing Success Rate',
+        statistic: Number(contractSuccessRate).toFixed(2) + "%",
+        subtitle: this.analytics.contractsSuccess.toLocaleString() + ' of ' + this.analytics.totalContracts.toLocaleString() + ' Successful'
+      });
+      this.bottomCardConfig = cards;
+      this.bottomCardLoad = false
     }
+
+  },
+  async mounted(){
+    this.analytics = await getAnalytics()
+    this.getConfigTopCards()
+    this.getConfigBottomCards()
   }
 }
 </script>
