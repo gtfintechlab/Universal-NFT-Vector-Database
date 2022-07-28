@@ -35,15 +35,14 @@ export default {
       default: false,
       required: false
     },
-    numCards: {
-      type: Number,
-      default: 4,
+    minWidth: {
+      type: String,
+      default: "200px",
       required: false
     }
   },
   data () {
     return {
-      configLength: this.config.length
     }
   }
 }
@@ -54,8 +53,7 @@ export default {
     .card-group-container{
         margin: 25px;
         display: grid;
-        // card width = 100% of container minus the gap space divided by number of cards
-        grid-template-columns: repeat(v-bind('numCards'), calc((100% - (v-bind('numCards') - 1)*23px) / v-bind('numCards')));
+        grid-template-columns: repeat(auto-fit, minmax(v-bind('minWidth'), 1fr));
         grid-column-gap: 23px;
         grid-row-gap: 23px;
     }
