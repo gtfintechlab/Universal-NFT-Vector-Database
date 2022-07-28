@@ -9,26 +9,29 @@
           <h3>{{ section }}</h3>
           <div class="section-container">
             <div v-for="(page, index2) in Object.keys(config[section])" :key="index2">
-              <NuxtLink class="tab-container" 
-                        :to="config[section][page]['link']"
-                        @mouseleave="setHover('','')" 
-                        @mouseenter="setHover(index, index2)">
-                
-                <Icon width="30px" 
-                      :icon="config[section][page]['icon']" 
-                      :class="{'tab-hover': checkHover(index, index2),
-                               'tab-selected': checkRoute(config[section][page]['link'])
-                              }
-                      "
-                      />
+              <NuxtLink
+                class="tab-container"
+                :to="config[section][page]['link']"
+                @mouseleave="setHover('','')"
+                @mouseenter="setHover(index, index2)"
+              >
+                <Icon
+                  width="30px"
+                  :icon="config[section][page]['icon']"
+                  :class="{'tab-hover': checkHover(index, index2),
+                           'tab-selected': checkRoute(config[section][page]['link'])
+                  }
+                  "
+                />
                 <span
-                      @mouseenter="setHover(index, index2)"
-                      @mouseleave="setHover('','')"
-                      :class="{ 'tab-subheader': true, 
-                                'tab-hover': checkHover(index, index2),
-                                'tab-selected': checkRoute(config[section][page]['link']) 
-                              }" >{{ page }}
-                      </span>
+                  :class="{ 'tab-subheader': true,
+                            'tab-hover': checkHover(index, index2),
+                            'tab-selected': checkRoute(config[section][page]['link'])
+                  }"
+                  @mouseenter="setHover(index, index2)"
+                  @mouseleave="setHover('','')"
+                >{{ page }}
+                </span>
               </NuxtLink>
             </div>
           </div>
@@ -56,23 +59,23 @@ export default {
   data () {
     return {
       hovering: -1,
-      backgroundStyle:{
-        backgroundColor:"#16a085" 
+      backgroundStyle: {
+        backgroundColor: '#16a085'
       }
     }
   },
 
   methods: {
-    setHover(index, index2){
+    setHover (index, index2) {
       this.hovering = (index + ' ' + index2)
     },
 
-    checkHover(index, index2){
+    checkHover (index, index2) {
       return this.hovering === (index + ' ' + index2)
     },
 
-    checkRoute(bindedRoute){
-      return ('/'+ this.$route.name).toLowerCase() === bindedRoute.toLowerCase()
+    checkRoute (bindedRoute) {
+      return ('/' + this.$route.name).toLowerCase() === bindedRoute.toLowerCase()
     }
   }
 }

@@ -1,14 +1,18 @@
 <template>
   <div>
-    <h1>Dashboard Page</h1>
+    <AnalyticsCardGroup :is-loading="false" />
+    <ImageCardGroup />
   </div>
 </template>
 
 <script>
 import { getAnalytics } from '../api/Analytics'
+import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue'
+import ImageCardGroup from '../components/Groups/ImageCardGroup.vue'
 
 export default {
   name: 'DashboardPage',
+  components: { AnalyticsCardGroup, ImageCardGroup },
   data () {
     return {
       analytics: {},
@@ -16,7 +20,6 @@ export default {
     }
   },
   methods: {
-
     async loadAnalytics () {
       try {
         const dbAnalytics = await getAnalytics()
