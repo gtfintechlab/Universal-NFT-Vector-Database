@@ -1,5 +1,5 @@
 <template>
-  <button @click="processContracts">Process Next Contracts</button>
+  <!-- <button @click="processContracts">Process Next Contracts</button> -->
 </template>
 
 <script>
