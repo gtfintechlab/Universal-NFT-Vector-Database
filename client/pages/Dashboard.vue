@@ -1,13 +1,13 @@
 <template>
   <div>
-    <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" />
-    <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" />
+    <!-- <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" />
+    <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" /> -->
   </div>
 </template>
 
 <script>
-import { getAnalytics } from '../api/Analytics'
-import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '../api/TaskQueue'
+import { getAnalytics } from '../api-src/Analytics'
+import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '../api-src/TaskQueue'
 import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue'
 import { mockAnalyticsCardGroup } from '../utils/MockData'
 
@@ -25,9 +25,9 @@ export default {
     }
   },
   async mounted () {
-    this.analytics = await getAnalytics()
-    this.getConfigTopCards()
-    this.getConfigBottomCards()
+    // this.analytics = await getAnalytics()
+    // this.getConfigTopCards()
+    // this.getConfigBottomCards()
   },
   methods: {
     async getConfigTopCards () {

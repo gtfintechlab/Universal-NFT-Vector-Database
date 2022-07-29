@@ -13,25 +13,31 @@
 
 <script>
 import { Scatter } from 'vue-chartjs'
+// import {
+//   Chart as ChartJS,
+//   Title,
+//   Tooltip,
+//   Legend,
+//   LineElement,
+//   LinearScale,
+//   PointElement
+// } from 'chart.js'
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
   LineElement,
-  CategoryScale,
   LinearScale,
   PointElement
-} from 'chart.js'
+} from 'chart.js/dist/chart.esm.js' 
 import { mockScatterChartPoints } from '~~/utils/MockData'
-// import zoom from 'chartjs-plugin-zoom';
 
 ChartJS.register(
   Title,
   Tooltip,
   Legend,
   LineElement,
-  CategoryScale,
   LinearScale,
   PointElement
 )

@@ -17,12 +17,12 @@ $margin-width: calc(2rem + 260px);
 
 @font-face {
   font-family: "Outfit";
-  src: local("Outfit"),   url("./assets/fonts/Outfit.ttf") format("truetype");
+  src: local("Outfit"),   url("./static/fonts/Outfit.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "Inter";
-  src: local("Inter"),   url("./assets/fonts/Inter.ttf") format("truetype");
+  src: local("Inter"),   url("./static/fonts/Inter.ttf") format("truetype");
 }
 
 html, body {

@@ -49,7 +49,7 @@ export const sidebarConfig = {
 
 export const noImageLoaded = Array(5).fill({
   title: 'No Image Available Yet',
-  imageURL: '../assets/images/no-image.jpg',
+  imageURL: 'https://i.ibb.co/Rczjykx/depositphotos-227724992-stock-illustration-image-available-icon-flat-vector.jpg',
   subtitle: {'Status': 'No action has occurred to load an image'},
   
 })

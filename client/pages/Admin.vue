@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { processNextContracts } from '~~/api/GraphProtocol'
+import { processNextContracts } from '~~/api-src/GraphProtocol'
 
 export default {
   name: 'AdminPage',

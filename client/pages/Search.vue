@@ -19,7 +19,7 @@ import UploadCard from '../components/UploadCard.vue'
 import ChartCard from '../components/UploadCard.vue'
 import ImageCardGroup from '~~/components/Groups/ImageCardGroup.vue'
 import { noImageLoaded } from '~~/utils/Config'
-import { searchClosestNFTs } from '../api/Search'
+import { searchClosestNFTs } from '../api-src/Search'
 
 export default {
   name: 'SearchPage',
