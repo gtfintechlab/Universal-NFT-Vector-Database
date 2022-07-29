@@ -1,7 +1,7 @@
 <template>
   <div class="chart-container">
     <div class="chart-align">
-      <slot v-if="!isLoading" />
+      <ScatterChart v-if="!isLoading" :height="height"></ScatterChart>
     </div>
     <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner" />
   </div>
@@ -9,14 +9,16 @@
 
 <script>
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import {mockScatterChartPoints} from '../utils/MockData'
+import ScatterChart from './Charts/ScatterChart.vue';
 
 export default {
   name: 'ChartCard',
-  components: { PulseLoader },
+  components: { PulseLoader, ScatterChart },
   props: {
     config: {
       type: null,
-      default: {},
+      default: mockScatterChartPoints,
       required: false
     },
     isLoading: {
@@ -38,11 +40,12 @@ export default {
 <style scoped>
 .chart-container{
     background-color: white;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    min-width: 0 !important;
+    height: 90%;
+    justify-content: center;
 }
 
 .chart-align{

@@ -3,7 +3,7 @@ import { urls } from '../utils/Config'
 
 export const getAnalytics = async () => {
   const analytics = await axios.get(
-    urls.api.localhost + '/api/analytics/get'
+    urls.api.server.localhost + '/api/analytics/get'
   )
 
   if (analytics?.data?.success) {

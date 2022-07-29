@@ -10,7 +10,8 @@
       credits="false"
       :server="imageProcessServer"
       :instant-upload="false"
-      :allow-revert="false"
+      :allow-revert="true"
+      :imagePreviewHeight="height"
     />
   </div>
 </template>
@@ -35,6 +36,13 @@ export default {
   components: {
     FilePond
   },
+  props: {
+    height: {
+      type: String,
+      default: "300px",
+      required: false,
+    }
+  },
   data: function () {
     return {
       /*eslint-disable */
@@ -46,6 +54,7 @@ export default {
             const b64Encoded = window.btoa(reader.result)
             this.$emit('runSearch', b64Encoded)
           }
+          load();
         },
         load: () => {}
       }
@@ -57,8 +66,8 @@ export default {
 
 <style scoped>
 .upload-container{
-  margin: 25px;
   cursor: pointer;
+  height: 100%;
 }
 
 </style>
@@ -74,6 +83,6 @@ export default {
     color: gray;
     cursor: pointer !important;
     font-family: 'Outfit';
-    font-size: 1.3rem;
+    font-size: 1.75vw;
 }
 </style>

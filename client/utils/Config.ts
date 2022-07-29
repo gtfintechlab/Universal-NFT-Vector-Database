@@ -1,6 +1,12 @@
 export const urls = {
   api: {
-    localhost: 'http://localhost:4000'
+    server: {
+      localhost: 'http://localhost:4000'
+    },
+    search: {
+      localhost: 'http://localhost:5000',
+      hosted: 'https://universal-nft-vector-database.web.app/api/search'
+    }
   }
 }
 

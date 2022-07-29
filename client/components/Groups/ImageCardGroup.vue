@@ -51,7 +51,6 @@ export default {
 <style lang="scss" scoped>
 
     .card-group-container{
-        margin: 25px;
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(v-bind('minWidth'), 1fr));
         grid-column-gap: 23px;
