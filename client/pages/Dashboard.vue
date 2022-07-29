@@ -35,17 +35,17 @@ export default {
       const nftsInTaskQueue = (await getNftAmountTaskQueue()).amount
       let nftSuccessRate = 100
       if (parseInt(this.analytics.totalNFTs) !== 0) {
-        nftSuccessRate = (parseInt((this.analytics.nftSuccess)) / parseInt((this.analytics.totalNFTs))) * 100
+        nftSuccessRate = (parseInt((this.analytics.nftSuccess)) / parseInt((this.analytics.nftSuccess + this.analytics.nftFailure))) * 100
       }
       cards.push({
         title: 'Total NFTs in Vector Database',
-        statistic: this.analytics.totalNFTs,
+        statistic: this.analytics.nftSuccess,
         subtitle: nftsInTaskQueue.toLocaleString() + ' NFTs in Task Queue'
       },
       {
         title: 'NFT Processing Success Rate',
         statistic: Number(nftSuccessRate).toFixed(2) + '%',
-        subtitle: this.analytics.nftSuccess.toLocaleString() + ' of ' + this.analytics.totalNFTs.toLocaleString() + ' Successful'
+        subtitle: this.analytics.nftSuccess.toLocaleString() + ' of ' + (this.analytics.nftSuccess + this.analytics.nftFailure).toLocaleString() + ' Successful'
       }
       )
       this.topCardConfig = cards
@@ -56,7 +56,7 @@ export default {
       let contractSuccessRate = 100
       const contractsInTaskQueue = (await getCollectionAmountTaskQueue()).amount
       if (parseInt(this.analytics.totalContracts) !== 0) {
-        contractSuccessRate = parseInt((this.analytics.contractsSuccess)) / parseInt((this.analytics.totalContracts))
+        contractSuccessRate = (parseInt((this.analytics.contractsSuccess)) / parseInt((this.analytics.totalContracts)))* 100
       }
 
       cards.push({

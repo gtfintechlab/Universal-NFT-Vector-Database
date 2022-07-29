@@ -24,3 +24,16 @@ export const getCollectionAmountTaskQueue = async () => {
     throw new Error('Failed to Retrieve NFT Collection Count in Task Queue!')
   }
 }
+
+export const addItemToTaskQueue = async (itemToAdd) => {
+  const taskQueueAdd = await axios.post(
+    urls.api.server.localhost + '/api/taskQueue/add', itemToAdd
+  )
+
+  if (taskQueueAdd?.data?.success) {
+    return taskQueueAdd.data
+  } else {
+    throw new Error('Failed to add item to task queue!')
+  }
+
+}

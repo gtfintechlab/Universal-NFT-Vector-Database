@@ -30,10 +30,22 @@ export default {
       type: Number,
       default: 300,
       required: false
+    },
+    cssHeight: {
+      type: String,
+      default: (props) => props.height + "px",
+      required: false
     }
+
   },
+  // computed: {
+  //   showCountOnSearchComputed () {
+  //     return this.height + "px" || this.cssHeight
+  //   }
+  // },
 
   methods: {
+
   }
 }
 </script>
@@ -44,7 +56,8 @@ export default {
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    height: 90%;
+    /* Take the height, add 32 to account for margins, subtract 20 for padding */
+    height: calc(v-bind('cssHeight') + 32px - 20px);
     justify-content: center;
 }
 

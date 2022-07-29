@@ -5,7 +5,10 @@ export const urls = {
     },
     search: {
       localhost: 'http://localhost:5000',
-      hosted: 'https://universal-nft-vector-database.web.app/api/search'
+      hosted: 'https://universal-nft-vector-database.web.app'
+    },
+    graphprotocol:{
+      hosted: "https://api.thegraph.com/subgraphs/name/wighawag/eip721-subgraph"
     }
   }
 }
@@ -43,3 +46,10 @@ export const sidebarConfig = {
     }
   }
 }
+
+export const noImageLoaded = Array(5).fill({
+  title: 'No Image Available Yet',
+  imageURL: '../assets/images/no-image.jpg',
+  subtitle: {'Status': 'No action has occurred to load an image'},
+  
+})

@@ -2,10 +2,12 @@ from flask import Flask, request
 from vector import convert_to_vector, search_pinecone
 from dotenv import load_dotenv, find_dotenv
 from database import update_analytics
+from flask_cors import CORS
 
 load_dotenv(find_dotenv())
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
 def home():

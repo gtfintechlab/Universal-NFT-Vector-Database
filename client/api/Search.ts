@@ -12,8 +12,7 @@ export const searchClosestNFTs = async  (image: String,amount: Number,
             withMetadata: withMetadata
         }
     )
-
-    if (searchResult?.data) {
+    if (searchResult?.data?.success) {
         return searchResult.data
     } else {
         throw new Error('Search API Failed to Retrieve Closest NFTs!')

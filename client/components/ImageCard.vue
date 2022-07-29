@@ -4,8 +4,10 @@
       {{ title }}
     </h1>
     <img v-if="!isLoading" :src="imageURL">
-    <h3 v-if="!isLoading" class="subtitle-text">
-      {{ subtitle }}
+    <h3 v-for="(sub, index) in Object.keys(subtitle)" v-if="!isLoading" class="subtitle-text" :key="index">
+      <span class="subtitle-topic">{{sub}}:</span> {{subtitle[sub]}}
+      <br/>
+      <br/>
     </h3>
     <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner" />
   </div>
@@ -29,7 +31,7 @@ export default {
       required: false
     },
     subtitle: {
-      type: String,
+      type: null,
       default: 'Contract: 0x6KH5KJ6H54KHJHKJ4H5KJ3HK3EJ5H',
       required: false
     },
@@ -80,6 +82,8 @@ img {
   margin-bottom: 12px;
   width: 100%;
   align-self: center;
+  height: 150px;
+  object-fit: cover;
 }
 
 .subtitle-text{
@@ -87,5 +91,10 @@ img {
     font-weight: 400;
     font-size: 0.75rem;
     word-wrap: break-word;
+    
+}
+
+.subtitle-topic{
+  font-weight: bold;
 }
 </style>

@@ -35,11 +35,11 @@ def main():
                 result = process_contract(item)
                 if not result:
                     update_processed(item, "failure")
-                    update_analytics(item, contractFailure=True)
+                    update_analytics(contractFailure=True)
                     continue
                 # Move the id from the queue to the success
                 update_processed(item, "success")
-                update_analytics(item, contractSuccess=True)
+                update_analytics(contractSuccess=True)
             
             # If the item is an NFT, process as per NFT guidelines
             elif item["type"] == "nft":
@@ -48,11 +48,11 @@ def main():
                 result, vector_id = process_nft(item)
                 if not result:
                     update_processed(item, "failure")
-                    update_analytics(item, nftFailure=True)
+                    update_analytics(nftFailure=True)
                     continue
                 # Move the id from the queue to the success
                 update_processed(item, "success")
-                update_analytics(item, nftSuccess=True)
+                update_analytics(nftSuccess=True)
         except Exception as e:
             print(e)
 
@@ -193,8 +193,8 @@ def update_analytics(totalContracts=False, totalERC1155=False, totalERC721=False
                   "totalNFTs": initialStats["totalNFTs"] + int(totalNFTs),
                   "nftSuccess": initialStats["nftSuccess"] + int(nftSuccess),
                   "nftFailure": initialStats["nftFailure"] + int(nftFailure),
-                  "contractSuccess": initialStats["contractSuccess"] + int(contractSuccess),
-                  "contractFailure": initialStats["contractFailure"] + int(contractFailure),
+                  "contractsSuccess": initialStats["contractsSuccess"] + int(contractSuccess),
+                  "contractsFailure": initialStats["contractsFailure"] + int(contractFailure),
                 }
         })
     
