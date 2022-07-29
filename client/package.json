@@ -10,24 +10,30 @@
     "lintfix": "npm run lint:js -- --fix"
   },
   "devDependencies": {
-    "nuxt": "3.0.0-rc.6",
-    "axios": "^0.27.2",
-    "chart.js": "^3.8.2",
-    "sass": "^1.54.0",
-    "sass-loader": "^13.0.2",
-    "typescript": "^4.7.4",
-    "unplugin-vue-components": "^0.21.1",
-    "vue": "^3.2.37",
-    "vue-chartjs": "^4.1.1",
-    "vue-spinner": "^1.0.4",
-    "unplugin-icons": "^0.14.7",
     "@babel/eslint-parser": "^7.18.9",
     "@iconify/json": "^2.1.81",
     "@iconify/vue": "^3.2.1",
     "@nuxtjs/eslint-config-typescript": "^10.0.0",
     "@nuxtjs/eslint-module": "^3.1.0",
+    "axios": "^0.27.2",
+    "chart.js": "^3.8.2",
     "eslint": "^8.20.0",
     "eslint-plugin-nuxt": "^3.2.0",
-    "eslint-plugin-vue": "^9.2.0"
+    "eslint-plugin-vue": "^9.2.0",
+    "nuxt": "3.0.0-rc.6",
+    "sass": "^1.54.0",
+    "sass-loader": "^13.0.2",
+    "typescript": "^4.7.4",
+    "unplugin-icons": "^0.14.7",
+    "unplugin-vue-components": "^0.21.1",
+    "vue": "^3.2.37",
+    "vue-chartjs": "^4.1.1",
+    "vue-spinner": "^1.0.4"
+  },
+  "dependencies": {
+    "filepond": "^4.30.4",
+    "filepond-plugin-file-validate-type": "^1.2.8",
+    "filepond-plugin-image-preview": "^4.6.11",
+    "vue-filepond": "^7.0.3"
   }
 }

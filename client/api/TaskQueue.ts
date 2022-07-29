@@ -14,14 +14,13 @@ export const getNftAmountTaskQueue = async () => {
 }
 
 export const getCollectionAmountTaskQueue = async () => {
-    const nftAmount = await axios.get(
-      urls.api.localhost + '/api/taskQueue/contracts/amount'
-    )
-  
-    if (nftAmount?.data?.success) {
-      return nftAmount.data
-    } else {
-      throw new Error('Failed to Retrieve NFT Collection Count in Task Queue!')
-    }
+  const nftAmount = await axios.get(
+    urls.api.localhost + '/api/taskQueue/contracts/amount'
+  )
+
+  if (nftAmount?.data?.success) {
+    return nftAmount.data
+  } else {
+    throw new Error('Failed to Retrieve NFT Collection Count in Task Queue!')
   }
-  
+}

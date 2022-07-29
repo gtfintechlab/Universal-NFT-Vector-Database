@@ -24,13 +24,18 @@ export default {
       error: null
     }
   },
+  async mounted () {
+    this.analytics = await getAnalytics()
+    this.getConfigTopCards()
+    this.getConfigBottomCards()
+  },
   methods: {
     async getConfigTopCards () {
       const cards = []
-      const nftsInTaskQueue = (await getNftAmountTaskQueue()).amount;
+      const nftsInTaskQueue = (await getNftAmountTaskQueue()).amount
       let nftSuccessRate = 100
-      if (parseInt(this.analytics.totalNFTs) !== 0){
-        nftSuccessRate = (parseInt((this.analytics.nftSuccess)) / parseInt((this.analytics.totalNFTs)))*100
+      if (parseInt(this.analytics.totalNFTs) !== 0) {
+        nftSuccessRate = (parseInt((this.analytics.nftSuccess)) / parseInt((this.analytics.totalNFTs))) * 100
       }
       cards.push({
         title: 'Total NFTs in Vector Database',
@@ -39,18 +44,18 @@ export default {
       },
       {
         title: 'NFT Processing Success Rate',
-        statistic: Number(nftSuccessRate).toFixed(2) + "%",
+        statistic: Number(nftSuccessRate).toFixed(2) + '%',
         subtitle: this.analytics.nftSuccess.toLocaleString() + ' of ' + this.analytics.totalNFTs.toLocaleString() + ' Successful'
       }
       )
-      this.topCardConfig = cards;
+      this.topCardConfig = cards
       this.topCardLoad = false
     },
     async getConfigBottomCards () {
       const cards = []
-      let contractSuccessRate = 100;
-      const contractsInTaskQueue = (await getCollectionAmountTaskQueue()).amount;
-      if (parseInt(this.analytics.totalContracts) !== 0){
+      let contractSuccessRate = 100
+      const contractsInTaskQueue = (await getCollectionAmountTaskQueue()).amount
+      if (parseInt(this.analytics.totalContracts) !== 0) {
         contractSuccessRate = parseInt((this.analytics.contractsSuccess)) / parseInt((this.analytics.totalContracts))
       }
 
@@ -61,18 +66,13 @@ export default {
       },
       {
         title: 'NFT Collection Processing Success Rate',
-        statistic: Number(contractSuccessRate).toFixed(2) + "%",
+        statistic: Number(contractSuccessRate).toFixed(2) + '%',
         subtitle: this.analytics.contractsSuccess.toLocaleString() + ' of ' + this.analytics.totalContracts.toLocaleString() + ' Successful'
-      });
-      this.bottomCardConfig = cards;
+      })
+      this.bottomCardConfig = cards
       this.bottomCardLoad = false
     }
 
-  },
-  async mounted(){
-    this.analytics = await getAnalytics()
-    this.getConfigTopCards()
-    this.getConfigBottomCards()
   }
 }
 </script>
