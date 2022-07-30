@@ -138,6 +138,7 @@ export default {
     grid-template-columns: repeat(auto-fit, minmax(325px, 1fr));
     margin: 25px;
     grid-column-gap: 23px;
+    grid-row-gap: 23px;
   }
 
   .margin-modifier{

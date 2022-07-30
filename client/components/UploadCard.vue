@@ -67,7 +67,8 @@ export default {
 <style scoped>
 .upload-container{
   cursor: pointer;
-  height: 100%;
+  /* Height of container + Margin */
+  max-height: calc(v-bind('height') + 32px);
 }
 
 </style>
@@ -76,9 +77,11 @@ export default {
   height: 100%;
 }
 
+.filepond--wrapper{
+  height: 100%;
+}
 .filepond--panel-root {
     background-color: white;
-    padding: 10px;
     cursor: pointer;
   }
 
