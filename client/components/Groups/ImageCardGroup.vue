@@ -6,7 +6,7 @@
       :title="card.title"
       :image-u-r-l="card.imageURL"
       :subtitle="card.subtitle"
-      :is-loading="isLoading"
+      :isLoading="isLoading"
       class="card"
     />
   </div>

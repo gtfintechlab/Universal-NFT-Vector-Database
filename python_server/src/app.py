@@ -3,6 +3,7 @@ from vector import convert_to_vector, search_pinecone
 from dotenv import load_dotenv, find_dotenv
 from database import update_analytics
 from flask_cors import CORS
+from sklearn.manifold import MDS
 
 load_dotenv(find_dotenv())
 
@@ -34,12 +35,25 @@ def search():
         )
         json_response = results.json()
         json_response['success'] = True
+        json_response['source'] = [float(element) for element in input_vector['vector']]
         return json_response
     except Exception as e:
         update_analytics(
             searchApiFailure=True
         )
         return {"success": False, "error": e}
-    
+
+@app.route("/api/mds", methods=['POST'])
+def multidimensional_scaling():
+    vectors = request.json['vectors']
+    individual_ids = list(vectors.keys())
+    individual_vectors = [vectors[vector_id] for vector_id in individual_ids]
+    mds = MDS()
+    points = mds.fit_transform(individual_vectors)
+    result = {}
+    for index, point in enumerate(points):
+        result[individual_ids[index]] = list(point)
+    return result
+ 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5000)

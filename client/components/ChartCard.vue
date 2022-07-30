@@ -1,7 +1,7 @@
 <template>
   <div class="chart-container">
     <div class="chart-align">
-      <ScatterChart v-if="!isLoading" :height="height"></ScatterChart>
+      <ScatterChart v-if="!isLoading" :height="height" :chartData="config"></ScatterChart>
     </div>
     <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner" />
   </div>
@@ -18,7 +18,7 @@ export default {
   props: {
     config: {
       type: null,
-      default: mockScatterChartPoints,
+      default: [],
       required: false
     },
     isLoading: {

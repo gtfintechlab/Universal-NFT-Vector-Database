@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" />
-    <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" /> -->
+    <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" />
+    <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" />
   </div>
 </template>
 
@@ -25,9 +25,9 @@ export default {
     }
   },
   async mounted () {
-    // this.analytics = await getAnalytics()
-    // this.getConfigTopCards()
-    // this.getConfigBottomCards()
+    this.analytics = await getAnalytics()
+    this.getConfigTopCards()
+    this.getConfigBottomCards()
   },
   methods: {
     async getConfigTopCards () {
@@ -39,7 +39,7 @@ export default {
       }
       cards.push({
         title: 'Total NFTs in Vector Database',
-        statistic: this.analytics.nftSuccess,
+        statistic: this.analytics.nftSuccess.toLocaleString(),
         subtitle: nftsInTaskQueue.toLocaleString() + ' NFTs in Task Queue'
       },
       {

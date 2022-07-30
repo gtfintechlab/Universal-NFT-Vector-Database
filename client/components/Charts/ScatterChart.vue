@@ -78,11 +78,14 @@ export default {
     chartTitle: {
       type: String,
       default: ''
+    },
+    chartData: {
+      type: null,
+      default: []
     }
   },
   data () {
     return {
-      chartData: mockScatterChartPoints,
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
