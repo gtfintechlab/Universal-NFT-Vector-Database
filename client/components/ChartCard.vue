@@ -1,7 +1,8 @@
 <template>
   <div class="chart-container">
     <div class="chart-align">
-      <ScatterChart v-if="!isLoading" :height="height" :chartData="config"></ScatterChart>
+      <ScatterChart v-if="!isLoading" :height="height" :chartData="config" :xAxisLabel="xAxisLabel"
+                    :yAxisLabel="yAxisLabel"></ScatterChart>
     </div>
     <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner" />
   </div>
@@ -35,7 +36,18 @@ export default {
       type: String,
       default: (props) => props.height + "px",
       required: false
+    },
+    xAxisLabel: {
+      type: String,
+      default: '',
+      required: false
+    },
+    yAxisLabel: {
+      type: String,
+      default: '',
+      required: false
     }
+
 
   },
   // computed: {

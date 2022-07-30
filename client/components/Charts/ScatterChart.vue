@@ -13,15 +13,6 @@
 
 <script>
 import { Scatter } from 'vue-chartjs'
-// import {
-//   Chart as ChartJS,
-//   Title,
-//   Tooltip,
-//   Legend,
-//   LineElement,
-//   LinearScale,
-//   PointElement
-// } from 'chart.js'
 import {
   Chart as ChartJS,
   Title,
@@ -82,7 +73,16 @@ export default {
     chartData: {
       type: null,
       default: []
+    },
+    xAxisLabel: {
+      type: String, 
+      defualt: ''
+    },
+    yAxisLabel: {
+      type: String, 
+      defualt: ''
     }
+
   },
   data () {
     return {
@@ -104,8 +104,44 @@ export default {
               weight: 400,
               lineHeight: 0.5
             }
+          },
+          legend: {
+            labels: {
+              font: {
+                family: 'Outfit'
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function (tooltipItems, data){
+                const parsedToolTip = JSON.parse(JSON.stringify(tooltipItems.raw));
+                console.log(parsedToolTip)
+                return [`x: ${parsedToolTip.x.toFixed(2)}`, `y: ${parsedToolTip.y.toFixed(2)}`, `Score: ${parsedToolTip.score}`];
+              }
+            }
           }
-        }
+        },
+        scales: {
+          xAxis: {
+            title: {
+              display: true,
+              text: this.xAxisLabel,
+              font: {
+                family: 'Outfit'
+              }
+            }
+          },
+          yAxis: {
+            title: {
+              display: true,
+              text: this.yAxisLabel,
+              font: {
+                family: 'Outfit'
+              }
+            }
+          }
+      }
       }
     }
   }

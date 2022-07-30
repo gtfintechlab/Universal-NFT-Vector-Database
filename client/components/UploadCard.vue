@@ -72,6 +72,9 @@ export default {
 
 </style>
 <style>
+.filepond--item{
+  height: 100%;
+}
 
 .filepond--panel-root {
     background-color: white;

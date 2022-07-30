@@ -5,6 +5,8 @@
         <ChartCard v-if="searchStarted" :isLoading="multiScaleLoading"
                                         :height="300"
                                         :config="chartConfig"
+                                        xAxisLabel="First Dimension"
+                                        yAxisLabel="Second Dimension"
                                         />
     </div>
     <div class="margin-modifier">
@@ -74,12 +76,14 @@ export default {
       const vectorDict = {};
       const parsedTopNFTs = JSON.parse(JSON.stringify(this.topNfts));
       const sourceVector = JSON.parse(JSON.stringify(this.sourceVector));
-
+      const scoreDict = {}
       parsedTopNFTs.map((nft) => {
         vectorDict[nft.id] = nft.values;
+        scoreDict[nft.id] = nft.score
       })
 
       vectorDict['source'] = sourceVector;
+      scoreDict['source'] = 0;
       
       const multidimensionalScalingResult = await getMultidimensionalScaling(vectorDict);
       const sourceDataset = {
@@ -90,7 +94,8 @@ export default {
         data: [
           {
             x: multidimensionalScalingResult['source'][0],
-            y: multidimensionalScalingResult['source'][1]
+            y: multidimensionalScalingResult['source'][1],
+            tooltipLabel: 'Source'
           }
         ]
       };
@@ -108,7 +113,9 @@ export default {
       for (const [key, value] of Object.entries(multidimensionalScalingResult)) {
         similarNFTDataset.data.push({
           x: value[0],
-          y: value[1]
+          y: value[1],
+          tooltipLabel: key,
+          score: scoreDict[key]
         });
       }
       
