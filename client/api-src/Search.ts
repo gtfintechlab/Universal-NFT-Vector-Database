@@ -19,9 +19,9 @@ export const searchClosestNFTs = async  (image: String,amount: Number,
     }
 }
 
-export const getMultidimensionalScaling = async (vectors) => {
+export const getTSNE = async (vectors) => {
     const mdsResult = await axios.post(
-        urls.api.search.hosted + '/api/mds',
+        urls.api.search.hosted + '/api/tsne',
         {
             vectors: vectors,
         }
@@ -30,7 +30,7 @@ export const getMultidimensionalScaling = async (vectors) => {
     if (mdsResult?.data) {
         return mdsResult.data;
     } else {
-        throw new Error('Multidimensional Scaling Failed!')
+        throw new Error('TSNE Failed!')
     }
 
 }

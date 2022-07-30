@@ -2,7 +2,7 @@
   <div>
     <div class="graph-image-container">
         <UploadCard @runSearch="processImage" height="300px"/>
-        <ChartCard v-if="searchStarted" :isLoading="multiScaleLoading"
+        <ChartCard v-if="searchStarted" :isLoading="tsneLoading"
                                         :height="300"
                                         :config="chartConfig"
                                         xAxisLabel="First Dimension"
@@ -22,7 +22,7 @@ import UploadCard from '../components/UploadCard.vue'
 import ChartCard from '../components/ChartCard.vue'
 import ImageCardGroup from '~~/components/Groups/ImageCardGroup.vue'
 import { noImageLoaded } from '~~/utils/Config'
-import { searchClosestNFTs, getMultidimensionalScaling } from '../api-src/Search'
+import { searchClosestNFTs, getTSNE } from '../api-src/Search'
 
 export default {
   name: 'SearchPage',
@@ -30,7 +30,7 @@ export default {
     return {
       similarNFTs: {},
       searchStarted: false,
-      multiScaleLoading: true,
+      tsneLoading: true,
       imageAndGraphHeight: "300px",
       chartConfig: [],
       imageGroupConfig: noImageLoaded,
@@ -44,11 +44,11 @@ export default {
     async processImage(base64EncodedString){
       this.searchStarted = true;
       this.imageGroupLoad = true;
-      this.multiScaleLoading = true;
+      this.tsneLoading = true;
       this.imageGroupConfig = noImageLoaded;
 
       await this.searchForNFTs(base64EncodedString);
-      await this.multidimensionalScaling();
+      await this.tDistributedStochasticNeighborEmbedding();
     },
     async searchForNFTs(base64EncodedString){
       const result = await searchClosestNFTs(base64EncodedString, 100, true, true);
@@ -72,7 +72,7 @@ export default {
       this.imageGroupLoad = false;
     },
 
-    async multidimensionalScaling(){
+    async tDistributedStochasticNeighborEmbedding(){
       const vectorDict = {};
       const parsedTopNFTs = JSON.parse(JSON.stringify(this.topNfts));
       const sourceVector = JSON.parse(JSON.stringify(this.sourceVector));
@@ -83,9 +83,8 @@ export default {
       })
 
       vectorDict['source'] = sourceVector;
-      scoreDict['source'] = 0;
-      
-      const multidimensionalScalingResult = await getMultidimensionalScaling(vectorDict);
+
+      const tsneResult = await getTSNE(vectorDict);
       const sourceDataset = {
         label: 'Source Image',
         fill: false,
@@ -93,14 +92,15 @@ export default {
         backgroundColor: '#f87979',
         data: [
           {
-            x: multidimensionalScalingResult['source'][0],
-            y: multidimensionalScalingResult['source'][1],
-            tooltipLabel: 'Source'
+            x: tsneResult['source'][0],
+            y: tsneResult['source'][1],
+            tooltipLabel: 'Source',
+            score: 0
           }
         ]
       };
 
-      delete multidimensionalScalingResult['source'];
+      delete tsneResult['source'];
 
       const similarNFTDataset = {
         label: 'Similar NFTs',
@@ -110,7 +110,7 @@ export default {
         data: []
       };
 
-      for (const [key, value] of Object.entries(multidimensionalScalingResult)) {
+      for (const [key, value] of Object.entries(tsneResult)) {
         similarNFTDataset.data.push({
           x: value[0],
           y: value[1],
@@ -120,7 +120,7 @@ export default {
       }
       
       this.chartConfig = {datasets: [sourceDataset, similarNFTDataset]};
-      this.multiScaleLoading = false;
+      this.tsneLoading = false;
     }
   }
 }

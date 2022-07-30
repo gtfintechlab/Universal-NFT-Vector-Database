@@ -97,9 +97,9 @@ export default {
         plugins: {
           title: {
             display: true,
-            text: 'Multidimensional Scaling Visualization',
+            text: 'T Distributed Stochastic Neighbor Embedding Visualization',
             font: {
-              size: 15,
+              size: 14,
               family: 'Outfit',
               weight: 400,
               lineHeight: 0.5
@@ -116,7 +116,6 @@ export default {
             callbacks: {
               label: function (tooltipItems, data){
                 const parsedToolTip = JSON.parse(JSON.stringify(tooltipItems.raw));
-                console.log(parsedToolTip)
                 return [`x: ${parsedToolTip.x.toFixed(2)}`, `y: ${parsedToolTip.y.toFixed(2)}`, `Score: ${parsedToolTip.score}`];
               }
             }
