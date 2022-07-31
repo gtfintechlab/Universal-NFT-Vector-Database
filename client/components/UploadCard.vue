@@ -69,25 +69,9 @@ export default {
   cursor: pointer;
   /* Height of container + Margin */
   max-height: calc(v-bind('height') + 32px);
-  border-radius: 10px;
 }
-
 </style>
 <style>
-.filepond--item{
-  height: 100%;
-}
-
-.filepond--wrapper{
-  height: 100%;
-  border-radius: 10px;
-}
-
-.filepond--hopper{
-  height: 100%;
-  background-color: white;
-  border-radius: 10px;
-}
 
 .filepond--panel-root {
     background-color: white;

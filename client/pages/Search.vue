@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="graph-image-container">
-        <UploadCard @runSearch="processImage" height="300px"/>
+        <UploadCard @runSearch="processImage" :height="imageAndGraphHeight"/>
         <ChartCard v-if="searchStarted" :isLoading="tsneLoading"
                                         :height="300"
                                         :config="chartConfig"
@@ -147,5 +147,4 @@ export default {
     margin-bottom: 25px;
     margin-top: 0px;
   }
-
 </style>
