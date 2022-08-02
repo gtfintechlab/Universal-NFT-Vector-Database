@@ -4,10 +4,10 @@
       {{ title }}
     </h1>
     <img v-if="!isLoading" :src="imageURL">
-    <h3 v-for="(sub, index) in Object.keys(subtitle)" v-if="!isLoading" class="subtitle-text" :key="index">
-      <span class="subtitle-topic">{{sub}}:</span> {{subtitle[sub]}}
-      <br/>
-      <br/>
+    <h3 v-for="(sub, index) in Object.keys(subtitle)" :key="index" class="subtitle-text" v-if="!isLoading">
+      <span class="subtitle-topic">{{ sub }}:</span> {{ subtitle[sub] }}
+      <br>
+      <br>
     </h3>
     <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner" />
   </div>
@@ -91,7 +91,7 @@ img {
     font-weight: 400;
     font-size: 0.75rem;
     word-wrap: break-word;
-    
+
 }
 
 .subtitle-topic{

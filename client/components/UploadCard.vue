@@ -11,7 +11,7 @@
       :server="imageProcessServer"
       :instant-upload="false"
       :allow-revert="true"
-      :imagePreviewHeight="height"
+      :image-preview-height="height"
     />
   </div>
 </template>
@@ -39,8 +39,8 @@ export default {
   props: {
     height: {
       type: String,
-      default: "300px",
-      required: false,
+      default: '300px',
+      required: false
     }
   },
   data: function () {

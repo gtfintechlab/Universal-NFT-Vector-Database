@@ -1,7 +1,9 @@
 <template>
   <div>
-    <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" />
-    <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" />
+    <div class="dashboard-container">
+      <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" class="top-card-group" />
+      <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" />
+    </div>
   </div>
 </template>
 
@@ -56,7 +58,7 @@ export default {
       let contractSuccessRate = 100
       const contractsInTaskQueue = (await getCollectionAmountTaskQueue()).amount
       if (parseInt(this.analytics.totalContracts) !== 0) {
-        contractSuccessRate = (parseInt((this.analytics.contractsSuccess)) / parseInt((this.analytics.totalContracts)))* 100
+        contractSuccessRate = (parseInt((this.analytics.contractsSuccess)) / parseInt((this.analytics.totalContracts))) * 100
       }
 
       cards.push({
@@ -76,3 +78,12 @@ export default {
   }
 }
 </script>
+
+<style>
+.dashboard-container{
+  margin: 25px;
+}
+.top-card-group{
+  margin: 25px 0px 25px 0px;
+}
+</style>

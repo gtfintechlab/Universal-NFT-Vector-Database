@@ -43,7 +43,6 @@ export default {
 .card-group-container{
     display: flex;
     flex-direction: v-bind('direction');
-    margin: 25px;
     gap: 20px;
     flex-wrap: wrap;
 }

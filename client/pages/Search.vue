@@ -1,17 +1,19 @@
 <template>
   <div>
     <div class="graph-image-container">
-        <UploadCard @runSearch="processImage" :height="imageAndGraphHeight"/>
-        <ChartCard v-if="searchStarted" :isLoading="tsneLoading"
-                                        :height="300"
-                                        :config="chartConfig"
-                                        xAxisLabel="First Dimension"
-                                        yAxisLabel="Second Dimension"
-                                        />
+      <UploadCard :height="imageAndGraphHeight" @runSearch="processImage" />
+      <ChartCard
+        v-if="searchStarted"
+        :is-loading="tsneLoading"
+        :height="300"
+        :config="chartConfig"
+        x-axis-label="First Dimension"
+        y-axis-label="Second Dimension"
+      />
     </div>
     <div class="margin-modifier">
       <h2>Explore Similar NFTs</h2>
-      <ImageCardGroup :config="imageGroupConfig" :isLoading="imageGroupLoad"></ImageCardGroup>
+      <ImageCardGroup :config="imageGroupConfig" :is-loading="imageGroupLoad" />
     </div>
   </div>
 </template>
@@ -20,18 +22,19 @@
 
 import UploadCard from '../components/UploadCard.vue'
 import ChartCard from '../components/ChartCard.vue'
+import { searchClosestNFTs, getTSNE } from '../api-src/Search'
 import ImageCardGroup from '~~/components/Groups/ImageCardGroup.vue'
 import { noImageLoaded } from '~~/utils/Config'
-import { searchClosestNFTs, getTSNE } from '../api-src/Search'
 
 export default {
   name: 'SearchPage',
-  data(){
+  components: { UploadCard, ChartCard, ImageCardGroup },
+  data () {
     return {
       similarNFTs: {},
       searchStarted: false,
       tsneLoading: true,
-      imageAndGraphHeight: "300px",
+      imageAndGraphHeight: '300px',
       chartConfig: [],
       imageGroupConfig: noImageLoaded,
       imageGroupLoad: false,
@@ -39,52 +42,55 @@ export default {
       sourceVector: []
     }
   },
-  components: { UploadCard, ChartCard, ImageCardGroup },
   methods: {
-    async processImage(base64EncodedString){
-      this.searchStarted = true;
-      this.imageGroupLoad = true;
-      this.tsneLoading = true;
-      this.imageGroupConfig = noImageLoaded;
+    async processImage (base64EncodedString) {
+      this.searchStarted = true
+      this.imageGroupLoad = true
+      this.tsneLoading = true
+      this.imageGroupConfig = noImageLoaded
 
-      await this.searchForNFTs(base64EncodedString);
-      await this.tDistributedStochasticNeighborEmbedding();
+      await this.searchForNFTs(base64EncodedString)
+      await this.tDistributedStochasticNeighborEmbedding()
     },
-    async searchForNFTs(base64EncodedString){
-      const result = await searchClosestNFTs(base64EncodedString, 100, true, true);
-      const topNfts = result.matches;
-      this.topNfts = topNfts;
-      this.sourceVector = result.source;
+    async searchForNFTs (base64EncodedString) {
+      const result = await searchClosestNFTs(base64EncodedString, 100, true, true)
+      const topNfts = result.matches
+      this.topNfts = topNfts
+      this.sourceVector = result.source
 
-      const imageCardsConfig = [];
+      const imageCardsConfig = []
       topNfts.map((match) => {
         imageCardsConfig.push(
           {
             title: `Score: ${match.score.toLocaleString()}`,
             imageURL: match.metadata.media,
-            subtitle: {'Contract': `${match.metadata.contract_address}`, 
-                       'Token Id': `${match.metadata.token_id}`}
+            subtitle: {
+              Contract: `${match.metadata.contract_address}`,
+              'Token Id': `${match.metadata.token_id}`
+            }
           }
         )
-      });
-
-      this.imageGroupConfig = imageCardsConfig;
-      this.imageGroupLoad = false;
-    },
-
-    async tDistributedStochasticNeighborEmbedding(){
-      const vectorDict = {};
-      const parsedTopNFTs = JSON.parse(JSON.stringify(this.topNfts));
-      const sourceVector = JSON.parse(JSON.stringify(this.sourceVector));
-      const scoreDict = {}
-      parsedTopNFTs.map((nft) => {
-        vectorDict[nft.id] = nft.values;
-        scoreDict[nft.id] = nft.score
+        return true
       })
 
-      vectorDict['source'] = sourceVector;
+      this.imageGroupConfig = imageCardsConfig
+      this.imageGroupLoad = false
+    },
 
-      const tsneResult = await getTSNE(vectorDict);
+    async tDistributedStochasticNeighborEmbedding () {
+      const vectorDict = {}
+      const parsedTopNFTs = JSON.parse(JSON.stringify(this.topNfts))
+      const sourceVector = JSON.parse(JSON.stringify(this.sourceVector))
+      const scoreDict = {}
+      parsedTopNFTs.map((nft) => {
+        vectorDict[nft.id] = nft.values
+        scoreDict[nft.id] = nft.score
+        return true
+      })
+
+      vectorDict.source = sourceVector
+
+      const tsneResult = await getTSNE(vectorDict)
       const sourceDataset = {
         label: 'Source Image',
         fill: false,
@@ -92,15 +98,15 @@ export default {
         backgroundColor: '#f87979',
         data: [
           {
-            x: tsneResult['source'][0],
-            y: tsneResult['source'][1],
+            x: tsneResult.source[0],
+            y: tsneResult.source[1],
             tooltipLabel: 'Source',
             score: 0
           }
         ]
-      };
+      }
 
-      delete tsneResult['source'];
+      delete tsneResult.source
 
       const similarNFTDataset = {
         label: 'Similar NFTs',
@@ -108,7 +114,7 @@ export default {
         borderColor: '#7acbf9',
         backgroundColor: '#7acbf9',
         data: []
-      };
+      }
 
       for (const [key, value] of Object.entries(tsneResult)) {
         similarNFTDataset.data.push({
@@ -116,11 +122,11 @@ export default {
           y: value[1],
           tooltipLabel: key,
           score: scoreDict[key]
-        });
+        })
       }
-      
-      this.chartConfig = {datasets: [sourceDataset, similarNFTDataset]};
-      this.tsneLoading = false;
+
+      this.chartConfig = { datasets: [sourceDataset, similarNFTDataset] }
+      this.tsneLoading = false
     }
   }
 }

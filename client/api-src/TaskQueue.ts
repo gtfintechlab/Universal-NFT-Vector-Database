@@ -35,5 +35,4 @@ export const addItemToTaskQueue = async (itemToAdd) => {
   } else {
     throw new Error('Failed to add item to task queue!')
   }
-
 }

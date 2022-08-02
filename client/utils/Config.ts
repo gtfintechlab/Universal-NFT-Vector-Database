@@ -7,8 +7,8 @@ export const urls = {
       localhost: 'http://localhost:5000',
       hosted: 'https://universal-nft-vector-database.web.app'
     },
-    graphprotocol:{
-      hosted: "https://api.thegraph.com/subgraphs/name/wighawag/eip721-subgraph"
+    graphprotocol: {
+      hosted: 'https://api.thegraph.com/subgraphs/name/wighawag/eip721-subgraph'
     }
   }
 }
@@ -50,6 +50,6 @@ export const sidebarConfig = {
 export const noImageLoaded = Array(5).fill({
   title: 'No Image Available Yet',
   imageURL: 'https://i.ibb.co/Rczjykx/depositphotos-227724992-stock-illustration-image-available-icon-flat-vector.jpg',
-  subtitle: {'Status': 'No action has occurred to load an image'},
-  
+  subtitle: { Status: 'No action has occurred to load an image' }
+
 })

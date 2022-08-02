@@ -21,8 +21,7 @@ import {
   LineElement,
   LinearScale,
   PointElement
-} from 'chart.js/dist/chart.esm.js' 
-import { mockScatterChartPoints } from '~~/utils/MockData'
+} from 'chart.js/dist/chart.esm.js'
 
 ChartJS.register(
   Title,
@@ -75,12 +74,12 @@ export default {
       default: []
     },
     xAxisLabel: {
-      type: String, 
-      defualt: ''
+      type: String,
+      default: 'X Axis'
     },
     yAxisLabel: {
-      type: String, 
-      defualt: ''
+      type: String,
+      default: 'Y Axis'
     }
 
   },
@@ -114,9 +113,9 @@ export default {
           },
           tooltip: {
             callbacks: {
-              label: function (tooltipItems, data){
-                const parsedToolTip = JSON.parse(JSON.stringify(tooltipItems.raw));
-                return [`x: ${parsedToolTip.x.toFixed(2)}`, `y: ${parsedToolTip.y.toFixed(2)}`, `Score: ${parsedToolTip.score}`];
+              label: function (tooltipItems) {
+                const parsedToolTip = JSON.parse(JSON.stringify(tooltipItems.raw))
+                return [`x: ${parsedToolTip.x.toFixed(2)}`, `y: ${parsedToolTip.y.toFixed(2)}`, `Score: ${parsedToolTip.score}`]
               }
             }
           }

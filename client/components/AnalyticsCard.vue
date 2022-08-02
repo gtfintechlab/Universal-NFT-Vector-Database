@@ -1,14 +1,21 @@
 <template>
   <div class="card-container">
-    <h1 v-if="!isLoading" class="title-text">
-      {{ title }}
-    </h1>
-    <h2 v-if="!isLoading" class="statistic-text">
-      {{ statistic }}
-    </h2>
-    <h3 v-if="!isLoading" class="subtitle-text">
-      {{ subtitle }}
-    </h3>
+    <div class="content-container">
+      <h1 v-if="!isLoading" class="title-text">
+        {{ title }}
+      </h1>
+      <h2
+        v-if="!isLoading"
+        :class="{'statistic-text': statistic !== '',
+                 'statistic-margin': subtitle !== '' && statistic !== ''
+        }"
+      >
+        {{ statistic }}
+      </h2>
+      <h3 v-if="!isLoading && subtitle !== ''" class="subtitle-text">
+        <span class="subtitle-topic">{{ subtitleTopic }}</span>{{ subtitle }}
+      </h3>
+    </div>
     <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner" />
   </div>
 </template>
@@ -27,17 +34,17 @@ export default {
     },
     statistic: {
       type: String,
-      default: '500,230',
+      default: '',
       required: false
     },
     subtitle: {
       type: String,
-      default: '432,000 in Task Queue',
+      default: '',
       required: false
     },
-    width: {
+    subtitleTopic: {
       type: String,
-      default: '40%',
+      default: '',
       required: false
     },
     isLoading: {
@@ -59,6 +66,7 @@ h1, h2, h3{
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+    justify-content: baseline;
 }
 
 .vue-spinner{
@@ -79,11 +87,22 @@ h1, h2, h3{
     font-family: "Inter";
     font-weight: 900;
     font-size: 2rem;
-    margin-bottom: 12px;
+}
+.statistic-margin{
+  margin-bottom: 12px;
 }
 .subtitle-text{
     font-family: "Inter";
     font-weight: 400;
     font-size: 1rem;
+    word-break: break-all;
+}
+
+.subtitle-topic{
+  font-weight: bold;
+}
+.content-container{
+  display: flex;
+  flex-direction: column;
 }
 </style>

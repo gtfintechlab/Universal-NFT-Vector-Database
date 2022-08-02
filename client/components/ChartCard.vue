@@ -1,8 +1,13 @@
 <template>
   <div class="chart-container">
     <div class="chart-align">
-      <ScatterChart v-if="!isLoading" :height="height" :chartData="config" :xAxisLabel="xAxisLabel"
-                    :yAxisLabel="yAxisLabel"></ScatterChart>
+      <ScatterChart
+        v-if="!isLoading"
+        :height="height"
+        :chart-data="config"
+        :x-axis-label="xAxisLabel"
+        :y-axis-label="yAxisLabel"
+      />
     </div>
     <PulseLoader v-if="isLoading" color="#16324C" class="vue-spinner" />
   </div>
@@ -10,8 +15,7 @@
 
 <script>
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
-import {mockScatterChartPoints} from '../utils/MockData'
-import ScatterChart from './Charts/ScatterChart.vue';
+import ScatterChart from './Charts/ScatterChart.vue'
 
 export default {
   name: 'ChartCard',
@@ -34,7 +38,7 @@ export default {
     },
     cssHeight: {
       type: String,
-      default: (props) => props.height + "px",
+      default: props => props.height + 'px',
       required: false
     },
     xAxisLabel: {
@@ -47,7 +51,6 @@ export default {
       default: '',
       required: false
     }
-
 
   },
   // computed: {
