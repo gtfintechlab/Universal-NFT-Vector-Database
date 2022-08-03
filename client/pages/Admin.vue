@@ -1,48 +1,67 @@
 <template>
   <div>
     <div class="admin-container">
-      <div class="contract-search-container">
-        <div class="horizontal-flexor">
-          <div class="task-queue-container">
-            <AnalyticsCard
-              subtitle-topic="Last Contract Processed: "
-              :is-loading="lastContractLoading"
-              :subtitle="analytics['lastContract']"
-              title="Task Queue Control"
-              class="task-queue-card"
-            />
-            <!--Change Later, keeping the button function as null so no one recklessly presses it-->
-            <button
-              class="task-queue-button"
-              :disabled="!finishedLoading"
-              @click="finishedLoading ? null : null"
-            >
-              Process Next 10 Contracts
-            </button>
+      <div class="login-container">
+      <div class="not-authenticated-container" v-if="!authenticated">
+        <label class="login-label">Username</label>
+        <input v-model="username" class="credentials-input" type="text"/>
+        <label class="login-label">Password</label>
+        <input v-model="password" class="credentials-input" type="password"/>
+        <button
+                @click="authenticateUser"
+                class="credentials-submit"
+              >Login</button>
+        <div v-if="error !== null" class="login-fail">{{error}}</div>
+      </div>
+      </div>
+      <!-- If the User is authenticated then show this -->
+      <div v-if="authenticated">
+        <div class="contract-search-container">
+          <div class="horizontal-flexor">
+            <div class="task-queue-container">
+              <AnalyticsCard
+                subtitle-topic="Last Contract Processed: "
+                :is-loading="lastContractLoading"
+                :subtitle="analytics['lastContract']"
+                title="Task Queue Control"
+                class="task-queue-card"
+              />
+              <!--Change Later, keeping the button function as null so no one recklessly presses it-->
+              <button
+                class="task-queue-button"
+                :disabled="!finishedLoading"
+                @click="finishedLoading ? null : null"
+              >
+                Process Next 10 Contracts
+              </button>
+            </div>
           </div>
+          <AnalyticsCardGroup
+            :is-loading="searchApiAnalyticsLoading"
+            :config="searchApiAnalyticsConfig"
+            class="contract-search-item"
+          />
         </div>
+
         <AnalyticsCardGroup
-          :is-loading="searchApiAnalyticsLoading"
-          :config="searchApiAnalyticsConfig"
-          class="contract-search-item"
+          :is-loading="taskQueueAnalyticsLoading"
+          :config="taskQueueAnalyticsConfig"
+          class="top-card-group"
         />
       </div>
-
-      <AnalyticsCardGroup
-        :is-loading="taskQueueAnalyticsLoading"
-        :config="taskQueueAnalyticsConfig"
-        class="top-card-group"
-      />
     </div>
   </div>
 </template>
 
 <script>
 
-import AnalyticsCardGroup from '~~/components/Groups/AnalyticsCardGroup.vue'
-import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '~~/actions/TaskQueue'
-import { getAnalytics } from '~~/actions/Analytics'
-import { getLastContract } from '~~/actions/Checkpoint'
+import AnalyticsCardGroup from '~~/components/Groups/AnalyticsCardGroup.vue';
+import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '~~/actions/TaskQueue';
+import { getAnalytics } from '~~/actions/Analytics';
+import { getLastContract } from '~~/actions/Checkpoint';
+import { getJWTToken, verifyJWTToken } from '~~/actions/Authentication';
+import { BlockchainType, NFTType } from '~~/utils/Types';
+
 export default {
   name: 'SearchPage',
   components: { AnalyticsCardGroup },
@@ -54,7 +73,12 @@ export default {
       searchApiAnalyticsConfig: [{}],
       searchApiAnalyticsLoading: true,
       lastContractLoading: true,
-      finishedLoading: false
+      finishedLoading: false,
+      authenticated: false,
+      webToken: "",
+      username: "",
+      password: "",
+      error: null
     }
   },
   async mounted () {
@@ -65,7 +89,25 @@ export default {
   },
   methods: {
     async processContracts () {
-      await processNextContracts()
+      await processNextContracts(
+        this.webToken,
+        10,
+        NFTType.ERC_721,
+        BlockchainType.ETHEREUM
+      )
+    },
+    async authenticateUser(){
+      this.error = null;
+      try{
+        const jwtToken = (await getJWTToken(this.username, this.password)).jwt;
+        const verify = await verifyJWTToken(jwtToken);
+        if (verify.authenticated){
+          this.authenticated = true;
+          this.webToken = jwtToken;
+        }
+      } catch{
+        this.error = "Incorrect Login or Failed to Verify User!"
+      }
     },
     async loadAnalytics () {
       this.taskQueueAnalyticsLoading = true
@@ -126,8 +168,69 @@ export default {
 </script>
 
 <style scoped>
+.login-container{
+  display: flex;
+  justify-content: center;
+}
+.not-authenticated-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  align-self: center;
+}
+
+input[type="text"]
+{
+  font-family: 'Outfit';
+  font-weight: 400;
+  font-size: 1.1em;
+}
+.credentials-input{
+  flex: 1 1 0;
+  align-self: center;
+  width: 100%;
+  padding: 12px 20px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.credentials-submit{
+  flex: 1 1 0;
+  align-self: center;
+  width: 100%;
+  background-color: #16324C;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Outfit';
+  font-weight: 400;
+  font-size: 1.1em;
+}
+.login-label{
+  font-family: 'Outfit';
+  font-weight: 400;
+  font-size: 1.1em;
+}
+
+.login-fail{
+  font-family: 'Outfit';
+  font-weight: 400;
+  font-size: 1.2em;
+  color: red;
+
+}
 .admin-container{
   margin: 25px;
+  height: calc(100vh);
 }
 
 .top-card-group{

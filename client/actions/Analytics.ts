@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { urls } from '../utils/Config'
 
 export const getAnalytics = async () => {
   const analytics = await axios.get('/api/analytics/get')

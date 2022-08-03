@@ -35,6 +35,7 @@
     "filepond": "^4.30.4",
     "filepond-plugin-file-validate-type": "^1.2.8",
     "filepond-plugin-image-preview": "^4.6.11",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.0",
     "vue-chartjs": "^4.1.1",
     "vue-filepond": "^7.0.3"

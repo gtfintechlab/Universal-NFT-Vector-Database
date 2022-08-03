@@ -1,17 +1,17 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const CheckpointSchema = new mongoose.Schema(
-    {
-      lastContract: {
-        type: String,
-        required: false,
-        default: '',
-      }
+  {
+    lastContract: {
+      type: String,
+      required: false,
+      default: ''
     }
-);
+  }
+)
 
-CheckpointSchema.statics.hasNoDependencies = () => true;
+CheckpointSchema.statics.hasNoDependencies = () => true
 
-const CheckpointModel = mongoose.model("Checkpoint", CheckpointSchema);
+const CheckpointModel = mongoose.model('Checkpoint', CheckpointSchema)
 
-export default CheckpointModel;
+export default CheckpointModel

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { urls } from '../utils/Config'
 
 export const getNftAmountTaskQueue = async () => {
   const nftAmount = await axios.get('/api/taskQueue/nfts/amount')
@@ -21,8 +20,11 @@ export const getCollectionAmountTaskQueue = async () => {
   }
 }
 
-export const addItemToTaskQueue = async (itemToAdd) => {
-  const taskQueueAdd = await axios.post('/api/taskQueue/add', itemToAdd)
+export const addItemToTaskQueue = async (itemToAdd, jwtToken) => {
+  const taskQueueAdd = await axios.post('/api/taskQueue/add', {
+    item: itemToAdd,
+    token: jwtToken
+  })
 
   if (taskQueueAdd?.data?.success) {
     return taskQueueAdd.data

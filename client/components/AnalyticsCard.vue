@@ -72,6 +72,8 @@ h1, h2, h3{
 .vue-spinner{
     align-self: center;
     justify-self: center;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .title-text{
