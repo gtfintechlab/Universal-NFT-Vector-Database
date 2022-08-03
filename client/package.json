@@ -29,10 +29,14 @@
     "vue-spinner": "^1.0.4"
   },
   "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "aws-sdk": "^2.1187.0",
     "chart.js": "^3.8.2",
     "filepond": "^4.30.4",
     "filepond-plugin-file-validate-type": "^1.2.8",
     "filepond-plugin-image-preview": "^4.6.11",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.5.0",
     "vue-chartjs": "^4.1.1",
     "vue-filepond": "^7.0.3"
   },

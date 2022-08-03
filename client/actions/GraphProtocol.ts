@@ -3,6 +3,7 @@ import { getLastContract, updateLastContract } from './Checkpoint'
 import { addItemToTaskQueue } from './TaskQueue'
 import { urls } from '~~/utils/Config'
 import { BlockchainType, NFTType, TaskQueueStatus, TaskQueueType } from '~~/utils/Types'
+import { verifyJWT } from '~~/server/utils/Auth'
 
 export const getNextContracts = async (lastContract: string, amount: number) => {
   const query = `query{
@@ -19,7 +20,12 @@ export const getNextContracts = async (lastContract: string, amount: number) => 
   }
 }
 
-export const processNextContracts = async (amount = 10, nftType = NFTType.ERC_721, chain = BlockchainType.ETHEREUM) => {
+export const processNextContracts = async (jwtToken, amount, nftType, chain) => {
+  const verifyToken = verifyJWT(jwtToken);
+  if (!(verifyToken.authenticated)){
+    throw new Error("Failed to Verify User is Authenticated")
+  }
+  
   const lastContract = await getLastContract()
   let newLastContract = ''
 
@@ -37,12 +43,12 @@ export const processNextContracts = async (amount = 10, nftType = NFTType.ERC_72
           chain
         }
       }
-      await addItemToTaskQueue(contractToAdd)
+      await addItemToTaskQueue(contractToAdd, jwtToken)
 
       if (index === nextContracts.length - 1) {
         newLastContract = contract.id
       };
     }
-    await updateLastContract(newLastContract)
+    await updateLastContract(newLastContract, jwtToken)
   }
 }

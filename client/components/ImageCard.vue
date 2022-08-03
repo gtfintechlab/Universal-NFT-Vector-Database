@@ -4,7 +4,7 @@
       {{ title }}
     </h1>
     <img v-if="!isLoading" :src="imageURL">
-    <h3 v-for="(sub, index) in Object.keys(subtitle)" :key="index" class="subtitle-text" v-if="!isLoading">
+    <h3 v-for="(sub, index) in Object.keys(subtitle)" v-if="!isLoading" :key="index" class="subtitle-text">
       <span class="subtitle-topic">{{ sub }}:</span> {{ subtitle[sub] }}
       <br>
       <br>

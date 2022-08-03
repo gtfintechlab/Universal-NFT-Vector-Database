@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import { getAnalytics } from '../api-src/Analytics'
-import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '../api-src/TaskQueue'
+import { getAnalytics } from '../actions/Analytics'
+import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '../actions/TaskQueue'
 import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue'
 import { mockAnalyticsCardGroup } from '../utils/MockData'
 

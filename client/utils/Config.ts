@@ -10,6 +10,9 @@ export const urls = {
     graphprotocol: {
       hosted: 'https://api.thegraph.com/subgraphs/name/wighawag/eip721-subgraph'
     }
+  },
+  secrets: {
+    doppler: 'https://api.doppler.com/v3/configs/config/secrets/download?format=json'
   }
 }
 

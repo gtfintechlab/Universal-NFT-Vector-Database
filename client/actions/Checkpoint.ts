@@ -1,10 +1,7 @@
 import axios from 'axios'
-import { urls } from '~~/utils/Config'
 
 export const getLastContract = async () => {
-  const lastContract = await axios.get(
-    urls.api.server.localhost + '/api/contracts/last/get'
-  )
+  const lastContract = await axios.get('/api/contracts/last/get')
 
   if (lastContract?.data?.success) {
     return lastContract.data
@@ -13,12 +10,11 @@ export const getLastContract = async () => {
   }
 }
 
-export const updateLastContract = async (newContract) => {
-  const updateContract = await axios.post(
-    urls.api.server.localhost + '/api/contracts/last/update',
-    {
-      newContract
-    }
+export const updateLastContract = async (newContract, jwtToken) => {
+  const updateContract = await axios.post('/api/contracts/last/update', {
+    newContract,
+    token: jwtToken
+  }
   )
 
   if (updateContract?.data?.success) {

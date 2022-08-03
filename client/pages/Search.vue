@@ -22,7 +22,7 @@
 
 import UploadCard from '../components/UploadCard.vue'
 import ChartCard from '../components/ChartCard.vue'
-import { searchClosestNFTs, getTSNE } from '../api-src/Search'
+import { searchClosestNFTs, getTSNE } from '../actions/Search'
 import ImageCardGroup from '~~/components/Groups/ImageCardGroup.vue'
 import { noImageLoaded } from '~~/utils/Config'
 
