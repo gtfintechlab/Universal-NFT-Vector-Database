@@ -40,9 +40,9 @@
 <script>
 
 import AnalyticsCardGroup from '~~/components/Groups/AnalyticsCardGroup.vue'
-import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '~~/api-src/TaskQueue'
-import { getAnalytics } from '~~/api-src/Analytics'
-import { getLastContract } from '~~/api-src/Checkpoint'
+import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '~~/actions/TaskQueue'
+import { getAnalytics } from '~~/actions/Analytics'
+import { getLastContract } from '~~/actions/Checkpoint'
 export default {
   name: 'SearchPage',
   components: { AnalyticsCardGroup },
