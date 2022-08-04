@@ -1,18 +1,15 @@
-import mongoose from "mongoose";
 import AnalyticsModel from "~~/server/db/Analytics";
+import dbConnect from "~~/server/utils/dbConnect";
 
 export default defineEventHandler(async (event) => {
     try{
-        const secrets = useRuntimeConfig().secretVariables;
-        await mongoose.connect(secrets.MONGO_DB_URL + 'universal-nft-vector-database');
-
+        await dbConnect();
         let analyticsDocument = await AnalyticsModel.findOne({}).exec();
             
         if (!analyticsDocument){
             const insertAnalytics = await AnalyticsModel.create({});
             analyticsDocument = insertAnalytics;
         }
-        await mongoose.connection.close();
         return {
             success: true,
             ...analyticsDocument.toObject()

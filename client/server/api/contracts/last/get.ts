@@ -1,10 +1,9 @@
-import mongoose from 'mongoose'
 import CheckpointModel from '~~/server/db/Checkpoints'
+import dbConnect from '~~/server/utils/dbConnect';
 
 export default defineEventHandler(async (event) => {
   try {
-    const secrets = useRuntimeConfig().secretVariables
-    await mongoose.connect(secrets.MONGO_DB_URL + 'universal-nft-vector-database')
+    await dbConnect();
     let contractCheckpoint = await CheckpointModel.findOne({})
 
     if (!contractCheckpoint) {
@@ -12,7 +11,6 @@ export default defineEventHandler(async (event) => {
       contractCheckpoint = newCheckpoint
     }
 
-    await mongoose.connection.close()
     return {
       success: true,
       lastContract: contractCheckpoint.lastContract

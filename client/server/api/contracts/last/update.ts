@@ -1,22 +1,22 @@
-import mongoose from 'mongoose'
 import CheckpointModel from '~~/server/db/Checkpoints'
+import { verifyJWT } from '~~/server/utils/Auth';
+import dbConnect from '~~/server/utils/dbConnect';
 
 export default defineEventHandler(async (event) => {
   try {
     const requestBody = (await useBody(event));
     const newContract = requestBody.newContract;
     const token = requestBody.token;
-
-    if (!(token.authenticated)){
+    const authenticated = verifyJWT(token).authenticated;
+    
+    if (!authenticated){
       throw new Error("Failed to Verify User is Authenticated")
     }
 
-    const secrets = useRuntimeConfig().secretVariables
-    await mongoose.connect(secrets.MONGO_DB_URL + 'universal-nft-vector-database')
-
+    await dbConnect();
+    
     const checkpoint = await CheckpointModel.findOneAndUpdate({}, { lastContract: newContract })
 
-    await mongoose.connection.close()
     return {
       success: true,
       lastContract: checkpoint
