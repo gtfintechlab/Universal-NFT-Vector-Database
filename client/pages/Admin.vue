@@ -30,7 +30,7 @@
               <button
                 class="task-queue-button"
                 :disabled="!finishedLoading"
-                @click="finishedLoading ? null : null"
+                @click="loadNextContracts"
               >
                 Process Next 10 Contracts
               </button>
@@ -61,6 +61,7 @@ import { getAnalytics } from '~~/actions/Analytics';
 import { getLastContract } from '~~/actions/Checkpoint';
 import { getJWTToken, verifyJWTToken } from '~~/actions/Authentication';
 import { BlockchainType, NFTType } from '~~/utils/Types';
+import { processNextContracts } from '~~/actions/GraphProtocol';
 
 export default {
   name: 'SearchPage',
@@ -88,14 +89,6 @@ export default {
     this.finishedLoading = true
   },
   methods: {
-    async processContracts () {
-      await processNextContracts(
-        this.webToken,
-        10,
-        NFTType.ERC_721,
-        BlockchainType.ETHEREUM
-      )
-    },
     async authenticateUser(){
       this.error = null;
       try{
@@ -161,6 +154,13 @@ export default {
 
       this.searchApiAnalyticsConfig = searchApiInfo
       this.searchApiAnalyticsLoading = false
+    },
+    async loadNextContracts(){
+      if (this.finishedLoading){
+        this.finishedLoading = false;
+        await processNextContracts(this.webToken, 10, NFTType.ERC_721, BlockchainType.ETHEREUM)
+        this.finishedLoading = true;
+      }
     }
   }
 
@@ -266,6 +266,22 @@ input[type="text"]
   width: 100%;
 }
 
+.task-queue-button:hover{
+  cursor: pointer;
+  background-color: #0f5a9f;
+}
+
+button:disabled,
+button[disabled]{
+  background-color: #cccccc;
+  color: black;
+}
+
+button:disabled,
+button[disabled]:hover{
+  background-color: #cccccc;
+  pointer-events: none;
+}
 .task-queue-card{
   flex: 1 1 0;
 }

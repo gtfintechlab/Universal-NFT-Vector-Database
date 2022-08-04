@@ -3,7 +3,7 @@ import { getLastContract, updateLastContract } from './Checkpoint'
 import { addItemToTaskQueue } from './TaskQueue'
 import { urls } from '~~/utils/Config'
 import { BlockchainType, NFTType, TaskQueueStatus, TaskQueueType } from '~~/utils/Types'
-import { verifyJWT } from '~~/server/utils/Auth'
+import { verifyJWTToken } from './Authentication'
 
 export const getNextContracts = async (lastContract: string, amount: number) => {
   const query = `query{
@@ -21,7 +21,7 @@ export const getNextContracts = async (lastContract: string, amount: number) => 
 }
 
 export const processNextContracts = async (jwtToken, amount, nftType, chain) => {
-  const verifyToken = verifyJWT(jwtToken);
+  const verifyToken = await verifyJWTToken(jwtToken);
   if (!(verifyToken.authenticated)){
     throw new Error("Failed to Verify User is Authenticated")
   }

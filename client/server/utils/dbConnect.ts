@@ -5,7 +5,7 @@ async function dbConnect(): Promise<void> {
   if (mongoose.connections[0].readyState) return;
 
   await mongoose.connect(secrets.MONGO_DB_URL, {
-    dbName: 'universal-nft-vector-database',
+    dbName: 'testingenv',
     socketTimeoutMS: 360000
   })
     .catch((error) => {
