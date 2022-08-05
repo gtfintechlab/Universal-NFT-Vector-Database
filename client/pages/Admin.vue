@@ -16,6 +16,7 @@
       </div>
       <!-- If the User is authenticated then show this -->
       <div v-if="authenticated">
+        <Table :config="tableConfig" class="table-margins" :isLoading="tableLoad"/>
         <div class="contract-search-container">
           <div class="horizontal-flexor">
             <div class="task-queue-container">
@@ -26,7 +27,6 @@
                 title="Task Queue Control"
                 class="task-queue-card"
               />
-              <!--Change Later, keeping the button function as null so no one recklessly presses it-->
               <button
                 class="task-queue-button"
                 :disabled="!finishedLoading"
@@ -69,6 +69,12 @@ export default {
   data () {
     return {
       analytics: {},
+      tableLoad: true,
+      tableConfig: {
+        title: "Overall Database Statistics",
+        headers: ["Statistic", "Success Count", "Failure Count", "Success Rate"],
+        data: []
+      },
       taskQueueAnalyticsConfig: [{}, {}, {}],
       taskQueueAnalyticsLoading: true,
       searchApiAnalyticsConfig: [{}],
@@ -86,6 +92,7 @@ export default {
     await this.loadAnalytics()
     this.getTaskQueueInformation()
     this.getSearchApiInformation()
+    this.getOverallStatistics()
     this.finishedLoading = true
   },
   methods: {
@@ -161,6 +168,55 @@ export default {
         await processNextContracts(this.webToken, 10, NFTType.ERC_721, BlockchainType.ETHEREUM)
         this.finishedLoading = true;
       }
+    },
+
+    async getOverallStatistics(){
+      // NFT Success, NFT Collection, Search API
+      this.tableLoad = true;
+      const analytics = await getAnalytics();
+      const nftSuccess = parseInt(analytics.nftSuccess);
+      const nftFailure = parseInt(analytics.nftFailure);
+      let nftSuccessRate = (nftSuccess / (nftFailure + nftSuccess)) * 100;
+            if (Number.isNaN(Number(nftSuccessRate))){
+        nftSuccessRate = 100;
+      }
+
+      const nftDict = {
+        Statistic: "NFTs Processed",
+        "Success Count": nftSuccess,
+        "Failure Count": nftFailure,
+        "Success Rate": Number(nftSuccessRate).toFixed(2) + '%',
+      }
+      const contractSuccess = parseInt(analytics.contractsSuccess);
+      const contractFailure = parseInt(analytics.contractsFailure);
+      let contractSuccessRate = (contractSuccess / (contractFailure + contractSuccess)) * 100;
+      if (Number.isNaN(Number(contractSuccessRate))){
+        contractSuccessRate = 100;
+      }
+
+      const contractDict = {
+        Statistic: "NFT Collections Processed",
+        "Success Count": contractSuccess,
+        "Failure Count": contractFailure,
+        "Success Rate": Number(contractSuccessRate).toFixed(2) + '%',
+      }
+
+      const searchSuccess = parseInt(analytics.searchApiSuccess);
+      const searchFailure = parseInt(analytics.searchApiFailure);
+      let searchSuccessRate = (searchSuccess / (searchFailure + searchSuccess)) * 100;
+      if (Number.isNaN(Number(searchSuccessRate))){
+        searchSuccessRate = 100;
+      }
+      const searchDict = {
+        Statistic: "Search API",
+        "Success Count": searchSuccess,
+        "Failure Count": searchFailure,
+        "Success Rate": Number(searchSuccessRate).toFixed(2) + '%',
+      }
+
+      this.tableConfig.data.push(nftDict, contractDict, searchDict)
+      this.tableLoad = false;
+
     }
   }
 
@@ -290,5 +346,9 @@ button[disabled]:hover{
   display: flex;
   flex-direction: row;
   flex: 1 1 0;
+}
+
+.table-margins{
+  margin-bottom: 25px;
 }
 </style>

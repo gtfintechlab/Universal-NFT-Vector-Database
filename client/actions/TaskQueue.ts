@@ -32,3 +32,13 @@ export const addItemToTaskQueue = async (itemToAdd, jwtToken) => {
     throw new Error('Failed to add item to task queue!')
   }
 }
+
+export const getTaskQueueItems = async () => {
+  const taskQueueItems = await axios.get('/api/taskQueue/get')
+
+  if (taskQueueItems?.data?.success) {
+    return taskQueueItems.data
+  } else {
+    throw new Error('Failed to load task queue items!')
+  }
+}

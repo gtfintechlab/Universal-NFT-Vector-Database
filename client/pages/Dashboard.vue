@@ -1,18 +1,19 @@
 <template>
   <div>
-    <Table :config="tableData" />
     <div class="dashboard-container">
       <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" class="top-card-group" />
       <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" />
+      <Table :config="tableData" class="table-margins" :isLoading="tableLoad"/>
     </div>
   </div>
 </template>
 
 <script>
 import { getAnalytics } from '../actions/Analytics'
-import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '../actions/TaskQueue'
+import { getNftAmountTaskQueue, getCollectionAmountTaskQueue, getTaskQueueItems } from '../actions/TaskQueue'
 import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue'
-import { mockAnalyticsCardGroup, mockTableData } from '../utils/MockData'
+import { mockAnalyticsCardGroup } from '../utils/MockData'
+import {TaskQueueType} from '../utils/Types';
 import Table from '../components/Table.vue'
 
 export default {
@@ -23,7 +24,12 @@ export default {
 },
   data () {
     return {
-      tableData: mockTableData,
+      tableLoad: true,
+      tableData: {
+        title: "Task Queue Items to be Processed",
+        headers: ["Item Type", "Item Identifier", "Blockchain"],
+        data: []
+      },
       analytics: {},
       topCardLoad: true,
       topCardConfig: mockAnalyticsCardGroup,
@@ -36,6 +42,7 @@ export default {
     this.analytics = await getAnalytics()
     this.getConfigTopCards()
     this.getConfigBottomCards()
+    this.getTaskQueueTable()
   },
   methods: {
     async getConfigTopCards () {
@@ -79,17 +86,50 @@ export default {
       })
       this.bottomCardConfig = cards
       this.bottomCardLoad = false
+    },
+    async getTaskQueueTable(){
+      this.tableLoad = true;
+      const taskQueueItems = (await getTaskQueueItems()).items
+      const taskQueueItemsSpliced = taskQueueItems.splice(0,5);
+      
+      taskQueueItemsSpliced.map((item) => {
+        let itemType = item.type;
+        let itemIdentifier = "";
+        let blockchain = "";
+        
+        if (itemType === TaskQueueType.ITEM_CONTRACT){
+          itemType = "NFT Collection";
+          itemIdentifier = item.data.address;
+          blockchain = item.data.chain;
+        } else if (itemType === TaskQueueType.ITEM_NFT){
+          itemType = "Single NFT";
+          itemIdentifier = item.data.media;
+          blockchain = item.data.chain;
+        }
+
+        this.tableData.data.push({
+          "Item Type": itemType,
+          "Item Identifier": itemIdentifier,
+          "Blockchain": blockchain
+        })
+      });
+
+      this.tableLoad = false;
     }
 
   }
 }
 </script>
 
-<style>
+<style scoped>
 .dashboard-container{
   margin: 25px;
 }
 .top-card-group{
   margin: 25px 0px 25px 0px;
+}
+
+.table-margins{
+  margin-top: 25px;
 }
 </style>

@@ -1,3 +1,8 @@
-<template>
-  <h1>About Page</h1>
-</template>
+<template><div /></template>
+
+<script>
+definePageMeta({
+  middleware: 'redirect-dashboard'
+})
+
+</script>

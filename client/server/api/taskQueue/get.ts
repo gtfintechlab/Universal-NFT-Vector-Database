@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     await dbConnect();
     const taskQueueItems = await TaskQueueItemModel.find(
       { status: TaskQueueStatus.IN_PROGRESS }
-    ).exec()
+    ).sort({'createdAt': 'asc'}).exec()
     return {
       success: true,
       items: taskQueueItems
