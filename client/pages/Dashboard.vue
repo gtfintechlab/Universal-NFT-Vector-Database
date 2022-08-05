@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Table :headers="tableHeaders" :title="tableTitle" :data="tableData" />
     <div class="dashboard-container">
       <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" class="top-card-group" />
       <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" />
@@ -12,12 +13,20 @@ import { getAnalytics } from '../actions/Analytics'
 import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '../actions/TaskQueue'
 import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue'
 import { mockAnalyticsCardGroup } from '../utils/MockData'
+import { mockVectorDatabaseData } from '../utils/MockData'
+import Table from '../components/Tables/Table.vue'
 
 export default {
   name: 'DashboardPage',
-  components: { AnalyticsCardGroup },
+  components: {
+    AnalyticsCardGroup,
+    Table
+},
   data () {
     return {
+      tableTitle: "Vector Database Index Status",
+      tableHeaders: ["Index Name", "Namespace", "Number of Vectors", "Vector Dimensions", "Index Fullness"],
+      tableData: mockVectorDatabaseData,
       analytics: {},
       topCardLoad: true,
       topCardConfig: mockAnalyticsCardGroup,
