@@ -1,15 +1,15 @@
 <template>
   <div class="parentTable">
-    <h2 class="title">{{ title.toUpperCase() }}</h2>
+    <h2 class="title">{{ config.title.toUpperCase() }}</h2>
     <table class="table">
         <thead>
             <tr>
-                <th v-for="(header, index) in headers" :key="index" class="headerStyle">{{ header }}</th>
+                <th v-for="(header, index) in config.headers" :key="index" class="headerStyle">{{ header }}</th>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(row, id) in data" :key="id" class="trStyle">
-                <td v-for="(header, indexHeader) in headers" :key="indexHeader" class="rowStyle">
+            <tr v-for="(row, id) in config.data" :key="id" class="trStyle">
+                <td v-for="(header, indexHeader) in config.headers" :key="indexHeader" class="rowStyle">
                     <div class="dataStyle">
                         {{row[header]}}
                     </div>
@@ -22,7 +22,14 @@
 
 <script>
 export default {
-    props: ['data', 'headers', 'title']
+    name: 'Table',
+    props: {
+        config: {
+            type: null,
+            default: {},
+            required: false
+        }
+    } 
 }
 </script>
 
@@ -30,7 +37,7 @@ export default {
     .parentTable{
         margin: 25px 25px 25px 25px;
         background-color: white;
-        padding: 20px;
+        padding: 20px 20px 10px 20px;
         border-radius: 10px;
         display: flex;
         flex-direction: column;
@@ -42,9 +49,9 @@ export default {
         color: #000000;
         opacity: 50%;
         font-size: 1.0rem;
-        font-weight: 400;
+        font-weight: 500;
         margin-top: 5px;
-        margin-bottom: 23px;
+        margin-bottom: 10px;
         padding-bottom: 20px;        
     }
 
@@ -53,14 +60,14 @@ export default {
         color: #000000;
         opacity: 50%;
         font-size: 1.0rem;
-        font-weight: 400;
+        font-weight: 500;
         margin-top: 5px;
         margin-bottom: 23px;
         padding-bottom: 20px;
     }   
     .parentTable .rowStyle{
         font-family: "Inter";
-        font-weight: 900;
+        font-weight: 600;
         font-size: 0.9rem;
         padding: 20px;
         padding-left: 0px;
@@ -69,7 +76,7 @@ export default {
         border-collapse: collapse;
     }
     .parentTable .trStyle {
-        border-top: 1pt solid #E6E6E6;
+        border-top: 2px solid #E6E6E6;
     }
 </style>
 
