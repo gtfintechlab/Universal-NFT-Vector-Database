@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Table :config="tableData" />
     <div class="dashboard-container">
       <AnalyticsCardGroup :config="topCardConfig" :is-loading="topCardLoad" class="top-card-group" />
       <AnalyticsCardGroup :config="bottomCardConfig" :is-loading="bottomCardLoad" />
@@ -11,13 +12,18 @@
 import { getAnalytics } from '../actions/Analytics'
 import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '../actions/TaskQueue'
 import AnalyticsCardGroup from '../components/Groups/AnalyticsCardGroup.vue'
-import { mockAnalyticsCardGroup } from '../utils/MockData'
+import { mockAnalyticsCardGroup, mockTableData } from '../utils/MockData'
+import Table from '../components/Table.vue'
 
 export default {
   name: 'DashboardPage',
-  components: { AnalyticsCardGroup },
+  components: {
+    AnalyticsCardGroup,
+    Table
+},
   data () {
     return {
+      tableData: mockTableData,
       analytics: {},
       topCardLoad: true,
       topCardConfig: mockAnalyticsCardGroup,
