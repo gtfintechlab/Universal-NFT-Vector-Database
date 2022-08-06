@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     
     await dbConnect();
     const createdTaskQueueItem = await TaskQueueItemModel.create(tQItem)
-    await addTaskIdSQS(createdTaskQueueItem._id.toString())
+    await addTaskIdSQS(createdTaskQueueItem._id.toString(), tQItem.type)
 
     return {
       success: true,
