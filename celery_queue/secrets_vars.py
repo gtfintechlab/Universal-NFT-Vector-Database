@@ -12,5 +12,7 @@ def get_all_secrets():
                          )
     return result.json()
 
+secret_vars = get_all_secrets()
+
 if __name__ == '__main__':
     print(get_all_secrets())

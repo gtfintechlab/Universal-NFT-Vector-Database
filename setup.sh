@@ -2,10 +2,6 @@
 
 # Linux Operating Systems
 if [[ $OSTYPE == "linux-gnu"* ]]; then
-    cd server
-    npm install
-    cd ..
-
     cd client
     npm install
     cd ..
@@ -17,7 +13,7 @@ if [[ $OSTYPE == "linux-gnu"* ]]; then
     cd ..
     cd ..
 
-    cd task_queue
+    cd celery_queue
     python3 -m venv venv
     source venv/bin/activate
     pip3 install -r requirements.txt
