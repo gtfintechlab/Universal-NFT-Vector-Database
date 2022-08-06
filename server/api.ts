@@ -86,7 +86,8 @@ function isValidTaskQueueItem(taskQueueItem: TaskQueueItem): boolean {
 
 async function initMongo(){
     if (!client) {
-        const MONGO_URL = "mongodb://127.0.0.1:27017/";
+        const evalSecrets = await SECRETS;
+        const MONGO_URL = evalSecrets.MONGO_DB_URL;
         client = await mongoose.connect((MONGO_URL + 
             "universal-nft-vector-database") as string, {
             socketTimeoutMS: 360000
@@ -117,23 +118,17 @@ function applyWaterfall(functionToExecute: Function){
 
 api.get("/api/analytics/get" , async (req, res) => {
     async function getAnalytics(){
-        const analyticsDocument = await AnalyticsModel.findOne({}).exec();
-        if (analyticsDocument){
-            res.status(200).json({
-                success: true,
-                totalContracts: analyticsDocument.totalContracts,
-                totalERC1155: analyticsDocument.totalERC1155,
-                totalERC721: analyticsDocument.totalERC721,
-                totalEthereumNFTs: analyticsDocument.totalEthereumNFTs,
-                totalNFTs: analyticsDocument.totalNFTs
-            });
-        } else {
-                res.status(400).json({
-                    success: false,
-                    error: "Failed to retrieve Analytics"
-                });
-            }
+        let analyticsDocument = await AnalyticsModel.findOne({}).exec();
+        
+        if (!analyticsDocument){
+            const insertAnalytics = await AnalyticsModel.create({});
+            analyticsDocument = insertAnalytics;
         }
+        res.status(200).json({
+            success: true,
+            ...analyticsDocument.toObject()
+        });
+    }
 
     applyWaterfall(getAnalytics);
 });
@@ -156,6 +151,38 @@ api.get("/api/taskQueue/get", async (req, res) => {
 
     applyWaterfall(getTaskQueue);
 })
+api.get("/api/taskQueue/nfts/amount", async (req, res) => {
+    async function getNftAmountTaskQueue(){
+        const nftTaskQueue = await TaskQueueItemModel.find({
+            status: TaskQueueStatus.IN_PROGRESS, 
+            type:TaskQueueType.ITEM_NFT}).exec();
+        
+        res.status(200).json({
+            success: true,
+            amount: nftTaskQueue.length,
+        });
+         
+    }
+    applyWaterfall(getNftAmountTaskQueue);
+})
+
+api.get("/api/taskQueue/contracts/amount", async (req, res) => {
+    async function getContractAmountTaskQueue(){
+        const contractTaskQueue = await TaskQueueItemModel.find({
+            status: TaskQueueStatus.IN_PROGRESS, 
+            type:TaskQueueType.ITEM_CONTRACT}).exec();
+        
+        res.status(200).json({
+            success: true,
+            amount: contractTaskQueue.length,
+        });
+         
+    }
+    applyWaterfall(getContractAmountTaskQueue);
+})
+
+
+
 
 api.get("/", async (req, res) => {
     res.status(200).json({
@@ -257,19 +284,16 @@ api.post("/api/taskQueue/add", async (req, res) => {
 
 api.get("/api/contracts/last/get", async(req, res) => {
     async function getLastContract(){
-        const contractCheckpoint = await CheckpointModel.findOne({});
-        if (contractCheckpoint != null){
+        let contractCheckpoint = await CheckpointModel.findOne({});
+
+        if (!contractCheckpoint){
+            const newCheckpoint = await CheckpointModel.create({})
+            contractCheckpoint = newCheckpoint;
+        }
             res.status(200).json({
                 "success": true,
                 "lastContract": contractCheckpoint.lastContract
-            });
-        } else {
-            res.status(400).json({
-                success: false,
-                error: "Could not retrieve checkpoint data"
-            });
-    
-        }
+        });
     }
 
     applyWaterfall(getLastContract);
@@ -297,17 +321,11 @@ api.get("/api/database/reset", async(req, res) => {
             await ContractModel.deleteMany({});
             await NFTModel.deleteMany({});
             await TaskQueueItemModel.deleteMany({});
-            await CheckpointModel.findOneAndUpdate({}, {
-                lastContract: ""
-            });
+            await AnalyticsModel.deleteMany({});
+            await CheckpointModel.deleteMany({});
     
-            await AnalyticsModel.findOneAndUpdate({}, {
-                totalContracts: 0,
-                totalERC1155: 0,
-                totalERC721: 0,
-                totalEthereumNFTs: 0,
-                totalNFTs: 0
-            });
+            await CheckpointModel.create({});
+            await AnalyticsModel.create({});
             const params = {
                 QueueUrl: evalSecrets.TASK_QUEUE_SQS_URL as string
             }

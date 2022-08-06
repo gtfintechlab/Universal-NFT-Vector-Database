@@ -4,7 +4,8 @@ const CheckpointSchema = new Schema(
     {
       lastContract: {
         type: String,
-        required: true
+        required: false,
+        default: '',
       }
     }
 );

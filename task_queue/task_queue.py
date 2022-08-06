@@ -35,9 +35,11 @@ def main():
                 result = process_contract(item)
                 if not result:
                     update_processed(item, "failure")
+                    update_analytics(contractFailure=True)
                     continue
                 # Move the id from the queue to the success
                 update_processed(item, "success")
+                update_analytics(contractSuccess=True)
             
             # If the item is an NFT, process as per NFT guidelines
             elif item["type"] == "nft":
@@ -46,9 +48,11 @@ def main():
                 result, vector_id = process_nft(item)
                 if not result:
                     update_processed(item, "failure")
+                    update_analytics(nftFailure=True)
                     continue
                 # Move the id from the queue to the success
                 update_processed(item, "success")
+                update_analytics(nftSuccess=True)
         except Exception as e:
             print(e)
 
@@ -175,7 +179,9 @@ def add_contract_to_database(item):
     except:
         return False
 
-def update_analytics(totalContracts=False, totalERC1155=False, totalERC721=False, totalEthereumNFTs=False, totalNFTs=False):
+def update_analytics(totalContracts=False, totalERC1155=False, totalERC721=False, 
+                    totalEthereumNFTs=False, totalNFTs=False,
+                    nftFailure=False, nftSuccess=False, contractFailure=False, contractSuccess=False):
     # Get Analytics Collection
     initialStats = database['analytics'].find_one()
 
@@ -184,7 +190,11 @@ def update_analytics(totalContracts=False, totalERC1155=False, totalERC721=False
                   "totalERC1155": initialStats["totalERC1155"] + int(totalERC1155),
                   "totalERC721": initialStats["totalERC721"] + int(totalERC721),
                   "totalEthereumNFTs": initialStats["totalEthereumNFTs"] + int(totalEthereumNFTs),
-                  "totalNFTs": initialStats["totalNFTs"] + int(totalNFTs)                  
+                  "totalNFTs": initialStats["totalNFTs"] + int(totalNFTs),
+                  "nftSuccess": initialStats["nftSuccess"] + int(nftSuccess),
+                  "nftFailure": initialStats["nftFailure"] + int(nftFailure),
+                  "contractsSuccess": initialStats["contractsSuccess"] + int(contractSuccess),
+                  "contractsFailure": initialStats["contractsFailure"] + int(contractFailure),
                 }
         })
     

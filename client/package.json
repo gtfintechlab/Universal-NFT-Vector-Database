@@ -1,58 +1,45 @@
 {
-  "name": "client",
-  "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@chakra-ui/react": "^1.8.8",
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.8.1",
-    "@fortawesome/fontawesome-svg-core": "^6.1.1",
-    "@fortawesome/free-solid-svg-icons": "^6.1.1",
-    "@fortawesome/react-fontawesome": "^0.1.18",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.1.1",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.0",
-    "@types/node": "^16.11.33",
-    "@types/react": "^18.0.8",
-    "@types/react-dom": "^18.0.3",
-    "@types/react-fontawesome": "^1.6.5",
-    "axios": "^0.27.2",
-    "framer-motion": "^6.3.3",
-    "graphql": "^16.5.0",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-router-dom": "^6.3.0",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.6.4",
-    "urql": "^2.2.0",
-    "web-vitals": "^2.1.4"
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
+    "lint": "npm run lint:js",
+    "lintfix": "npm run lint:js -- --fix"
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.3.3"
-  }
+    "@babel/eslint-parser": "^7.18.9",
+    "@iconify/json": "^2.1.81",
+    "@iconify/vue": "^3.2.1",
+    "@nuxtjs/eslint-config-typescript": "^10.0.0",
+    "@nuxtjs/eslint-module": "^3.1.0",
+    "axios": "^0.27.2",
+    "eslint": "^8.20.0",
+    "eslint-plugin-nuxt": "^3.2.0",
+    "eslint-plugin-vue": "^9.2.0",
+    "nuxt": "3.0.0-rc.6",
+    "sass": "^1.54.0",
+    "sass-loader": "^13.0.2",
+    "typescript": "^4.7.4",
+    "unplugin-icons": "^0.14.7",
+    "unplugin-vue-components": "^0.21.1",
+    "vue": "^3.2.37",
+    "vue-spinner": "^1.0.4"
+  },
+  "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "aws-sdk": "^2.1187.0",
+    "chart.js": "^3.8.2",
+    "filepond": "^4.30.4",
+    "filepond-plugin-file-validate-type": "^1.2.8",
+    "filepond-plugin-image-preview": "^4.6.11",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.5.0",
+    "uuid": "^8.3.2",
+    "vue-chartjs": "^4.1.1",
+    "vue-filepond": "^7.0.3"
+  },
+  "type": "commonjs"
 }
