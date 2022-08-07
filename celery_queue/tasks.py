@@ -66,14 +66,15 @@ def process_nft(item):
             raise Exception("Failed to Convert to Vector")
 
         vector_id = str(uuid.uuid4().hex)
-        # Inser the data and get the id of the inserted image
-        pinecone_insert = insert_pinecone(input_vector=vector,
-                                          vector_id=vector_id,
-                                          vector_metadata={
-                                            "contract_address": item["data"]["contractAddress"],
-                                            "token_id": item["data"]["tokenId"],
-                                            "media": item["data"]["media"]
-                                          })
+        if os.environ["environment"] == "production":
+            # Insert the data and get the id of the inserted image
+            pinecone_insert = insert_pinecone(input_vector=vector,
+                                            vector_id=vector_id,
+                                            vector_metadata={
+                                                "contract_address": item["data"]["contractAddress"],
+                                                "token_id": item["data"]["tokenId"],
+                                                "media": item["data"]["media"]
+                                            })
 
         return True, vector_id
     except:
