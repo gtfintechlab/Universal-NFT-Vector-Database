@@ -10,18 +10,18 @@ if [[ $1 == "start" && $OSTYPE == "linux-gnu"* ]]; then
     cd ..
     cd ..
 
-    cd task_queue
+    cd celery_queue
     source venv/bin/activate
     nohup bash -c 'celery -A tasks worker' &
     TASK_QUEUE_PID=$!
     cd ..
-    echo ${TASK_QUEUE_PID} > pids/task_queue.pid;
+    echo ${TASK_QUEUE_PID} > pids/celery_queue.pid;
 fi
 
 if [[ $1 == "end" && $OSTYPE == "linux-gnu"* ]]; then
     lsof -i:3000 -Fp | head -n 1 | sed 's/^p//' | xargs kill
     lsof -i:5000 -Fp | head -n 1 | sed 's/^p//' | xargs kill
-    kill `cat pids/task_queue.pid`;
+    kill `cat pids/celery_queue.pid`;
     rm -rf pids/
 
     cd python_server/src
