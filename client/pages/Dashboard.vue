@@ -50,7 +50,7 @@ export default {
       const nftsInTaskQueue = (await getNftAmountTaskQueue()).amount
       let nftSuccessRate = 100
       if (parseInt(this.analytics.totalNFTs) !== 0) {
-        nftSuccessRate = (parseInt((this.analytics.nftSuccess)) / parseInt((this.analytics.nftSuccess + this.analytics.nftFailure))) * 100
+        nftSuccessRate = (parseInt((this.analytics.nftSuccess)) / parseInt((this.analytics.totalNFTs))) * 100
       }
       cards.push({
         title: 'Total NFTs in Vector Database',
@@ -60,7 +60,7 @@ export default {
       {
         title: 'NFT Processing Success Rate',
         statistic: Number(nftSuccessRate).toFixed(2) + '%',
-        subtitle: this.analytics.nftSuccess.toLocaleString() + ' of ' + (this.analytics.nftSuccess + this.analytics.nftFailure).toLocaleString() + ' Successful'
+        subtitle: this.analytics.nftSuccess.toLocaleString() + ' of ' + (this.analytics.totalNFTs).toLocaleString() + ' Successful'
       }
       )
       this.topCardConfig = cards

@@ -30,17 +30,13 @@ def search():
                                 withVector=withVector,
                                 withMetadata=withMetadata
                                 )
-        update_analytics(
-            searchApiSuccess=True
-        )
+        update_analytics(['searchApiSuccess'])
         json_response = results.json()
         json_response['success'] = True
         json_response['source'] = [float(element) for element in input_vector['vector']]
         return json_response
     except Exception as e:
-        update_analytics(
-            searchApiFailure=True
-        )
+        update_analytics(['searchApiFailure'])
         return {"success": False, "error": e}
 
 @app.route("/api/tsne", methods=['POST'])

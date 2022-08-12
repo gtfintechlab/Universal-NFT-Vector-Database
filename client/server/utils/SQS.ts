@@ -4,10 +4,11 @@ import {v4 as uuidv4} from 'uuid';
 export async function addTaskIdSQS (taskId, taskType) {
   const secrets = useRuntimeConfig().secretVariables
   const environment = useRuntimeConfig().environment;
-  process.env.AWS_ACCESS_KEY_ID = secrets.AWS_ACCESS_KEY_ID
-  process.env.AWS_SECRET_ACCESS_KEY = secrets.AWS_SECRET_ACCESS_KEY
+
   AWS.config.update({
     region: "us-east-1",
+    accessKeyId: secrets.AWS_ACCESS_KEY_ID,
+    secretAccessKey: secrets.AWS_SECRET_ACCESS_KEY
   })
 
   const sqs = new AWS.SQS()

@@ -16,5 +16,6 @@ broker_transport_options = {
         },
       },
       'polling_interval': 60,
-      'max_retries': 5
+      'max_retries': 0,
+      'visibility_timeout': 7200
     }
