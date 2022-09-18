@@ -1,9 +1,9 @@
 import CheckpointModel from '~~/server/db/Checkpoints'
-import dbConnect from '~~/server/utils/dbConnect';
+import dbConnect from '~~/server/utils/dbConnect'
 
 export default defineEventHandler(async (event) => {
   try {
-    await dbConnect();
+    await dbConnect()
     let contractCheckpoint = await CheckpointModel.findOne({})
 
     if (!contractCheckpoint) {

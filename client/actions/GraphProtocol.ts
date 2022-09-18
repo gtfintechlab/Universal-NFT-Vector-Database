@@ -1,9 +1,9 @@
 import axios from 'axios'
 import { getLastContract, updateLastContract } from './Checkpoint'
 import { addItemToTaskQueue } from './TaskQueue'
+import { verifyJWTToken } from './Authentication'
 import { urls } from '~~/utils/Config'
 import { BlockchainType, NFTType, TaskQueueStatus, TaskQueueType } from '~~/utils/Types'
-import { verifyJWTToken } from './Authentication'
 
 export const getNextContracts = async (lastContract: string, amount: number) => {
   const query = `query{
@@ -21,11 +21,11 @@ export const getNextContracts = async (lastContract: string, amount: number) => 
 }
 
 export const processNextContracts = async (jwtToken, amount, nftType, chain) => {
-  const verifyToken = await verifyJWTToken(jwtToken);
-  if (!(verifyToken.authenticated)){
-    throw new Error("Failed to Verify User is Authenticated")
+  const verifyToken = await verifyJWTToken(jwtToken)
+  if (!(verifyToken.authenticated)) {
+    throw new Error('Failed to Verify User is Authenticated')
   }
-  
+
   const lastContract = await getLastContract()
   let newLastContract = ''
 

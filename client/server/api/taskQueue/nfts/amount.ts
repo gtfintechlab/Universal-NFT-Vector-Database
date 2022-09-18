@@ -1,10 +1,10 @@
 import TaskQueueItemModel from '~~/server/db/TaskQueueItem'
 import { TaskQueueStatus, TaskQueueType } from '~~/utils/Types'
-import dbConnect from '~~/server/utils/dbConnect';
+import dbConnect from '~~/server/utils/dbConnect'
 
 export default defineEventHandler(async (event) => {
   try {
-    await dbConnect();
+    await dbConnect()
     const nftTaskQueue = await TaskQueueItemModel.find({
       status: TaskQueueStatus.IN_PROGRESS,
       type: TaskQueueType.ITEM_NFT

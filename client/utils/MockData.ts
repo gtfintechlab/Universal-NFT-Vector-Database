@@ -76,14 +76,13 @@ export const mockAnalyticsCardGroup = [
 
 export const mockImageCardGroup = [{}, {}, {}, {}, {}, {}]
 
-
-export const mockTableData = { 
+export const mockTableData = {
   data: [
-  {"Index Name": "all-nfts", "Namespace": "ethereum-erc721", "Number of Vectors": "274,022", "Vector Dimensions": "2,048", "Index Fullness": "0.5"},
-  {"Index Name": "all-nfts", "Namespace": "polygon-erc721", "Number of Vectors": "166,056", "Vector Dimensions": "2,048", "Index Fullness": "0.5"},
-  {"Index Name": "all-nfts", "Namespace": "ethereum-erc1155", "Number of Vectors": "10,456", "Vector Dimensions": "2,048", "Index Fullness": "0.5"},
-  {"Index Name": "all-nfts", "Namespace": "polygon-erc1155", "Number of Vectors": "5,924", "Vector Dimensions": "2,048", "Index Fullness": "0.5"}
-],
-  headers: ["Index Name", "Namespace", "Number of Vectors", "Vector Dimensions", "Index Fullness"],
-  title: "VECTOR DATABASE INDEX STATUS"
+    { 'Index Name': 'all-nfts', Namespace: 'ethereum-erc721', 'Number of Vectors': '274,022', 'Vector Dimensions': '2,048', 'Index Fullness': '0.5' },
+    { 'Index Name': 'all-nfts', Namespace: 'polygon-erc721', 'Number of Vectors': '166,056', 'Vector Dimensions': '2,048', 'Index Fullness': '0.5' },
+    { 'Index Name': 'all-nfts', Namespace: 'ethereum-erc1155', 'Number of Vectors': '10,456', 'Vector Dimensions': '2,048', 'Index Fullness': '0.5' },
+    { 'Index Name': 'all-nfts', Namespace: 'polygon-erc1155', 'Number of Vectors': '5,924', 'Vector Dimensions': '2,048', 'Index Fullness': '0.5' }
+  ],
+  headers: ['Index Name', 'Namespace', 'Number of Vectors', 'Vector Dimensions', 'Index Fullness'],
+  title: 'VECTOR DATABASE INDEX STATUS'
 }

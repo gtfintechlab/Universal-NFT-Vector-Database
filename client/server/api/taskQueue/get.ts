@@ -1,13 +1,13 @@
 import TaskQueueItemModel from '~~/server/db/TaskQueueItem'
 import { TaskQueueStatus } from '~~/utils/Types'
-import dbConnect from '~/server/utils/dbConnect';
+import dbConnect from '~/server/utils/dbConnect'
 
 export default defineEventHandler(async (event) => {
   try {
-    await dbConnect();
+    await dbConnect()
     const taskQueueItems = await TaskQueueItemModel.find(
       { status: TaskQueueStatus.IN_PROGRESS }
-    ).limit(20).sort({'createdAt': 'asc'}).exec()
+    ).limit(20).sort({ createdAt: 'asc' }).exec()
     return {
       success: true,
       items: taskQueueItems

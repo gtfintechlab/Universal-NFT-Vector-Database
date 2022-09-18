@@ -2,21 +2,25 @@
   <div>
     <div class="admin-container">
       <div class="login-container">
-      <div class="not-authenticated-container" v-if="!authenticated">
-        <label class="login-label">Username</label>
-        <input v-model="username" class="credentials-input" type="text"/>
-        <label class="login-label">Password</label>
-        <input v-model="password" class="credentials-input" type="password"/>
-        <button
-                @click="authenticateUser"
-                class="credentials-submit"
-              >Login</button>
-        <div v-if="error !== null" class="login-fail">{{error}}</div>
-      </div>
+        <div v-if="!authenticated" class="not-authenticated-container">
+          <label class="login-label">Username</label>
+          <input v-model="username" class="credentials-input" type="text">
+          <label class="login-label">Password</label>
+          <input v-model="password" class="credentials-input" type="password">
+          <button
+            class="credentials-submit"
+            @click="authenticateUser"
+          >
+            Login
+          </button>
+          <div v-if="error !== null" class="login-fail">
+            {{ error }}
+          </div>
+        </div>
       </div>
       <!-- If the User is authenticated then show this -->
       <div v-if="authenticated">
-        <Table :config="tableConfig" class="table-margins" :isLoading="tableLoad"/>
+        <Table :config="tableConfig" class="table-margins" :is-loading="tableLoad" />
         <div class="contract-search-container">
           <div class="horizontal-flexor">
             <div class="task-queue-container">
@@ -48,6 +52,21 @@
           :config="taskQueueAnalyticsConfig"
           class="top-card-group"
         />
+        <div class="specific-contract-container">
+          <label class="specific-contract-label">Contract Address</label>
+          <input v-model="contractAddress" class="specific-contract-input" type="text">
+          <label class="specific-contract-label">Contract Name</label>
+          <input v-model="contractName" class="specific-contract-input" type="text">
+          <button
+            class="contract-submit"
+            @click="processSpecificContract"
+          >
+            Process Contract
+          </button>
+          <div v-if="contractError !== null" class="specific-contract-fail">
+            {{ contractError }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -55,13 +74,13 @@
 
 <script>
 
-import AnalyticsCardGroup from '~~/components/Groups/AnalyticsCardGroup.vue';
-import { getNftAmountTaskQueue, getCollectionAmountTaskQueue } from '~~/actions/TaskQueue';
-import { getAnalytics } from '~~/actions/Analytics';
-import { getLastContract } from '~~/actions/Checkpoint';
-import { getJWTToken, verifyJWTToken } from '~~/actions/Authentication';
-import { BlockchainType, NFTType } from '~~/utils/Types';
-import { processNextContracts } from '~~/actions/GraphProtocol';
+import AnalyticsCardGroup from '~~/components/Groups/AnalyticsCardGroup.vue'
+import { getNftAmountTaskQueue, getCollectionAmountTaskQueue, addItemToTaskQueue } from '~~/actions/TaskQueue'
+import { getAnalytics } from '~~/actions/Analytics'
+import { getLastContract } from '~~/actions/Checkpoint'
+import { getJWTToken, verifyJWTToken } from '~~/actions/Authentication'
+import { BlockchainType, NFTType, TaskQueueType, TaskQueueStatus } from '~~/utils/Types'
+import { processNextContracts } from '~~/actions/GraphProtocol'
 
 export default {
   name: 'SearchPage',
@@ -71,8 +90,8 @@ export default {
       analytics: {},
       tableLoad: true,
       tableConfig: {
-        title: "Overall Database Statistics",
-        headers: ["Statistic", "Success Count", "Failure Count", "Success Rate"],
+        title: 'Overall Database Statistics',
+        headers: ['Statistic', 'Success Count', 'Failure Count', 'Success Rate'],
         data: []
       },
       taskQueueAnalyticsConfig: [{}, {}, {}],
@@ -82,9 +101,12 @@ export default {
       lastContractLoading: true,
       finishedLoading: false,
       authenticated: false,
-      webToken: "",
-      username: "",
-      password: "",
+      webToken: '',
+      username: '',
+      password: '',
+      contractAddress: '',
+      contractName: '',
+      contractError: null,
       error: null
     }
   },
@@ -96,18 +118,35 @@ export default {
     this.finishedLoading = true
   },
   methods: {
-    async authenticateUser(){
-      this.error = null;
-      try{
-        const jwtToken = (await getJWTToken(this.username, this.password)).jwt;
-        const verify = await verifyJWTToken(jwtToken);
-        if (verify.authenticated){
-          this.authenticated = true;
-          this.webToken = jwtToken;
+    async authenticateUser () {
+      this.error = null
+      try {
+        const jwtToken = (await getJWTToken(this.username, this.password)).jwt
+        const verify = await verifyJWTToken(jwtToken)
+        if (verify.authenticated) {
+          this.authenticated = true
+          this.webToken = jwtToken
         }
-      } catch{
-        this.error = "Incorrect Login or Failed to Verify User!"
+      } catch {
+        this.error = 'Incorrect Login or Failed to Verify User!'
       }
+    },
+
+    async processSpecificContract () {
+      const contractToSend = {
+        type: TaskQueueType.ITEM_CONTRACT,
+        status: TaskQueueStatus.IN_PROGRESS,
+        data: {
+          address: this.contractAddress,
+          name: this.contractName,
+          chain: BlockchainType.ETHEREUM,
+          type: NFTType.ERC_721
+        }
+      }
+
+      const result = await addItemToTaskQueue(contractToSend, this.webToken)
+      console.log(result)
+      return result
     },
     async loadAnalytics () {
       this.taskQueueAnalyticsLoading = true
@@ -162,61 +201,60 @@ export default {
       this.searchApiAnalyticsConfig = searchApiInfo
       this.searchApiAnalyticsLoading = false
     },
-    async loadNextContracts(){
-      if (this.finishedLoading){
-        this.finishedLoading = false;
+    async loadNextContracts () {
+      if (this.finishedLoading) {
+        this.finishedLoading = false
         await processNextContracts(this.webToken, 10, NFTType.ERC_721, BlockchainType.ETHEREUM)
-        this.finishedLoading = true;
+        this.finishedLoading = true
       }
     },
 
-    async getOverallStatistics(){
+    async getOverallStatistics () {
       // NFT Success, NFT Collection, Search API
-      this.tableLoad = true;
-      const analytics = await getAnalytics();
-      const nftSuccess = parseInt(analytics.nftSuccess);
-      const nftFailure = parseInt(analytics.nftFailure);
-      let nftSuccessRate = (nftSuccess / (nftFailure + nftSuccess)) * 100;
-            if (Number.isNaN(Number(nftSuccessRate))){
-        nftSuccessRate = 100;
+      this.tableLoad = true
+      const analytics = await getAnalytics()
+      const nftSuccess = parseInt(analytics.nftSuccess)
+      const nftFailure = parseInt(analytics.nftFailure)
+      let nftSuccessRate = (nftSuccess / (nftFailure + nftSuccess)) * 100
+      if (Number.isNaN(Number(nftSuccessRate))) {
+        nftSuccessRate = 100
       }
 
       const nftDict = {
-        Statistic: "NFTs Processed",
-        "Success Count": nftSuccess,
-        "Failure Count": nftFailure,
-        "Success Rate": Number(nftSuccessRate).toFixed(2) + '%',
+        Statistic: 'NFTs Processed',
+        'Success Count': nftSuccess,
+        'Failure Count': nftFailure,
+        'Success Rate': Number(nftSuccessRate).toFixed(2) + '%'
       }
-      const contractSuccess = parseInt(analytics.contractsSuccess);
-      const contractFailure = parseInt(analytics.contractsFailure);
-      let contractSuccessRate = (contractSuccess / (contractFailure + contractSuccess)) * 100;
-      if (Number.isNaN(Number(contractSuccessRate))){
-        contractSuccessRate = 100;
+      const contractSuccess = parseInt(analytics.contractsSuccess)
+      const contractFailure = parseInt(analytics.contractsFailure)
+      let contractSuccessRate = (contractSuccess / (contractFailure + contractSuccess)) * 100
+      if (Number.isNaN(Number(contractSuccessRate))) {
+        contractSuccessRate = 100
       }
 
       const contractDict = {
-        Statistic: "NFT Collections Processed",
-        "Success Count": contractSuccess,
-        "Failure Count": contractFailure,
-        "Success Rate": Number(contractSuccessRate).toFixed(2) + '%',
+        Statistic: 'NFT Collections Processed',
+        'Success Count': contractSuccess,
+        'Failure Count': contractFailure,
+        'Success Rate': Number(contractSuccessRate).toFixed(2) + '%'
       }
 
-      const searchSuccess = parseInt(analytics.searchApiSuccess);
-      const searchFailure = parseInt(analytics.searchApiFailure);
-      let searchSuccessRate = (searchSuccess / (searchFailure + searchSuccess)) * 100;
-      if (Number.isNaN(Number(searchSuccessRate))){
-        searchSuccessRate = 100;
+      const searchSuccess = parseInt(analytics.searchApiSuccess)
+      const searchFailure = parseInt(analytics.searchApiFailure)
+      let searchSuccessRate = (searchSuccess / (searchFailure + searchSuccess)) * 100
+      if (Number.isNaN(Number(searchSuccessRate))) {
+        searchSuccessRate = 100
       }
       const searchDict = {
-        Statistic: "Search API",
-        "Success Count": searchSuccess,
-        "Failure Count": searchFailure,
-        "Success Rate": Number(searchSuccessRate).toFixed(2) + '%',
+        Statistic: 'Search API',
+        'Success Count': searchSuccess,
+        'Failure Count': searchFailure,
+        'Success Rate': Number(searchSuccessRate).toFixed(2) + '%'
       }
 
       this.tableConfig.data.push(nftDict, contractDict, searchDict)
-      this.tableLoad = false;
-
+      this.tableLoad = false
     }
   }
 
@@ -238,6 +276,58 @@ export default {
   border-radius: 10px;
   width: 100%;
   align-self: center;
+}
+
+.specific-contract-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  align-self: center;
+  margin-bottom: 25px;
+}
+
+.specific-contract-label{
+  font-family: 'Outfit';
+  font-weight: 400;
+  font-size: 1.1em;
+}
+
+.specific-contract-fail{
+  font-family: 'Outfit';
+  font-weight: 400;
+  font-size: 1.2em;
+  color: red;
+}
+
+.specific-contract-input{
+  flex: 1 1 0;
+  align-self: center;
+  width: 100%;
+  padding: 12px 20px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.contract-submit{
+  flex: 1 1 0;
+  align-self: center;
+  width: 100%;
+  background-color: #16324C;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Outfit';
+  font-weight: 400;
+  font-size: 1.1em;
 }
 
 input[type="text"]

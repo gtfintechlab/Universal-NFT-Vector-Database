@@ -14,7 +14,7 @@ export default defineNuxtConfig(async () => {
     privateRuntimeConfig: {
       apiSecret: process.env.DOPPLER_SERVICE_TOKEN,
       secretVariables: dopplerSecrets,
-      environment: "development"
+      environment: 'development'
     }
   }
 })

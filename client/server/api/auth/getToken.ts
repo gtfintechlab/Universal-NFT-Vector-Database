@@ -1,17 +1,17 @@
-import {hashString} from '../../utils/Auth';
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'
+import { hashString } from '../../utils/Auth'
 
 export default defineEventHandler(async (event) => {
   try {
     const secrets = useRuntimeConfig().secretVariables
-    const requestBody = await useBody(event);
-    const user = `${requestBody.username}${requestBody.password}`;
+    const requestBody = await useBody(event)
+    const user = `${requestBody.username}${requestBody.password}`
     const hashed = hashString(user, secrets.SERVER_SECRET)
-    if (hashed !== secrets.HASHED_PASSWORD){
-        throw Error(`Unable to Authorize Token for User ${requestBody.username}`);
+    if (hashed !== secrets.HASHED_PASSWORD) {
+      throw new Error(`Unable to Authorize Token for User ${requestBody.username}`)
     }
 
-    const webToken = jwt.sign({authenticated: true}, secrets.SERVER_SECRET)
+    const webToken = jwt.sign({ authenticated: true }, secrets.SERVER_SECRET)
     return {
       success: true,
       jwt: webToken

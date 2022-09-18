@@ -21,6 +21,7 @@ export const getCollectionAmountTaskQueue = async () => {
 }
 
 export const addItemToTaskQueue = async (itemToAdd, jwtToken) => {
+  console.log(itemToAdd)
   const taskQueueAdd = await axios.post('/api/taskQueue/add', {
     item: itemToAdd,
     token: jwtToken
