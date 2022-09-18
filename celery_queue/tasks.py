@@ -44,6 +44,14 @@ def get_item(taskId):
 def process_contract(item):
     try:
         address = item["data"]["address"]
+
+        # Check if contract has already been added
+        contract_in_database = database['contracts'].find_one({
+            "address": address
+        })
+        if contract_in_database:
+            return True
+
         chain = item["data"]["chain"]
         token_list = get_collection_tokens(address, chain)
         for token in token_list:
