@@ -19,9 +19,9 @@ export const searchClosestNFTs = async (image: String, amount: Number,
   }
 }
 
-export const getTSNE = async (vectors) => {
+export const getTSVD = async (vectors) => {
   const mdsResult = await axios.post(
-    urls.api.search.hosted + '/api/tsne',
+    urls.api.search.hosted + '/api/tsvd',
     {
       vectors
     }

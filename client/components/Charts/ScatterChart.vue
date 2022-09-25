@@ -96,7 +96,7 @@ export default {
         plugins: {
           title: {
             display: true,
-            text: 'T Distributed Stochastic Neighbor Embedding Visualization',
+            text: 'Truncated Singular Value Decomposition',
             font: {
               size: 14,
               family: 'Outfit',

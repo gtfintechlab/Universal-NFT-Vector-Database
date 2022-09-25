@@ -4,6 +4,8 @@ from dotenv import load_dotenv, find_dotenv
 from database import update_analytics
 from flask_cors import CORS
 from sklearn.manifold import TSNE
+from sklearn.decomposition import TruncatedSVD
+import numpy as np
 
 load_dotenv(find_dotenv())
 
@@ -39,13 +41,15 @@ def search():
         update_analytics(['searchApiFailure'])
         return {"success": False, "error": e}
 
-@app.route("/api/tsne", methods=['POST'])
-def t_distributed_stochastic_neighbor_embedding():
+@app.route("/api/tsvd", methods=['POST'])
+def truncated_singular_value_decomposition():
     vectors = request.json['vectors']
     individual_ids = list(vectors.keys())
     individual_vectors = [vectors[vector_id] for vector_id in individual_ids]
-    tsne = TSNE(n_components=2,init='pca')
-    points = tsne.fit_transform(individual_vectors)
+
+    tsvd = TruncatedSVD(n_components=2, n_iter=10, random_state=0)
+    points = tsvd.fit_transform(np.array(individual_vectors))
+
     result = {}
     for index, point in enumerate(points):
         result[individual_ids[index]] = [float(pt) for pt in point]

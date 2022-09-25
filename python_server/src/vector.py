@@ -1,18 +1,24 @@
 import base64
 import io
+import os
 from PIL import Image
 from img2vec_pytorch import Img2Vec
 from utils.get_secrets import get_all_secrets
 import requests
+from towhee import pipeline
+from uuid import uuid4
 
 secrets_dict = get_all_secrets()
 
 def convert_to_vector(base64String):
     try:
-        img2vec = Img2Vec(cuda=False, model='efficientnet_b5')
         file_content = base64.b64decode(base64String)
-        image = Image.open(io.BytesIO(file_content)).convert('RGB')
-        vector = img2vec.get_vec(image, tensor=False)
+        image = Image.open(io.BytesIO(file_content))
+        path = 'tmp/' + str(uuid4()) + '.png'
+        image.save(path, "PNG")
+        embedding_pipeline = pipeline('towhee/image-embedding-regnety-080')
+        vector = embedding_pipeline(path)
+        os.remove(path)
         return {"success": True, "vector": vector}
     except Exception as e:
         print(e)

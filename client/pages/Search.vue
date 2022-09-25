@@ -22,7 +22,7 @@
 
 import UploadCard from '../components/UploadCard.vue'
 import ChartCard from '../components/ChartCard.vue'
-import { searchClosestNFTs, getTSNE } from '../actions/Search'
+import { searchClosestNFTs, getTSVD } from '../actions/Search'
 import ImageCardGroup from '~~/components/Groups/ImageCardGroup.vue'
 import { noImageLoaded } from '~~/utils/Config'
 
@@ -90,7 +90,7 @@ export default {
 
       vectorDict.source = sourceVector
 
-      const tsneResult = await getTSNE(vectorDict)
+      const tsneResult = await getTSVD(vectorDict)
       const sourceDataset = {
         label: 'Source Image',
         fill: false,

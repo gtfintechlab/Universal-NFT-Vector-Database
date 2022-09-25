@@ -2,6 +2,7 @@ import requests
 from secrets_vars import secret_vars
 from PIL import Image
 from img2vec_pytorch import Img2Vec
+from towhee import pipeline
 
 def get_collection_tokens(contractAddress, chain="ethereum"):
     # Boolean value for pagnication of Alchemy API Response
@@ -58,9 +59,8 @@ def get_collection_tokens_helper(contractAddress, startToken="", chain="ethereum
 
 def convert_to_vector(image_path):
     try:
-        img2vec = Img2Vec(cuda=False, model='efficientnet_b5')
-        image = Image.open(requests.get(image_path, stream=True, timeout=5).raw).convert('RGB')
-        vector = img2vec.get_vec(image, tensor=False)
+        embedding_pipeline = pipeline('towhee/image-embedding-regnety-080')
+        vector = embedding_pipeline(image_path)
         return True, vector
     except Exception as e:
         return False, None
@@ -84,3 +84,6 @@ def insert_pinecone(input_vector, vector_id, vector_metadata):
     }
     response = requests.post(secret_vars['ALL_NFTS_PINECONE_ENDPOINT'] + '/vectors/upsert', headers=headers, json=json_data)
     return response
+
+if __name__ == '__main__':
+    print(convert_to_vector('https://samratsahoo.github.io/samrat.jpg'))
