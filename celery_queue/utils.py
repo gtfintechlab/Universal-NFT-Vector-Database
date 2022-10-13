@@ -86,4 +86,4 @@ def insert_pinecone(input_vector, vector_id, vector_metadata):
     return response
 
 if __name__ == '__main__':
-    print(convert_to_vector('https://samratsahoo.github.io/samrat.jpg'))
+    print(convert_to_vector(''))

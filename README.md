@@ -1,6 +1,6 @@
 ## What is the Universal NFT Vector Database
 
-The Universal NFT Vector Database is an initiative started by the Georgia Tech FinTech Lab in an effort to store a vectorized version of every image-based Ethereum NFT (ERC-721). This project leverages a variety of technology to make this possible including Alchemy API, the Graph Protocol, and Pinecone.io.
+The Universal NFT Vector Database is an initiative to store a vectorized version of every image-based Ethereum NFT (ERC-721). This project leverages a variety of technology to make this possible including Alchemy API, the Graph Protocol, and Pinecone.
 
 ## Project Milestones
 
@@ -23,7 +23,7 @@ The Universal NFT Vector Database is an initiative started by the Georgia Tech F
 
 ## Supporting / Contributing to this Project
 
-We always welcome pull requests to this repository for fixing and further improving our database. Alternatively, if you would like to sponsor this project, please reach out to ssahoo61@gatech.edu
+We always welcome pull requests to this repository for fixing and further improving our database.
 
 ## Installation Setup - Setup Script
 
@@ -35,7 +35,7 @@ We have provided a setup script available (`setup.sh`) to setup the system local
 
 ### Environment Variables
 
-You will also need to add an enviornment file for this project. Please contact Samrat to obtain this environment variable; Directories with an .env file:
+You will also need to add an enviornment file for this project. Directories with an .env file:
 
 - `python_server/src/`
 - `client/`
