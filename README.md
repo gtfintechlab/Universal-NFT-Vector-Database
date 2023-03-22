@@ -41,7 +41,7 @@ You will also need to add an enviornment file for this project. Directories with
 - `celery_queue/`
 - `benchmarks/`
 
-We have provided an `.env.example` for each .env file. We also provide a `doppler.example` to see what other environment variables we have because we use ![Doppler](https://www.doppler.com/) as our unified secret management software.
+We have provided an `.env.example` for each .env file. We also provide a `doppler.example` to see what other environment variables we have because we use [Doppler](https://www.doppler.com/) as our unified secret management software.
 
 ### Run Setup Script
 
